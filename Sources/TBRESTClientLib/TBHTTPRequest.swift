@@ -1,0 +1,66 @@
+//
+//  TBApiHTTPRequest.swift
+//  
+//
+//  Created by Johannes Kinzig on 06.09.24.
+//
+
+import Foundation
+
+class TBHTTPRequest {
+    
+    // MARK: - Properties
+    var httpClient: SimpleHTTPClient
+    private(set) var errorHandler: ((TBAppError) -> Void)? = nil
+    
+    // MARK: - Initialization
+    init(httpSessionHandler: URLSessionProtocol) {
+        httpClient = SimpleHTTPClient(sessionHandler: httpSessionHandler)
+    }
+    
+    // MARK: - Implementation
+    /**
+     Register application error function – called when the TB server application responds with an error
+     - Parameter errorHandler: callable which taks a single argument of type conforming to 'TBErrorDataModel' protoco
+     - Returns: Void
+     */
+    func registerAppErrorHandler(errorHandler: @escaping (TBAppError) -> Void) {
+        self.errorHandler = errorHandler
+    }
+    
+    /**
+     TB API request simplifying each http call
+     - Parameter fromEndpoint: Specify endpoint by giving the endpoint URL als 'TBApiEndpoints conforming protocol type'
+     - Parameter usingMethod: Give the desired HTTP method, default: .post
+     - Parameter withPayload: HTTP request payload given as Dictionary<String, Any>
+     - Parameter authData: Authentication data
+     - Parameter expectedTBResponseObject: expected TB Data Model Object
+     - Parameter successHandler: function to run in case of success
+     */
+    internal func tbApiRequest(fromEndpoint endpointURL: String,
+                              usingMethod httpMethod: SupportedHTTPMethods = .post,
+                              withPayload payload: Dictionary<String, Any>? = nil,
+                              authToken authData: AuthLogin? = nil,
+                              expectedTBResponseObject responseObject: TBDataModel.Type,
+                              successHandler: @escaping (TBDataModel) -> Void)
+    -> Void {
+        var tbheaders = ["Content-Type": "application/json", "Accept": "application/json"]
+        if let token = authData?.token { tbheaders["x-authorization"] = "Bearer \(token)" }
+        httpClient.doHttpRequest(from: endpointURL, usingMethod: httpMethod, withhttpHeaders: tbheaders, withPayload: payload, expectedTBResponseObject: responseObject) { result in
+            switch result {
+            case .success(let responseObject):
+                successHandler(responseObject)
+            case .failure(let error):
+                if case TBHTTPClientRequestError.tbAppError(let apperror) = error {
+                    // run registered app error handler
+                    self.errorHandler?(apperror)
+                    // TODO: add logger
+                    print("App Error Message: \(apperror)")
+                } else {
+                    // TODO: add logger
+                    print("HTTP Request Error: \(error)")
+                }
+            }
+        }
+    }
+}
