@@ -26,6 +26,3 @@ This project was started as part of larger project which required API access to 
 
 ## Contact
 * Johannes Kinzig – [Mail](mailto:johannes@parallelogon-software.com) – [Web](https://parallelogon-software.com)
-
-#### Repository and Project avatar
-[Networking Icons by srip – on flaticon](https://www.flaticon.com/free-icon/networking_3797569)
