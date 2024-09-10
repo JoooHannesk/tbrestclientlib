@@ -56,13 +56,13 @@ struct ServerSettings: TBDataModel {
     let password: String
 }
 
-
 struct AuthLogin: TBResponseDataModel {
     let token: String
     let refreshToken: String
 }
 
 struct User: TBResponseDataModel {
+    // TODO: implement equality check
     let id: ID
     let createdTime: Int
     let tenantId: ID
@@ -76,12 +76,12 @@ struct User: TBResponseDataModel {
     let additionalInfo: AdditionalInfo?
 }
 
-// TODO: implement equality check because there exists more than one API call to receive devices
 struct Device: TBResponseDataModel {
     /** represent
      - Device objects
      - DeviceInfo objects
      */
+    // TODO: implement equality check because there exists more than one API call to receive devices
     let id: ID
     let createdTime: Int
     let tenantId: ID
@@ -91,25 +91,19 @@ struct Device: TBResponseDataModel {
     let label: String?
     let deviceProfileId: ID
     
-    // the following properties are only defined for DeviceInfo objects
+    // the following properties are defined for DeviceInfo objects only
     let customerTitle: String?
     let customerIsPublic: Bool?
     let deviceProfileName: String?
     let active: Bool?
 }
 
-
-// MARK: - Application Error Data Models
-struct TBAppError: TBErrorDataModel {
-    let status: Int
-    let message: String
-    let errorCode: Int
-    let timestamp: Int
+struct DeviceProfile: TBResponseDataModel {
+    // TODO: implement equality check because there exists more than one API call to receive object
 }
 
-
-// MARK: - TB Schema Models
 struct ID: TBResponseDataModel {
+    // TODO: implement equality check
     let id: String
     let entityType: String
 }
@@ -126,9 +120,17 @@ struct AdditionalInfo: TBResponseDataModel {
     let userCredentialsEnabled: Bool?
 }
 
-struct PageDataDevice: TBResponseDataModel, PageDataResponseType {
-    let data: Array<Device>?
+struct PageDataContainer<T>: TBResponseDataModel, PageDataResponseType where T: TBResponseDataModel {
+    let data: Array<T>?
     let totalPages: Int
     let totalElements: Int
     let hasNext: Bool
+}
+
+// MARK: - Application Error Data Models
+struct TBAppError: TBErrorDataModel {
+    let status: Int
+    let message: String
+    let errorCode: Int
+    let timestamp: Int
 }

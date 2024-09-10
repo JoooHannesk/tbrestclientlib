@@ -8,16 +8,16 @@ Simple client library for ThingsBoard server installations implementing the admi
 * Integration tests executed using ThingsBoard CE 3.7.0 with an on-premise installation
 
 ## Project Status
-This project was started as part of larger project which required API access to ThingsBoard instances – this library is continuously growing but **has not implemented all ThingsBoard API endpoints**.
+This project was started as part of larger project which required API access to ThingsBoard instances – this library is continuously growing but **has not implemented all ThingsBoard API endpoints**. I tried to grab all elements for each endpoint as defined by the ThingsBoard api-schema but omitted the ones which seemed too far away for my current use case. Check ´TbDataModels.swift´ for detailed properties contained in each schema model.  
 
 ## Installation
-* TODO!
+* TODO - documentation
 
 ## Usage
-* TODO!
+* TODO - documentation
 
 ## Integration Tests
-* TODO: Explain how to edit ServerSettings.sample.json to run integration tests against own ThingsBoard installation / server
+* TODO: describe how to edit ServerSettings.sample.json to run integration tests against own ThingsBoard installation / server
 
 ## License
 * MIT License
