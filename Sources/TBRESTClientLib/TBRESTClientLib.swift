@@ -91,15 +91,15 @@ class TBUserApiClient: TBHTTPRequest {
                             textSearch: String? = nil,
                             sortProperty: TbQuerySortProperty = .name,
                             sortOrder: TbQuerysortOrder = .ascending,
-                            responseHandler: ((PageDataDevice) -> Void)?) -> Void {
+                            responseHandler: ((PageDataContainer<Device>) -> Void)?) -> Void {
         let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getCustomerDevices,
                                                                 replacePaths: [URLModifier(searchString: "{?customerId?}", replaceString: customerId)],
                                                                 pageSize: pageSize, page: page, type: type,
                                                                 textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseObject: PageDataDevice.self) { responseObject -> Void in
-            responseHandler?(responseObject as! PageDataDevice)
+                     authToken: self.authData, expectedTBResponseObject: PageDataContainer<Device>.self) { responseObject -> Void in
+            responseHandler?(responseObject as! PageDataContainer<Device>)
         }
     }
     
@@ -124,7 +124,7 @@ class TBUserApiClient: TBHTTPRequest {
                                 textSearch: String? = nil,
                                 sortProperty: TbQuerySortProperty = .name,
                                 sortOrder: TbQuerysortOrder = .ascending,
-                                responseHandler: ((PageDataDevice) -> Void)?) -> Void {
+                                responseHandler: ((PageDataContainer<Device>) -> Void)?) -> Void {
         let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getCustomerDeviceInfos,
                                                                 replacePaths: [URLModifier(searchString: "{?customerId?}", replaceString: customerId)],
                                                                 pageSize: pageSize, page: page, type: type,
@@ -132,8 +132,8 @@ class TBUserApiClient: TBHTTPRequest {
                                                                 active: active, textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseObject: PageDataDevice.self) { responseObject -> Void in
-            responseHandler?(responseObject as! PageDataDevice)
+                     authToken: self.authData, expectedTBResponseObject: PageDataContainer<Device>.self) { responseObject -> Void in
+            responseHandler?(responseObject as! PageDataContainer<Device>)
         }
     }
 }
