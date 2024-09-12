@@ -1,6 +1,6 @@
 //
 //  tb-data-models.swift
-//  TBClientAPI
+//
 //
 //  Created by Johannes Kinzig on 01.08.24.
 //
@@ -15,7 +15,7 @@ protocol TBDataModel: Codable, CustomStringConvertible {
 }
 
 extension TBDataModel {
-    var description: String { return getStringRepresentation(for: self) }
+    public var description: String { return getStringRepresentation(for: self) }
 }
 
 protocol TBResponseDataModel: TBDataModel  { }
@@ -56,7 +56,7 @@ struct ServerSettings: TBDataModel {
     let password: String
 }
 
-struct AuthLogin: TBResponseDataModel {
+public struct AuthLogin: TBResponseDataModel {
     let token: String
     let refreshToken: String
 }
@@ -100,6 +100,22 @@ struct Device: TBResponseDataModel {
 
 struct DeviceProfile: TBResponseDataModel {
     // TODO: implement equality check because there exists more than one API call to receive object
+    let id: ID
+    let createdTime: Int?
+    let tenantId: ID
+    let name: String
+    let description: String?
+    let image: String?
+    let type: String
+    let transportType: String
+    let provisionType: String?
+    let defaultRuleChainId: ID?
+    let defaultDashboardId: ID?
+    let defaultQueueName: String?
+    let provisionDeviceKey: String?
+    let firmwareId: ID?
+    let softwareId: ID?
+    let defaultEdgeRuleChainId: ID?
 }
 
 struct ID: TBResponseDataModel {

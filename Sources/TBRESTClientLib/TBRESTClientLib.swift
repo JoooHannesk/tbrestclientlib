@@ -8,7 +8,7 @@
 
 import Foundation
 
-class TBUserApiClient: TBHTTPRequest {
+public class TBUserApiClient: TBHTTPRequest {
     
     // MARK: - Properties
     typealias TBApiEndpoints = TbAPIEndpointsV1
@@ -36,18 +36,18 @@ class TBUserApiClient: TBHTTPRequest {
         super.init(httpSessionHandler: httpSessionHandler)
     }
     
-    convenience init?(baseUrlStr: String, usernameStr: String, passwordStr: String) throws {
+    public convenience init?(baseUrlStr: String, usernameStr: String, passwordStr: String) throws {
         try self.init(baseUrlStr: baseUrlStr, usernameStr: usernameStr, passwordStr: passwordStr, httpSessionHandler: URLSession.shared)
     }
     
     // MARK: – Authentication
     /**
      Request authentication with the thingsboard server to optain an authentication token
-     - Parameter responseHandler: Register a function/method to be called after login succeeded
+     - Parameter responseHandler: takes an 'AuthLogin' as parameter and is called upon successful server response
      - Returns: Void
      - Note: authData contains token and refreshToken after login succeeded
      */
-    func login(responseHandler: ((AuthLogin) -> Void)? = nil) -> Void {
+    public func login(responseHandler: ((AuthLogin) -> Void)? = nil) -> Void {
         let authDataDict: Dictionary<String, String> = ["username": serverSettings.username, "password": serverSettings.password]
         tbApiRequest(fromEndpoint: AEM.getEndpointURL(TBApiEndpoints.login),
                      withPayload: authDataDict,
@@ -60,8 +60,9 @@ class TBUserApiClient: TBHTTPRequest {
     // MARK: - User related requests
     /**
      Get currently logged in user info
-     - Parameter responseHandler: Register a function/method to be called after user info was fetched
+     - Parameter responseHandler: takes a 'User' as parameter and is called upon successful server response
      - Returns: Void
+     - Note: for supported data models as parameters see: TbDataModels.swift
      */
     func getUser(responseHandler: ((User) -> Void)? = nil) -> Void {
         tbApiRequest(fromEndpoint: AEM.getEndpointURL(TBApiEndpoints.getUser),
@@ -75,7 +76,8 @@ class TBUserApiClient: TBHTTPRequest {
     // MARK: - Device related requests
     /**
      Get Customer Devices – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     Receives a page of devices assigned to the customer (by ID). Specify parameters to filter the results, which are wrapped inside a PageData object that allows to iterate over the result set using pagination.
+     Receives a page of devices assigned to the customer (by ID). Specify parameters to filter the results, which are wrapped inside a PageData object that
+     allows to iterate over the result set using pagination.
      - Parameter customerId: A string value representing the customer id
      - Parameter pageSize: Maximum amount of entities in a one page
      - Parameter page: Sequence number of page starting from 0
@@ -83,6 +85,9 @@ class TBUserApiClient: TBHTTPRequest {
      - Parameter textSearch: The case insensitive 'substring' filter based on the device name.
      - Parameter sortProperty: sort resutls according to enumeration 'TbQuerySortProperty'; default: .name
      - Parameter sortOrder: sort results in ascending or descending order, state according to 'TbQuerysortOrder'; default: .ascending
+     - Parameter responseHandler: takes a 'PageDataContainer<Device>' as parameter and is called upon successful server response
+     - Returns: Void
+     - Note: for supported data models as parameters see: TbDataModels.swift
      */
     func getCustomerDevices(customerId: String,
                             pageSize: Int32 = Int32.max,
@@ -91,7 +96,8 @@ class TBUserApiClient: TBHTTPRequest {
                             textSearch: String? = nil,
                             sortProperty: TbQuerySortProperty = .name,
                             sortOrder: TbQuerysortOrder = .ascending,
-                            responseHandler: ((PageDataContainer<Device>) -> Void)?) -> Void {
+                            responseHandler: ((PageDataContainer<Device>) -> Void)?)
+    -> Void {
         let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getCustomerDevices,
                                                                 replacePaths: [URLModifier(searchString: "{?customerId?}", replaceString: customerId)],
                                                                 pageSize: pageSize, page: page, type: type,
@@ -105,7 +111,8 @@ class TBUserApiClient: TBHTTPRequest {
     
     /**
      Get Customer Device Infos – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     Receives a page of devices info objects assigned to the customer (by ID). Specify parameters to filter the results, which are wrapped inside a PageData object that allows you to iterate over the result set using pagination.
+     Receives a page of devices info objects assigned to the customer (by ID). Specify parameters to filter the results, which are wrapped inside a PageData object that
+     allows to iterate over the result set using pagination.
      - Parameter pageSize: Maximum amount of entities in a one page
      - Parameter page: Sequence number of page starting from 0
      - Parameter type: Device type as the name of the device profile
@@ -114,6 +121,9 @@ class TBUserApiClient: TBHTTPRequest {
      - Parameter textSearch: The case insensitive 'substring' filter based on the device name
      - Parameter sortProperty: sort resutls according to enumeration 'TbQuerySortProperty'; default: .name
      - Parameter sortOrder: sort results in ascending or descending order, state according to 'TbQuerysortOrder'; default: .ascending
+     - Parameter responseHandler: takes a 'PageDataContainer<Device>' as parameter and is called upon successful server response
+     - Returns: Void
+     - Note: for supported data models as parameters see: TbDataModels.swift
      */
     func getCustomerDeviceInfos(customerId: String,
                                 pageSize: Int32 = Int32.max,
@@ -124,7 +134,8 @@ class TBUserApiClient: TBHTTPRequest {
                                 textSearch: String? = nil,
                                 sortProperty: TbQuerySortProperty = .name,
                                 sortOrder: TbQuerysortOrder = .ascending,
-                                responseHandler: ((PageDataContainer<Device>) -> Void)?) -> Void {
+                                responseHandler: ((PageDataContainer<Device>) -> Void)?)
+    -> Void {
         let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getCustomerDeviceInfos,
                                                                 replacePaths: [URLModifier(searchString: "{?customerId?}", replaceString: customerId)],
                                                                 pageSize: pageSize, page: page, type: type,
@@ -134,6 +145,70 @@ class TBUserApiClient: TBHTTPRequest {
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
                      authToken: self.authData, expectedTBResponseObject: PageDataContainer<Device>.self) { responseObject -> Void in
             responseHandler?(responseObject as! PageDataContainer<Device>)
+        }
+    }
+
+    
+    // MARK: - Device Profile related requests
+    /**
+     Get Device Profile Infos – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     Receives a page of devices profile info objects defined for the tenant. Specify parameters to filter the results, which are wrapped inside a PageData object that
+     allows to iterate over result set using pagination.
+     - Parameter pageSize: Maximum amount of entities in a one page
+     - Parameter page: Sequence number of page starting from 0
+     - Parameter textSearch: The case insensitive 'substring' filter based on the device name
+     - Parameter sortProperty: sort resutls according to enumeration 'TbQuerySortProperty'; default: .name
+     - Parameter sortOrder: sort results in ascending or descending order, state according to 'TbQuerysortOrder'; default: .ascending
+     - Parameter transportType: Type of the transport the device profile support: DEFAULT, MQTT, COAP, LWM2M, SNMP
+     - Parameter responseHandler: takes a 'PageDataContainer<DeviceProfile>' as parameter and is called upon successful server response
+     - Returns: void
+     */
+    func getDeviceProfileInfos(
+        pageSize: Int32 = Int32.max,
+        page: Int32 = 0,
+        textSearch: String? = nil,
+        sortProperty: TbQuerySortProperty = .name,
+        sortOrder: TbQuerysortOrder = .ascending,
+        transportType: TbQueryTransportType? = nil,
+        responseHandler: ((PageDataContainer<DeviceProfile>) -> Void)?)
+    -> Void {
+        let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getDeviceProfileInfos,
+                                                                pageSize: pageSize, page: page,
+                                                                textSearch: textSearch, transportType: transportType,
+                                                                sortProperty: sortProperty, sortOrder: sortOrder)
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                     authToken: self.authData, expectedTBResponseObject: PageDataContainer<DeviceProfile>.self) { responseObject -> Void in
+            responseHandler?(responseObject as! PageDataContainer<DeviceProfile>)
+        }
+    }
+     
+    /**
+     Get Device Profiles – requires 'TENANT\_ADMIN' authority
+     Receives a page of devices profile objects defined for the tenant. Specify parameters to filter the results which are wrapped insude a PageData object that
+     allows to iterate over result set using pagination.
+     - Parameter pageSize: Maximum amount of entities in a one page
+     - Parameter page: Sequence number of page starting from 0
+     - Parameter textSearch: The case insensitive 'substring' filter based on the device name
+     - Parameter sortProperty: sort resutls according to enumeration 'TbQuerySortProperty'; default: .name
+     - Parameter sortOrder: sort results in ascending or descending order, state according to 'TbQuerysortOrder'; default: .ascending
+     - Parameter responseHandler: takes a 'PageDataContainer<DeviceProfile>' as parameter and is called upon successful server response
+     - Returns: void
+     - Note: works with 'TENANT\_ADMIN' authority only!
+     */
+    func getDeviceProfiles(
+        pageSize: Int32 = Int32.max,
+        page: Int32 = 0,
+        textSearch: String? = nil,
+        sortProperty: TbQuerySortProperty = .name,
+        sortOrder: TbQuerysortOrder = .ascending,
+        responseHandler: ((PageDataContainer<DeviceProfile>) -> Void)?)
+    -> Void {
+        let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getDeviceProfiles,
+                                                                pageSize: pageSize, page: page, textSearch: textSearch,
+                                                                sortProperty: sortProperty, sortOrder: sortOrder)
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                     authToken: self.authData, expectedTBResponseObject: PageDataContainer<DeviceProfile>.self) { responseObject -> Void in
+            responseHandler?(responseObject as! PageDataContainer<DeviceProfile>)
         }
     }
 }

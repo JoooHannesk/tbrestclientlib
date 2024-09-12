@@ -1,0 +1,294 @@
+{
+  "data": [
+    {
+      "id": {
+        "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+        "entityType": "DEVICE_PROFILE"
+      },
+      "createdTime": 1609459200000,
+      "tenantId": {
+        "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+        "entityType": "TENANT"
+      },
+      "name": "Moisture Sensor",
+      "description": "string",
+      "image": "string",
+      "type": "DEFAULT",
+      "transportType": "DEFAULT",
+      "provisionType": "DISABLED",
+      "defaultRuleChainId": {
+        "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+        "entityType": "RULE_CHAIN"
+      },
+      "defaultDashboardId": {
+        "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+        "entityType": "DASHBOARD"
+      },
+      "defaultQueueName": "string",
+      "provisionDeviceKey": "string",
+      "firmwareId": {
+        "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+        "entityType": "OTA_PACKAGE"
+      },
+      "softwareId": {
+        "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+        "entityType": "OTA_PACKAGE"
+      },
+      "defaultEdgeRuleChainId": {
+        "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+        "entityType": "RULE_CHAIN"
+      },
+      "default": true,
+      "profileData": {
+        "configuration": {
+          "type": "string"
+        },
+        "transportConfiguration": {
+          "type": "string",
+          "coapDeviceTypeConfiguration": {
+            "coapDeviceType": "string"
+          },
+          "clientSettings": {
+            "powerMode": "PSM",
+            "psmActivityTimer": 9007199254740991,
+            "edrxCycle": 9007199254740991,
+            "pagingTransmissionWindow": 9007199254740991
+          }
+        },
+        "provisionConfiguration": {
+          "provisionDeviceSecret": "string",
+          "type": "string"
+        },
+        "alarms": [
+          {
+            "id": "highTemperatureAlarmID",
+            "alarmType": "High Temperature Alarm",
+            "createRules": {
+              "additionalProp1": {
+                "condition": {
+                  "condition": [
+                    {
+                      "key": {
+                        "type": "TIME_SERIES",
+                        "key": "temp"
+                      },
+                      "valueType": "NUMERIC",
+                      "value": "string",
+                      "predicate": {
+                        "type": "string",
+                        "operation": "EQUAL",
+                        "value": {
+                          "defaultValue": true,
+                          "userValue": true,
+                          "dynamicValue": {
+                            "sourceType": "CURRENT_TENANT",
+                            "sourceAttribute": "string",
+                            "inherit": true
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "spec": {
+                    "type": "string",
+                    "unit": "NANOSECONDS",
+                    "predicate": {
+                      "defaultValue": 9007199254740991,
+                      "userValue": 9007199254740991,
+                      "dynamicValue": {
+                        "sourceType": "CURRENT_TENANT",
+                        "sourceAttribute": "string",
+                        "inherit": true
+                      }
+                    }
+                  }
+                },
+                "schedule": {
+                  "type": "ANY_TIME",
+                  "dynamicValue": {
+                    "sourceType": "CURRENT_TENANT",
+                    "sourceAttribute": "string",
+                    "inherit": true
+                  }
+                },
+                "alarmDetails": "string",
+                "dashboardId": {
+                  "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+                  "entityType": "DASHBOARD"
+                }
+              },
+              "additionalProp2": {
+                "condition": {
+                  "condition": [
+                    {
+                      "key": {
+                        "type": "TIME_SERIES",
+                        "key": "temp"
+                      },
+                      "valueType": "NUMERIC",
+                      "value": "string",
+                      "predicate": {
+                        "type": "string",
+                        "operation": "EQUAL",
+                        "value": {
+                          "defaultValue": true,
+                          "userValue": true,
+                          "dynamicValue": {
+                            "sourceType": "CURRENT_TENANT",
+                            "sourceAttribute": "string",
+                            "inherit": true
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "spec": {
+                    "type": "string",
+                    "unit": "NANOSECONDS",
+                    "predicate": {
+                      "defaultValue": 9007199254740991,
+                      "userValue": 9007199254740991,
+                      "dynamicValue": {
+                        "sourceType": "CURRENT_TENANT",
+                        "sourceAttribute": "string",
+                        "inherit": true
+                      }
+                    }
+                  }
+                },
+                "schedule": {
+                  "type": "ANY_TIME",
+                  "dynamicValue": {
+                    "sourceType": "CURRENT_TENANT",
+                    "sourceAttribute": "string",
+                    "inherit": true
+                  }
+                },
+                "alarmDetails": "string",
+                "dashboardId": {
+                  "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+                  "entityType": "DASHBOARD"
+                }
+              },
+              "additionalProp3": {
+                "condition": {
+                  "condition": [
+                    {
+                      "key": {
+                        "type": "TIME_SERIES",
+                        "key": "temp"
+                      },
+                      "valueType": "NUMERIC",
+                      "value": "string",
+                      "predicate": {
+                        "type": "string",
+                        "operation": "EQUAL",
+                        "value": {
+                          "defaultValue": true,
+                          "userValue": true,
+                          "dynamicValue": {
+                            "sourceType": "CURRENT_TENANT",
+                            "sourceAttribute": "string",
+                            "inherit": true
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "spec": {
+                    "type": "string",
+                    "unit": "NANOSECONDS",
+                    "predicate": {
+                      "defaultValue": 9007199254740991,
+                      "userValue": 9007199254740991,
+                      "dynamicValue": {
+                        "sourceType": "CURRENT_TENANT",
+                        "sourceAttribute": "string",
+                        "inherit": true
+                      }
+                    }
+                  }
+                },
+                "schedule": {
+                  "type": "ANY_TIME",
+                  "dynamicValue": {
+                    "sourceType": "CURRENT_TENANT",
+                    "sourceAttribute": "string",
+                    "inherit": true
+                  }
+                },
+                "alarmDetails": "string",
+                "dashboardId": {
+                  "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+                  "entityType": "DASHBOARD"
+                }
+              }
+            },
+            "clearRule": {
+              "condition": {
+                "condition": [
+                  {
+                    "key": {
+                      "type": "TIME_SERIES",
+                      "key": "temp"
+                    },
+                    "valueType": "NUMERIC",
+                    "value": "string",
+                    "predicate": {
+                      "type": "string",
+                      "operation": "EQUAL",
+                      "value": {
+                        "defaultValue": true,
+                        "userValue": true,
+                        "dynamicValue": {
+                          "sourceType": "CURRENT_TENANT",
+                          "sourceAttribute": "string",
+                          "inherit": true
+                        }
+                      }
+                    }
+                  }
+                ],
+                "spec": {
+                  "type": "string",
+                  "unit": "NANOSECONDS",
+                  "predicate": {
+                    "defaultValue": 9007199254740991,
+                    "userValue": 9007199254740991,
+                    "dynamicValue": {
+                      "sourceType": "CURRENT_TENANT",
+                      "sourceAttribute": "string",
+                      "inherit": true
+                    }
+                  }
+                }
+              },
+              "schedule": {
+                "type": "ANY_TIME",
+                "dynamicValue": {
+                  "sourceType": "CURRENT_TENANT",
+                  "sourceAttribute": "string",
+                  "inherit": true
+                }
+              },
+              "alarmDetails": "string",
+              "dashboardId": {
+                "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+                "entityType": "DASHBOARD"
+              }
+            },
+            "propagate": true,
+            "propagateToOwner": true,
+            "propagateToTenant": true,
+            "propagateRelationTypes": [
+              "string"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "totalPages": 1073741824,
+  "totalElements": 9007199254740991,
+  "hasNext": true
+}
