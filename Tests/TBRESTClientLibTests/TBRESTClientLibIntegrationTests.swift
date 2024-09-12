@@ -64,4 +64,23 @@ final class TBRESTClientLibIntegrationLoginAuth: TCGTBRESTClientLibLoginAuth {
         getCustomerDeviceInfos(apiClient: tbTestClient)
     }
     
+    /**
+     Test getDeviceProfileInfos()
+     */
+    func testGetDeviceProfileInfos() {
+        let tbTestClient = prepare().0
+        loginSucceeds(apiClient: tbTestClient)
+        getDeviceProfileInfos(apiClient: tbTestClient)
+    }
+    
+    /**
+     Test getDeviceProfiles()
+     - Note: works with 'TENANT\_ADMIN' authority only!
+     */
+    func testGetDeviceProfiles() {
+        let tbTestClient = prepare().0
+        loginSucceeds(apiClient: tbTestClient)
+        getDeviceProfiles(apiClient: tbTestClient)
+    }
+    
 }

@@ -81,6 +81,23 @@ final class TBRESTClientLibUnitLoginAuth: TCGTBRESTClientLibLoginAuth {
         getCustomerDeviceInfos(apiClient: tbTestClient)
     }
     
+    /**
+     Test getDeviceProfileInfos()
+     */
+    func testGetDeviceProfileInfos() {
+        let tbTestClient = testableApiClient.getUnitTestableApiClient(expectedHTTPResponse: "GetDeviceProfileInfos", expectedHTTPStatusCode: 200)
+        getDeviceProfileInfos(apiClient: tbTestClient)
+    }
+    
+    /**
+     Test getDeviceProfiles()
+     - Note: works with 'TENANT\_ADMIN' authority only!
+     */
+    func testGetDeviceProfiles() {
+        let tbTestClient = testableApiClient.getUnitTestableApiClient(expectedHTTPResponse: "GetDeviceProfiles", expectedHTTPStatusCode: 200)
+        getDeviceProfiles(apiClient: tbTestClient)
+    }
+    
 }
 
 // TODO: improve client implementation to react to different http status codes

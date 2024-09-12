@@ -7,7 +7,7 @@
 
 import Foundation
 
-class TBHTTPRequest {
+public class TBHTTPRequest {
     
     // MARK: - Properties
     var httpClient: SimpleHTTPClient

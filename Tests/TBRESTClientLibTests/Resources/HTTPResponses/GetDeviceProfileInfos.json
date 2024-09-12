@@ -1,0 +1,25 @@
+{
+  "data": [
+    {
+      "id": {
+        "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+        "entityType": "DEVICE_PROFILE"
+      },
+      "tenantId": {
+        "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+        "entityType": "TENANT"
+      },
+      "name": "string",
+      "image": "string",
+      "defaultDashboardId": {
+        "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+        "entityType": "DASHBOARD"
+      },
+      "type": "DEFAULT",
+      "transportType": "DEFAULT"
+    }
+  ],
+  "totalPages": 1073741824,
+  "totalElements": 9007199254740991,
+  "hasNext": true
+}
