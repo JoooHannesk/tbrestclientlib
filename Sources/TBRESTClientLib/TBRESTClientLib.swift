@@ -1,6 +1,6 @@
 //
 //  TBRESTClientLib.swift
-//  
+//
 //
 //  Created by Johannes Kinzig on 30.07.24.
 //
@@ -24,7 +24,9 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter usernameStr: user's username as utf8 string
      - Parameter passwordStr: user's password as utf8 string
      - Parameter httpSessionHandler: HTTP session handler to use for http request
-     - Note: Intention for httpSessionHandler: can take a mock-http session handler for unit testing the http calls
+     - Note: Intention for httpSessionHandler: can take a mock-http session handler for unit testing the http calls.
+     This initializer's intention is mainly to be used when performing unit testing. When using the library it is recommended to use the
+     convenience initializer.
      */
     init?(baseUrlStr: String, usernameStr: String, passwordStr: String, httpSessionHandler: URLSessionProtocol) throws {
         guard !baseUrlStr.isEmpty && !usernameStr.isEmpty && !passwordStr.isEmpty else {
@@ -36,6 +38,13 @@ public class TBUserApiClient: TBHTTPRequest {
         super.init(httpSessionHandler: httpSessionHandler)
     }
     
+    /**
+     Initialize TB client
+     - Parameter baseUrlStr: server url as utf8 string without trailing slash (no API endpoint, just base server URL)
+     - Parameter usernameStr: user's username as utf8 string
+     - Parameter passwordStr: user's password as utf8 string
+     - Parameter httpSessionHandler: HTTP session handler to use for http request
+     */
     public convenience init?(baseUrlStr: String, usernameStr: String, passwordStr: String) throws {
         try self.init(baseUrlStr: baseUrlStr, usernameStr: usernameStr, passwordStr: passwordStr, httpSessionHandler: URLSession.shared)
     }

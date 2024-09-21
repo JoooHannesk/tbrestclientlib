@@ -57,23 +57,28 @@ struct ServerSettings: TBDataModel {
 }
 
 public struct AuthLogin: TBResponseDataModel {
-    let token: String
-    let refreshToken: String
+    public let token: String
+    public let refreshToken: String
 }
 
-struct User: TBResponseDataModel {
-    // TODO: implement equality check
-    let id: ID
-    let createdTime: Int
-    let tenantId: ID
-    let customerId: ID
-    let email: String
-    let authority: String
-    let firstName: String
-    let lastName: String
-    let phone: String?
-    let name: String
-    let additionalInfo: AdditionalInfo?
+public struct User: TBResponseDataModel, Equatable {
+    public let id: ID
+    public let createdTime: Int
+    public let tenantId: ID
+    public let customerId: ID
+    public let email: String
+    public let authority: String
+    public let firstName: String
+    public let lastName: String
+    public let phone: String?
+    public let name: String
+    public let additionalInfo: AdditionalInfo?
+    
+    // Support equality check
+    public static func == (lhs: User, rhs: User) -> Bool {
+        return lhs.id == rhs.id && lhs.email == rhs.email && lhs.name == rhs.name
+    }
+    
 }
 
 struct Device: TBResponseDataModel {
@@ -118,22 +123,26 @@ struct DeviceProfile: TBResponseDataModel {
     let defaultEdgeRuleChainId: ID?
 }
 
-struct ID: TBResponseDataModel {
-    // TODO: implement equality check
-    let id: String
-    let entityType: String
+public struct ID: TBResponseDataModel, Equatable {
+    public let id: String
+    public let entityType: String
+    
+    // Support equality check
+    public static func == (lhs: ID, rhs: ID) -> Bool {
+        return lhs.id == rhs.id && lhs.entityType == rhs.entityType
+    }
 }
 
-struct AdditionalInfo: TBResponseDataModel {
-    let defaultDashboardFullscreen: Bool?
-    let defaultDashboardId: String?
-    let description: String?
-    let failedLoginAttempts: Int?
-    let homeDashboardHideToolbar: Bool?
-    let homeDashboardId: String?
-    let lang: String?
-    let lastLoginTs: Int?
-    let userCredentialsEnabled: Bool?
+public struct AdditionalInfo: TBResponseDataModel {
+    public let defaultDashboardFullscreen: Bool?
+    public let defaultDashboardId: String?
+    public let description: String?
+    public let failedLoginAttempts: Int?
+    public let homeDashboardHideToolbar: Bool?
+    public let homeDashboardId: String?
+    public let lang: String?
+    public let lastLoginTs: Int?
+    public let userCredentialsEnabled: Bool?
 }
 
 struct PageDataContainer<T>: TBResponseDataModel, PageDataResponseType where T: TBResponseDataModel {

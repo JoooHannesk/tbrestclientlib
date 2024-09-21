@@ -1,11 +1,18 @@
 # Usage
+Description of relevant methods and data models which are used to communicate with your thingsboard server.
 
-<!--@START_MENU_TOKEN@-->Summary<!--@END_MENU_TOKEN@-->
+## Currently supported methods
 
-## Overview
+## Data Models
+When requesting data from your thingsboard server, the response is wrapped into one or more of the following data models:
 
-<!--@START_MENU_TOKEN@-->Text<!--@END_MENU_TOKEN@-->
+### Initialization
+* ``TBUserApiClient/init(baseUrlStr:usernameStr:passwordStr:)``
 
-### Section header
+### Authentication / Users
+* ``AuthLogin``
+* ``User``
 
-<!--@START_MENU_TOKEN@-->Text<!--@END_MENU_TOKEN@-->
+### Device Profiles
+
+### Devices

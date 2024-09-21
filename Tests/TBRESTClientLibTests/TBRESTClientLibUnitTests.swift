@@ -9,7 +9,7 @@
 import XCTest
 @testable import TBRESTClientLib
 
-final class TBRESTClientLibUnitLoginFields: XCTestCase {
+final class TBRESTClientLibUnitTestsLoginFields: XCTestCase {
 
     /**
      Check that initializer runs without throwing when all login fields are given
@@ -34,7 +34,7 @@ final class TBRESTClientLibUnitLoginFields: XCTestCase {
     }
 }
 
-final class TBRESTClientLibUnitLoginAuth: TCGTBRESTClientLibLoginAuth {
+final class TBRESTClientLibUnitTests: FunctionalTestCasesTBRESTClientLib {
     
     let testableApiClient = CreateUnitTestableAPIClient(baseUrlStr: "url.server.com", usernameStr: "user@example.com", passwordStr: "supersecretpassword")
     
