@@ -9,7 +9,10 @@
 import XCTest
 @testable import TBRESTClientLib
 
-final class TBRESTClientLibUnitTestsLoginFields: XCTestCase {
+final class UnitTests: FunctionalTestCases {
+    
+    // prepare mock api client
+    let testableApiClient = MockAPIClientFactory(baseUrlStr: "url.server.com", usernameStr: "user@example.com", passwordStr: "supersecretpassword")
 
     /**
      Check that initializer runs without throwing when all login fields are given
@@ -32,17 +35,12 @@ final class TBRESTClientLibUnitTestsLoginFields: XCTestCase {
             }
         }
     }
-}
-
-final class TBRESTClientLibUnitTests: FunctionalTestCasesTBRESTClientLib {
-    
-    let testableApiClient = CreateUnitTestableAPIClient(baseUrlStr: "url.server.com", usernameStr: "user@example.com", passwordStr: "supersecretpassword")
     
     /**
      Test login() - expect failure with "Bad Credentials"
      */
     func testLoginFails() {
-        let tbTestClient = testableApiClient.getUnitTestableApiClient(expectedHTTPResponse: "LoginFailsBadCredentials", expectedHTTPStatusCode: 200)
+        let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "LoginFailsBadCredentials", expectedHTTPStatusCode: 200)
         loginFails(apiClient: tbTestClient)
     }
     
@@ -50,7 +48,7 @@ final class TBRESTClientLibUnitTests: FunctionalTestCasesTBRESTClientLib {
      Test login() - expect success
      */
     func testLoginSucceeds() {
-        let tbTestClient = testableApiClient.getUnitTestableApiClient(expectedHTTPResponse: "Login", expectedHTTPStatusCode: 200)
+        let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "Login", expectedHTTPStatusCode: 200)
         loginSucceeds(apiClient: tbTestClient)
     }
     
@@ -58,8 +56,22 @@ final class TBRESTClientLibUnitTests: FunctionalTestCasesTBRESTClientLib {
      Test getUser()
      */
     func testGetUser() {
-        let tbTestClient = testableApiClient.getUnitTestableApiClient(expectedHTTPResponse: "SampleOwnUserInfo", expectedHTTPStatusCode: 200)
-        getUser(apiClient: tbTestClient, expectedUsername: "user@example.com")
+        let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "SampleUser1Info", expectedHTTPStatusCode: 200)
+        getUser(apiClient: tbTestClient, expectedUsername: "user1@example.com")
+    }
+    
+    /**
+     Test 'User' data model equality check
+     */
+    func testUserEqualityCheck() {
+        let tbTestClient1 = testableApiClient.getMockApiClient(expectedHTTPResponse: "SampleUser1Info", expectedHTTPStatusCode: 200)
+        let tbTestClient2 = testableApiClient.getMockApiClient(expectedHTTPResponse: "SampleUser2Info", expectedHTTPStatusCode: 200)
+        let user1 = getUser(apiClient: tbTestClient1, expectedUsername: "user1@example.com")
+        let user2 = getUser(apiClient: tbTestClient2, expectedUsername: "user2@example.com")
+        // expected 'User's to be equal
+        XCTAssertEqual(user1, user1)
+        // expect 'User's to be unequal
+        XCTAssertNotEqual(user1, user2)
     }
     
     /**
@@ -67,7 +79,7 @@ final class TBRESTClientLibUnitTests: FunctionalTestCasesTBRESTClientLib {
      */
     func testGetCustomerDevices() {
         testGetUser()
-        let tbTestClient = testableApiClient.getUnitTestableApiClient(expectedHTTPResponse: "GetCustomerDevices", expectedHTTPStatusCode: 200)
+        let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "GetCustomerDevices", expectedHTTPStatusCode: 200)
         getCustomerDevices(apiClient: tbTestClient)
     }
     
@@ -77,7 +89,7 @@ final class TBRESTClientLibUnitTests: FunctionalTestCasesTBRESTClientLib {
     func testGetCustomerDeviceInfos() {
         testGetUser()
         testGetCustomerDevices()
-        let tbTestClient = testableApiClient.getUnitTestableApiClient(expectedHTTPResponse: "GetCustomerDeviceInfos", expectedHTTPStatusCode: 200)
+        let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "GetCustomerDeviceInfos", expectedHTTPStatusCode: 200)
         getCustomerDeviceInfos(apiClient: tbTestClient)
     }
     
@@ -85,7 +97,7 @@ final class TBRESTClientLibUnitTests: FunctionalTestCasesTBRESTClientLib {
      Test getDeviceProfileInfos()
      */
     func testGetDeviceProfileInfos() {
-        let tbTestClient = testableApiClient.getUnitTestableApiClient(expectedHTTPResponse: "GetDeviceProfileInfos", expectedHTTPStatusCode: 200)
+        let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "GetDeviceProfileInfos", expectedHTTPStatusCode: 200)
         getDeviceProfileInfos(apiClient: tbTestClient)
     }
     
@@ -94,7 +106,7 @@ final class TBRESTClientLibUnitTests: FunctionalTestCasesTBRESTClientLib {
      - Note: works with 'TENANT\_ADMIN' authority only!
      */
     func testGetDeviceProfiles() {
-        let tbTestClient = testableApiClient.getUnitTestableApiClient(expectedHTTPResponse: "GetDeviceProfiles", expectedHTTPStatusCode: 200)
+        let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "GetDeviceProfiles", expectedHTTPStatusCode: 200)
         getDeviceProfiles(apiClient: tbTestClient)
     }
     

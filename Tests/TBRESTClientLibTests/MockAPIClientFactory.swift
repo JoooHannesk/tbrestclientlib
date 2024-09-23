@@ -1,5 +1,5 @@
 //
-//  UnitTestableAPIClientPreparation.swift
+//  MockAPIClientFactory.swift
 //
 //
 //  Created by Johannes Kinzig on 25.08.24.
@@ -24,7 +24,7 @@ struct MockURLResponse {
     }
 }
 
-struct CreateUnitTestableAPIClient {
+struct MockAPIClientFactory {
     let baseUrlStr: String
     let usernameStr: String
     let passwordStr: String
@@ -38,7 +38,7 @@ struct CreateUnitTestableAPIClient {
      - Parameter error: http error
      - Note: In case the api client cannot be created and is nil, nil will be returned
      */
-    func getUnitTestableApiClient(expectedHTTPResponse: String, expectedHTTPStatusCode: Int, expectedError: Error? = nil) -> TBUserApiClient? {
+    func getMockApiClient(expectedHTTPResponse: String, expectedHTTPStatusCode: Int, expectedError: Error? = nil) -> TBUserApiClient? {
         let mockLoginHTTPSession = mhs.createMockHttpSession(jsonFileName: expectedHTTPResponse, httpStatusCode: expectedHTTPStatusCode, error: expectedError)
         let tbTestClient = try? TBUserApiClient(baseUrlStr: baseUrlStr, usernameStr: usernameStr, passwordStr: passwordStr, httpSessionHandler: mockLoginHTTPSession!)
         return tbTestClient

@@ -21,7 +21,7 @@ public class TBHTTPRequest {
     // MARK: - Implementation
     /**
      Register application error function – called when the TB server application responds with an error
-     - Parameter errorHandler: callable which taks a single argument of type conforming to 'TBErrorDataModel' protoco
+     - Parameter errorHandler: callable which taks a single argument of type conforming to 'TBErrorDataModel' protocol
      - Returns: Void
      */
     func registerAppErrorHandler(errorHandler: @escaping (TBAppError) -> Void) {

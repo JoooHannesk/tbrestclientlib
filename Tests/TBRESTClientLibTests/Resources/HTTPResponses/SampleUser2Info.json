@@ -1,0 +1,22 @@
+{
+  "id": {
+    "id": "784f394c-42b6-435a-983c-b7beff2784f1",
+    "entityType": "USER"
+  },
+  "createdTime": 1609459200000,
+  "tenantId": {
+    "id": "784f394c-42b6-435a-983c-b7beff2784f1",
+    "entityType": "TENANT"
+  },
+  "customerId": {
+    "id": "784f394c-42b6-435a-983c-b7beff2784f1",
+    "entityType": "CUSTOMER"
+  },
+  "email": "user2@example.com",
+  "authority": "CUSTOMER_USER",
+  "firstName": "Max",
+  "lastName": "Mustermann",
+  "phone": "38012345123",
+  "name": "user2@example.com",
+  "additionalInfo": {}
+}

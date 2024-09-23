@@ -12,11 +12,11 @@
     "id": "784f394c-42b6-435a-983c-b7beff2784f9",
     "entityType": "CUSTOMER"
   },
-  "email": "user@example.com",
+  "email": "user1@example.com",
   "authority": "CUSTOMER_USER",
   "firstName": "John",
   "lastName": "Doe",
-  "phone": "38012345123",
-  "name": "user@example.com",
+  "phone": "38012345124",
+  "name": "user1@example.com",
   "additionalInfo": {}
 }
