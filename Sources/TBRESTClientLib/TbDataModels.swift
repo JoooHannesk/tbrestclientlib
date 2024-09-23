@@ -9,23 +9,34 @@ import Foundation
 
 
 // MARK: - Protocols & Extensions
-// representing all TB data models
+
+/// Represent all TB data models and make them printable for debug purposes
 protocol TBDataModel: Codable, CustomStringConvertible {
     var description: String { get }
 }
-
 extension TBDataModel {
     public var description: String { return getStringRepresentation(for: self) }
 }
 
+/// Support subscript access for conforming types
 protocol PaginationDataResponseType<T> {
     associatedtype T
     var data: Array<T>?  { get }
 }
-
 extension PaginationDataResponseType {
     subscript(idx: Int) -> T? {
         return data?[idx]
+    }
+}
+
+/// Support equality check for conforming types
+protocol EntityEquatable: Equatable {
+    var id: ID { get }
+    var name: String { get }
+}
+extension EntityEquatable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.id == rhs.id && lhs.name == rhs.name
     }
 }
 
@@ -58,7 +69,7 @@ public struct AuthLogin: TBDataModel {
     public let refreshToken: String
 }
 
-public struct User: TBDataModel, Equatable {
+public struct User: TBDataModel, EntityEquatable {
     public let id: ID
     public let createdTime: Int
     public let tenantId: ID
@@ -70,11 +81,6 @@ public struct User: TBDataModel, Equatable {
     public let phone: String?
     public let name: String
     public let additionalInfo: AdditionalInfo?
-    
-    // Support equality check
-    public static func == (lhs: User, rhs: User) -> Bool {
-        return lhs.id == rhs.id && lhs.name == rhs.name
-    }
 }
 
 struct Device: TBDataModel {
