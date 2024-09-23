@@ -18,15 +18,12 @@ extension TBDataModel {
     public var description: String { return getStringRepresentation(for: self) }
 }
 
-protocol TBResponseDataModel: TBDataModel  { }
-protocol TBErrorDataModel: TBDataModel { }
-
-protocol PageDataResponseType<T> {
+protocol PaginationDataResponseType<T> {
     associatedtype T
     var data: Array<T>?  { get }
 }
 
-extension PageDataResponseType {
+extension PaginationDataResponseType {
     subscript(idx: Int) -> T? {
         return data?[idx]
     }
@@ -56,12 +53,12 @@ struct ServerSettings: TBDataModel {
     let password: String
 }
 
-public struct AuthLogin: TBResponseDataModel {
+public struct AuthLogin: TBDataModel {
     public let token: String
     public let refreshToken: String
 }
 
-public struct User: TBResponseDataModel, Equatable {
+public struct User: TBDataModel, Equatable {
     public let id: ID
     public let createdTime: Int
     public let tenantId: ID
@@ -76,12 +73,11 @@ public struct User: TBResponseDataModel, Equatable {
     
     // Support equality check
     public static func == (lhs: User, rhs: User) -> Bool {
-        return lhs.id == rhs.id && lhs.email == rhs.email && lhs.name == rhs.name
+        return lhs.id == rhs.id && lhs.name == rhs.name
     }
-    
 }
 
-struct Device: TBResponseDataModel {
+struct Device: TBDataModel {
     /** represent
      - Device objects
      - DeviceInfo objects
@@ -103,7 +99,7 @@ struct Device: TBResponseDataModel {
     let active: Bool?
 }
 
-struct DeviceProfile: TBResponseDataModel {
+struct DeviceProfile: TBDataModel {
     // TODO: implement equality check because there exists more than one API call to receive object
     let id: ID
     let createdTime: Int?
@@ -123,7 +119,7 @@ struct DeviceProfile: TBResponseDataModel {
     let defaultEdgeRuleChainId: ID?
 }
 
-public struct ID: TBResponseDataModel, Equatable {
+public struct ID: TBDataModel, Equatable {
     public let id: String
     public let entityType: String
     
@@ -133,7 +129,7 @@ public struct ID: TBResponseDataModel, Equatable {
     }
 }
 
-public struct AdditionalInfo: TBResponseDataModel {
+public struct AdditionalInfo: TBDataModel {
     public let defaultDashboardFullscreen: Bool?
     public let defaultDashboardId: String?
     public let description: String?
@@ -145,7 +141,7 @@ public struct AdditionalInfo: TBResponseDataModel {
     public let userCredentialsEnabled: Bool?
 }
 
-struct PageDataContainer<T>: TBResponseDataModel, PageDataResponseType where T: TBResponseDataModel {
+struct PaginationDataContainer<T>: TBDataModel, PaginationDataResponseType where T: TBDataModel {
     let data: Array<T>?
     let totalPages: Int
     let totalElements: Int
@@ -153,7 +149,7 @@ struct PageDataContainer<T>: TBResponseDataModel, PageDataResponseType where T: 
 }
 
 // MARK: - Application Error Data Models
-struct TBAppError: TBErrorDataModel {
+struct TBAppError: TBDataModel {
     let status: Int
     let message: String
     let errorCode: Int

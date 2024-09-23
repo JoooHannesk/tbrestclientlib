@@ -105,7 +105,7 @@ public class TBUserApiClient: TBHTTPRequest {
                             textSearch: String? = nil,
                             sortProperty: TbQuerySortProperty = .name,
                             sortOrder: TbQuerysortOrder = .ascending,
-                            responseHandler: ((PageDataContainer<Device>) -> Void)?)
+                            responseHandler: ((PaginationDataContainer<Device>) -> Void)?)
     -> Void {
         let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getCustomerDevices,
                                                                 replacePaths: [URLModifier(searchString: "{?customerId?}", replaceString: customerId)],
@@ -113,8 +113,8 @@ public class TBUserApiClient: TBHTTPRequest {
                                                                 textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseObject: PageDataContainer<Device>.self) { responseObject -> Void in
-            responseHandler?(responseObject as! PageDataContainer<Device>)
+                     authToken: self.authData, expectedTBResponseObject: PaginationDataContainer<Device>.self) { responseObject -> Void in
+            responseHandler?(responseObject as! PaginationDataContainer<Device>)
         }
     }
     
@@ -143,7 +143,7 @@ public class TBUserApiClient: TBHTTPRequest {
                                 textSearch: String? = nil,
                                 sortProperty: TbQuerySortProperty = .name,
                                 sortOrder: TbQuerysortOrder = .ascending,
-                                responseHandler: ((PageDataContainer<Device>) -> Void)?)
+                                responseHandler: ((PaginationDataContainer<Device>) -> Void)?)
     -> Void {
         let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getCustomerDeviceInfos,
                                                                 replacePaths: [URLModifier(searchString: "{?customerId?}", replaceString: customerId)],
@@ -152,8 +152,8 @@ public class TBUserApiClient: TBHTTPRequest {
                                                                 active: active, textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseObject: PageDataContainer<Device>.self) { responseObject -> Void in
-            responseHandler?(responseObject as! PageDataContainer<Device>)
+                     authToken: self.authData, expectedTBResponseObject: PaginationDataContainer<Device>.self) { responseObject -> Void in
+            responseHandler?(responseObject as! PaginationDataContainer<Device>)
         }
     }
 
@@ -179,15 +179,15 @@ public class TBUserApiClient: TBHTTPRequest {
         sortProperty: TbQuerySortProperty = .name,
         sortOrder: TbQuerysortOrder = .ascending,
         transportType: TbQueryTransportType? = nil,
-        responseHandler: ((PageDataContainer<DeviceProfile>) -> Void)?)
+        responseHandler: ((PaginationDataContainer<DeviceProfile>) -> Void)?)
     -> Void {
         let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getDeviceProfileInfos,
                                                                 pageSize: pageSize, page: page,
                                                                 textSearch: textSearch, transportType: transportType,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseObject: PageDataContainer<DeviceProfile>.self) { responseObject -> Void in
-            responseHandler?(responseObject as! PageDataContainer<DeviceProfile>)
+                     authToken: self.authData, expectedTBResponseObject: PaginationDataContainer<DeviceProfile>.self) { responseObject -> Void in
+            responseHandler?(responseObject as! PaginationDataContainer<DeviceProfile>)
         }
     }
      
@@ -210,14 +210,14 @@ public class TBUserApiClient: TBHTTPRequest {
         textSearch: String? = nil,
         sortProperty: TbQuerySortProperty = .name,
         sortOrder: TbQuerysortOrder = .ascending,
-        responseHandler: ((PageDataContainer<DeviceProfile>) -> Void)?)
+        responseHandler: ((PaginationDataContainer<DeviceProfile>) -> Void)?)
     -> Void {
         let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getDeviceProfiles,
                                                                 pageSize: pageSize, page: page, textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseObject: PageDataContainer<DeviceProfile>.self) { responseObject -> Void in
-            responseHandler?(responseObject as! PageDataContainer<DeviceProfile>)
+                     authToken: self.authData, expectedTBResponseObject: PaginationDataContainer<DeviceProfile>.self) { responseObject -> Void in
+            responseHandler?(responseObject as! PaginationDataContainer<DeviceProfile>)
         }
     }
 }
