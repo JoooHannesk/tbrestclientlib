@@ -68,9 +68,9 @@ final class UnitTests: FunctionalTestCases {
         let tbTestClient2 = testableApiClient.getMockApiClient(expectedHTTPResponse: "SampleUser2Info", expectedHTTPStatusCode: 200)
         let user1 = getUser(apiClient: tbTestClient1, expectedUsername: "user1@example.com")
         let user2 = getUser(apiClient: tbTestClient2, expectedUsername: "user2@example.com")
-        // expected 'User's to be equal
+        // expected users to be equal
         XCTAssertEqual(user1, user1)
-        // expect 'User's to be unequal
+        // expect users to be unequal
         XCTAssertNotEqual(user1, user2)
     }
     
