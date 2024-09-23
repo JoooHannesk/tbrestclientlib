@@ -9,7 +9,7 @@
 import XCTest
 @testable import TBRESTClientLib
 
-final class TBRESTClientLibIntegrationTests: FunctionalTestCasesTBRESTClientLib {
+final class IntegrationTests: FunctionalTestCases {
     
     func prepare() -> (TBUserApiClient?, ServerSettings?) {
         let serversettings = FileResourceLoader(searchPath: "Resources").loadServerSettingsFromFile(fileName: "ServerSettings")

@@ -10,7 +10,7 @@ import XCTest
 @testable import TBRESTClientLib
 
 
-class FunctionalTestCasesTBRESTClientLib: XCTestCase {
+class FunctionalTestCases: XCTestCase {
     
     // MARK: - TBDataModel instances
     var tbUser: User?
@@ -57,7 +57,8 @@ class FunctionalTestCasesTBRESTClientLib: XCTestCase {
     /**
      Test getUser() – get current user info
      */
-    func getUser(apiClient: TBUserApiClient?, expectedUsername: String) {
+    @discardableResult
+    func getUser(apiClient: TBUserApiClient?, expectedUsername: String) -> User? {
         let expectResponseWithUserInfo = XCTestExpectation(description: "Expected response containing own user info!")
         apiClient?.getUser() { userinfo in
             self.tbUser = userinfo
@@ -65,6 +66,7 @@ class FunctionalTestCasesTBRESTClientLib: XCTestCase {
             expectResponseWithUserInfo.fulfill()
         }
         wait(for: [expectResponseWithUserInfo], timeout: 3.0)
+        return self.tbUser
     }
     
     /**
@@ -142,19 +144,5 @@ class FunctionalTestCasesTBRESTClientLib: XCTestCase {
             }
         }
         wait(for: [expectResponseWithCustomerDeviceProfiles], timeout: 3.0)
-    }
-}
-
-
-class UtilTestCasesTBRESTClientLib: XCTestCase {
-    /**
-     Test equality check implementation for 'User' in DataModels.swift
-     */
-    func userEqualityCheck(user1: User, user2: User) {
-        // expected 'User' to be equal
-        XCTAssertEqual(user1, user1)
-        
-        // expect 'User' to be unequal
-        XCTAssertNotEqual(user1, user2)
     }
 }
