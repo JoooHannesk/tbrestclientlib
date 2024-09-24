@@ -62,6 +62,7 @@ final class UnitTests: FunctionalTestCases {
     
     /**
      Test 'User' data model equality check
+     Equality check (==) was moved from 'User' struct to a protocol extension to support all conforming entity data models
      */
     func testUserEqualityCheck() {
         let tbTestClient1 = testableApiClient.getMockApiClient(expectedHTTPResponse: "SampleUser1Info", expectedHTTPStatusCode: 200)
@@ -77,11 +78,29 @@ final class UnitTests: FunctionalTestCases {
     /**
      Test getCustomerDevices()
      */
-    func testGetCustomerDevices() {
+    @discardableResult
+    func testGetCustomerDevices() -> Array<Device>? {
         testGetUser()
         let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "GetCustomerDevices", expectedHTTPStatusCode: 200)
-        getCustomerDevices(apiClient: tbTestClient)
+        let customer_devices = getCustomerDevices(apiClient: tbTestClient)
+        return customer_devices
     }
+    
+    /**
+     Test 'Device' data model equality check
+     Equality check (==) was moved to a protocol extension to support all conforming entity data models in commit
+     Test compatibility for 'Device' data model - for sake of an additional test using a different type
+     This test requires to have **at least two different devices** in the GetCustomerDevices.json resource file
+     */
+    func testDeviceEqualityCheck() {
+        let devices = testGetCustomerDevices()
+        // expect devices to be equal
+        XCTAssertEqual(devices?[0], devices?[0])
+        XCTAssertEqual(devices?[1], devices?[1])
+        // expect devices to be unequal
+        XCTAssertNotEqual(devices?[0], devices?[1])
+    }
+    
     
     /**
      Test getCustomerDeviceInfos()

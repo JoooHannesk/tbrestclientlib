@@ -15,8 +15,9 @@ class FunctionalTestCases: XCTestCase {
     // MARK: - TBDataModel instances
     var tbUser: User?
     var tbDevice: Device?
+    var tbDevices: Array<Device>?
     
-    // MARK: - Geneal Test Cases
+    // MARK: - General Test Cases
     /**
      Fails with "bad credentials" tb app error
      */
@@ -71,19 +72,24 @@ class FunctionalTestCases: XCTestCase {
     
     /**
      Test getCustomerDevices() - for a given customer ID
+     - Note: This test requires to have **at least two different devices** in the GetCustomerDevices.json resource file (for unit tests)
+     or in your TB tenant (for integration tests)
      */
-    func getCustomerDevices(apiClient: TBUserApiClient?) {
+    @discardableResult
+    func getCustomerDevices(apiClient: TBUserApiClient?) -> Array<Device>? {
         let expectResponseWithCustomerDevices = XCTestExpectation(description: "Expected response containing customer Device objects!")
         if let customerId = self.tbUser?.customerId.id, let tenantId = self.tbUser?.tenantId.id {
             apiClient?.getCustomerDevices(customerId: customerId) { customerDevices in
-                XCTAssertGreaterThanOrEqual(customerDevices.totalElements, 1)
+                XCTAssertGreaterThanOrEqual(customerDevices.itemsOnPage, 2)
                 self.tbDevice = customerDevices[0]
                 XCTAssertEqual(customerDevices[0]?.customerId.id , customerId)
                 XCTAssertEqual(customerDevices[0]?.tenantId.id , tenantId)
+                self.tbDevices = customerDevices.getItemsInsideArray()
                 expectResponseWithCustomerDevices.fulfill()
             }
         }
         wait(for: [expectResponseWithCustomerDevices], timeout: 3.0)
+        return self.tbDevices
     }
     
     /**

@@ -42,6 +42,49 @@
           "pagingTransmissionWindow": 9007199254740991
         }
       }
+    },
+    {
+      "id": {
+        "id": "784f394c-42b6-435a-983d-b7beff2784f3",
+        "entityType": "DEVICE"
+      },
+      "createdTime": 1609459200000,
+      "tenantId": {
+        "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+        "entityType": "TENANT"
+      },
+      "customerId": {
+        "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+        "entityType": "CUSTOMER"
+      },
+      "name": "A4B72CCDFF44",
+      "type": "Humidity Sensor",
+      "label": "Room 007 Sensor",
+      "deviceProfileId": {
+        "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+        "entityType": "DEVICE_PROFILE"
+      },
+      "firmwareId": {
+        "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+        "entityType": "OTA_PACKAGE"
+      },
+      "softwareId": {
+        "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+        "entityType": "OTA_PACKAGE"
+      },
+      "additionalInfo": {},
+      "deviceData": {
+        "configuration": {
+          "type": "string"
+        },
+        "transportConfiguration": {
+          "type": "string",
+          "powerMode": "PSM",
+          "psmActivityTimer": 9007199254740991,
+          "edrxCycle": 9007199254740991,
+          "pagingTransmissionWindow": 9007199254740991
+        }
+      }
     }
   ],
   "totalPages": 1073741824,
