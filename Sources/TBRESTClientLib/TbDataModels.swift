@@ -19,13 +19,42 @@ extension TBDataModel {
 }
 
 /// Support subscript access for conforming types
-protocol PaginationDataResponseType<T> {
+protocol PaginationDataResponse<T> {
     associatedtype T
     var data: Array<T>?  { get }
 }
-extension PaginationDataResponseType {
+extension PaginationDataResponse {
+    /**
+     Return number of items on this page
+     - Returns: number of items on this page, Int
+     */
+    var itemsOnPage: Int {
+        get {
+            if let itemsInside = data?.count {
+                return itemsInside
+            }
+            else {
+                return 0
+            }
+        }
+    }
+    /**
+     Make conforming types support item access using subscripts
+     - Parameter idx: Item index
+     - Returns: item T? at index, where T conforms to TBDataModel
+     */
     subscript(idx: Int) -> T? {
         return data?[idx]
+    }
+    
+    /**
+     Return all items fetched for this page as array
+     - Returns: Array containing items of type T
+     - Note: Returns all fetched items on the current page. If more items exist
+     on previous or following pages, these devices must be fetched seperatly with an additional call.
+     */
+    func getItemsInsideArray() -> Array<T>? {
+        return data
     }
 }
 
@@ -83,7 +112,7 @@ public struct User: TBDataModel, EntityEquatable {
     public let additionalInfo: AdditionalInfo?
 }
 
-struct Device: TBDataModel {
+struct Device: TBDataModel, EntityEquatable {
     /** represent
      - Device objects
      - DeviceInfo objects
@@ -147,7 +176,7 @@ public struct AdditionalInfo: TBDataModel {
     public let userCredentialsEnabled: Bool?
 }
 
-struct PaginationDataContainer<T>: TBDataModel, PaginationDataResponseType where T: TBDataModel {
+struct PaginationDataContainer<T>: TBDataModel, PaginationDataResponse where T: TBDataModel {
     let data: Array<T>?
     let totalPages: Int
     let totalElements: Int
