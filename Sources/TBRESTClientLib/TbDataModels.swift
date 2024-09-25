@@ -19,7 +19,7 @@ extension TBDataModel {
 }
 
 /// Support subscript access for conforming types
-protocol PaginationDataResponse<T> {
+protocol PaginationDataResponse {
     associatedtype T
     var data: Array<T>?  { get }
 }
@@ -181,6 +181,8 @@ struct PaginationDataContainer<T>: TBDataModel, PaginationDataResponse where T: 
     let totalPages: Int
     let totalElements: Int
     let hasNext: Bool
+// alternative way to define this struct:
+// struct PaginationDataContainer<T: TBDataModel>: TBDataModel, PaginationDataResponse {
 }
 
 // MARK: - Application Error Data Models
