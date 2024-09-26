@@ -156,7 +156,7 @@ public class TBUserApiClient: TBHTTPRequest {
             responseHandler?(responseObject as! PaginationDataContainer<Device>)
         }
     }
-
+    
     
     // MARK: - Device Profile related requests
     /**
@@ -190,7 +190,7 @@ public class TBUserApiClient: TBHTTPRequest {
             responseHandler?(responseObject as! PaginationDataContainer<DeviceProfile>)
         }
     }
-     
+    
     /**
      Get Device Profiles – requires 'TENANT\_ADMIN' authority
      Receives a page of devices profile objects defined for the tenant. Specify parameters to filter the results which are wrapped insude a PageData object that
@@ -218,6 +218,27 @@ public class TBUserApiClient: TBHTTPRequest {
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
                      authToken: self.authData, expectedTBResponseObject: PaginationDataContainer<DeviceProfile>.self) { responseObject -> Void in
             responseHandler?(responseObject as! PaginationDataContainer<DeviceProfile>)
+        }
+    }
+    
+    // MARK: - Attributes and Telemetry
+    /**
+     Get Attribute Keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
+     Get a set of unique attribute keys for the requested entity.
+     - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityId: entitiy id
+     - Parameter responseHandler: takes an 'Array<String>' as parameter and is called upon successful server response
+     - Note: The response will include merged key names set for all attribute scopes: server - for all entity types, client - for devices, shared - for devices
+     */
+    func getAttributeKeys(for entityType: TbEntityTypes, entityId: String, responseHandler: ((Array<String>) -> Void)?)
+    -> Void {
+        let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getAttributeKeys, replacePaths: [
+            URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
+            URLModifier(searchString: "{?entityId?}", replaceString: entityId)
+        ])
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                     authToken: self.authData, expectedTBResponseObject: Array<String>.self) { responseObject -> Void in
+            responseHandler?(responseObject as! Array<String>)
         }
     }
 }

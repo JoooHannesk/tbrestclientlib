@@ -90,7 +90,7 @@ class SimpleHTTPClient {
     
     /**
      Convert server response from json string to dictionary
-     - Parameter responseStr: json string from webserver as response to http request
+     - Parameter responseData: json string from webserver as response to http request
      - Returns: Result object containing dictionary
      */
     fileprivate func convertResponseToTbDataModelObject(_ responseData: Data, expectedResponseObject: TBDataModel.Type)
@@ -101,38 +101,24 @@ class SimpleHTTPClient {
         guard !responseDataStr.isEmpty else {
             return .failure(.emptyResponsePayloadData)
         }
-        if let dictionary = try? JSONSerialization.jsonObject(with: responseData, options: []) as? [String: Any] {
-            let resultDataModelObject = convertDictToDataModelObject(dictionary, expectedResponseObject: expectedResponseObject)
-            return resultDataModelObject
-        } else {
-            // TODO: – add logger here
-            print("Improper payload response data format: \(responseDataStr)")
-            return .failure(.improperPayloadDataFormat)
-        }
-    }
-    
-    
-    fileprivate func convertDictToDataModelObject(_ responseDict: Dictionary<String, Any>, expectedResponseObject: TBDataModel.Type)
-    -> Result<TBDataModel, TBHTTPClientRequestError> {
         var localError: String = ""
         let decoder = JSONDecoder()
         // try converting to data model object
         do {
-            let tbResponse = try decoder.decode(expectedResponseObject.self, from: JSONSerialization.data(withJSONObject: responseDict))
+            let tbResponse = try decoder.decode(expectedResponseObject.self, from: responseData)
             return .success(tbResponse)
         } catch {
-            localError = "\(error.localizedDescription): \(error)\nAPI Response: \(responseDict)\n"
+            localError = "\(error.localizedDescription): \(error)\nAPI Response: \(responseDataStr)\n"
         }
         // try converting to app error model object
         do {
-            let tbapperror = try decoder.decode(TBAppError.self, from: JSONSerialization.data(withJSONObject: responseDict))
+            let tbapperror = try decoder.decode(TBAppError.self, from: responseData)
             return .failure(.tbAppError(apperror: tbapperror))
         } catch {
-            localError += "\(error.localizedDescription): \(error)\nAPI Response: \(responseDict)\n"
+            localError += "\(error.localizedDescription): \(error)\nAPI Response: \(responseDataStr)\n"
         }
         // TODO: – add logger here
         print(localError)
         return .failure(.tbAppResponseUndefinedDataModelMatch)
     }
-    
 }

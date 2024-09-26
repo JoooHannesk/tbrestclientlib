@@ -16,6 +16,7 @@ enum TbAPIEndpointsV1: String, TbAPIEndpointsEnum {
     case getCustomerDeviceInfos = "/api/customer/{?customerId?}/deviceInfos"
     case getDeviceProfileInfos =  "/api/deviceProfileInfos"
     case getDeviceProfiles = "/api/deviceProfiles"
+    case getAttributeKeys = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/keys/attributes"
 }
 
 
@@ -41,6 +42,22 @@ enum TbQueryTransportType: String {
     case snmp = "SNMP"
 }
 
+enum TbAttributeScope: String {
+    case server = "SERVER_SCOPE" /// for all entity types
+    case client = "CLIENT_SCOPE" /// for devices
+    case shared = "SHARED_SCOPE" /// for devices
+}
+
+enum TbEntityTypes: String {
+    case tenant = "TENANT"
+    case customer = "CUSTOMER"
+    case user = "USER"
+    case dahsboard = "DASHBOARD"
+    case asset = "ASSET"
+    case device = "DEVICE"
+    case alarm = "ALARM"
+    case entitiyView = "ENTITY_VIEW"
+}
 
 // MARK: - URL Paths Modification
 struct URLModifier {
@@ -84,40 +101,6 @@ struct APIEndpointManager {
     }
     
     /**
-     Get query parameter string
-     - Parameter pageSize: Maximum amount of entities in a one page
-     - Parameter page: Sequence number of page starting from 0
-     - Parameter type: Device type as the name of the device profile
-     - Parameter deviceProfileId: String value representing the device profile id. For example, '784f394c-42b6-435a-983c-b7beff2784f9'
-     - Parameter active: Boolean value indicating if a device is currently available and communicating with the cloud
-     - Parameter textSearch: The case insensitive 'substring' filter based on the device name
-     - Parameter transportType: transport type (defined for a device), either: DEFAULT, MQTT, COAP, LWM2M, SNMP
-     - Parameter sortProperty: sort resutls according to enumeration 'TbQuerySortProperty'; default: .name
-     - Parameter sortOrder: sort results in ascending or descending order, state according to 'TbQuerysortOrder'; default: .ascending
-     - Returns: query parameters as String
-     */
-    private static func assembleQueryParameters(
-        pageSize: Int32,
-        page: Int32,
-        type: String? = nil,
-        deviceProfileId: String? = nil,
-        active: Bool? = nil,
-        textSearch: String? = nil,
-        transportType: TbQueryTransportType? = nil,
-        sortProperty: TbQuerySortProperty = .name,
-        sortOrder: TbQuerysortOrder = .ascending
-    ) -> String {
-        // always present according to API specification
-        var queryParameter = "&pageSize=\(pageSize)&page=\(page)&sortProperty=\(sortProperty.rawValue)&sortOrder=\(sortOrder.rawValue)"
-        if let type = type { queryParameter += "&type=\(type)" }
-        if let deviceProfileId = deviceProfileId { queryParameter += "&deviceProfileId=\(deviceProfileId)" }
-        if let active = active { queryParameter += "&active=\(active)" }
-        if let textSearch = textSearch { queryParameter += "&textSearch=\(textSearch)" }
-        if let transportType = transportType { queryParameter += "&transportType=\(transportType.rawValue)"}
-        return queryParameter
-    }
-    
-    /**
      Get full qualified endpoint url with path and query parameters
      - Parameter apiPath: API identifier as type conforming to protocol 'TbAPIEndpointsEnum'
      - Parameter replacePaths: replace paths in URL (optional)
@@ -134,20 +117,27 @@ struct APIEndpointManager {
     internal static func getEndpointURLWithQueryParameters(
         apiPath: some TbAPIEndpointsEnum,
         replacePaths: [URLModifier]? = nil,
-        pageSize: Int32,
-        page: Int32,
+        pageSize: Int32? = nil,
+        page: Int32? = nil,
         type: String? = nil,
         deviceProfileId: String? = nil,
         active: Bool? = nil,
         textSearch: String? = nil,
         transportType: TbQueryTransportType? = nil,
-        sortProperty: TbQuerySortProperty = .name,
-        sortOrder: TbQuerysortOrder = .ascending
+        sortProperty: TbQuerySortProperty? = .name,
+        sortOrder: TbQuerysortOrder? = .ascending
     ) -> String {
-        let queryParameters = assembleQueryParameters(pageSize: pageSize, page: page, type: type, deviceProfileId: deviceProfileId,
-                                                      active: active, textSearch: textSearch, transportType: transportType,
-                                                      sortProperty: sortProperty, sortOrder: sortOrder)
-        return getEndpointURL(apiPath, replacePaths: replacePaths, appendQuery: queryParameters)
+        var queryParameter = ""
+        if let pageSize = pageSize { queryParameter += "&pageSize=\(pageSize)" }
+        if let page = page { queryParameter += "&page=\(page)" }
+        if let sortProperty = sortProperty { queryParameter += "&sortProperty=\(sortProperty.rawValue)" }
+        if let sortOrder = sortOrder { queryParameter += "&sortOrder=\(sortOrder.rawValue)" }
+        if let type = type { queryParameter += "&type=\(type)" }
+        if let deviceProfileId = deviceProfileId { queryParameter += "&deviceProfileId=\(deviceProfileId)" }
+        if let active = active { queryParameter += "&active=\(active)" }
+        if let textSearch = textSearch { queryParameter += "&textSearch=\(textSearch)" }
+        if let transportType = transportType { queryParameter += "&transportType=\(transportType.rawValue)"}
+        return getEndpointURL(apiPath, replacePaths: replacePaths, appendQuery: queryParameter)
     }
 }
 

@@ -129,6 +129,15 @@ final class UnitTests: FunctionalTestCases {
         getDeviceProfiles(apiClient: tbTestClient)
     }
     
+    /**
+     Test getAttributeKeys()
+     */
+    func testGetAttributeKeys() {
+        testGetUser()
+        testGetCustomerDevices()
+        let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "GetAttributeKeys", expectedHTTPStatusCode: 200)
+        getAttributeKeys(apiClient: tbTestClient)
+    }
 }
 
 // TODO: improve client implementation to react to different http status codes

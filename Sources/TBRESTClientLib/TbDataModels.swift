@@ -18,6 +18,8 @@ extension TBDataModel {
     public var description: String { return getStringRepresentation(for: self) }
 }
 
+extension Array<String>: TBDataModel where Element: Codable { }
+
 /// Support subscript access for conforming types
 protocol PaginationDataResponse {
     associatedtype T
