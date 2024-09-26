@@ -241,4 +241,28 @@ public class TBUserApiClient: TBHTTPRequest {
             responseHandler?(responseObject as! Array<String>)
         }
     }
+    
+    /**
+     Get Attribute Keys by Scope – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
+     Get a set of unique attribute keys for the requested entity and given scope
+     - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityId: entitiy id
+     - Parameter scope: scope in which the attribute is managed as defined in ``TbAttributesScope``
+     - Parameter responseHandler: takes an 'Array<String>' as parameter and is called upon successful server response
+     - Note: The response will include merged key names set for all attribute scopes: server - for all entity types, client - for devices, shared - for devices
+     */
+    public func getAttributeKeysByScope(for entityType: TbEntityTypes, entityId: String,
+                                        scope: TbAttributesScope, responseHandler: ((Array<String>) -> Void)?)
+    -> Void {
+        let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getAttributeKeysByScope, replacePaths: [
+            URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
+            URLModifier(searchString: "{?entityId?}", replaceString: entityId),
+            URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
+        ])
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                     authToken: self.authData, expectedTBResponseObject: Array<String>.self) { responseObject -> Void in
+            responseHandler?(responseObject as! Array<String>)
+        }
+    }
+    
 }

@@ -17,6 +17,7 @@ enum TbAPIEndpointsV1: String, TbAPIEndpointsEnum {
     case getDeviceProfileInfos =  "/api/deviceProfileInfos"
     case getDeviceProfiles = "/api/deviceProfiles"
     case getAttributeKeys = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/keys/attributes"
+    case getAttributeKeysByScope = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/keys/attributes/{?scope?}"
 }
 
 
@@ -42,7 +43,7 @@ public enum TbQueryTransportType: String {
     case snmp = "SNMP"
 }
 
-enum TbAttributeScope: String {
+public enum TbAttributesScope: String {
     case server = "SERVER_SCOPE" /// for all entity types
     case client = "CLIENT_SCOPE" /// for devices
     case shared = "SHARED_SCOPE" /// for devices

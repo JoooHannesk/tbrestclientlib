@@ -83,4 +83,25 @@ final class IntegrationTests: FunctionalTestCases {
         getDeviceProfiles(apiClient: tbTestClient)
     }
     
+    /**
+     Test getAttributeKeys()
+     */
+    func testGetAttributeKeys() {
+        let (tbTestClient, serversettings) = prepare()
+        loginSucceeds(apiClient: tbTestClient)
+        getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        getCustomerDevices(apiClient: tbTestClient)
+        getAttributeKeys(apiClient: tbTestClient)
+    }
+    
+    /**
+     Test getAttributeKeysByScope()
+     */
+    func testGetAttributeKeysByScope() {
+        let (tbTestClient, serversettings) = prepare()
+        loginSucceeds(apiClient: tbTestClient)
+        getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        getCustomerDevices(apiClient: tbTestClient)
+        getAttributeKeysByScope(apiClient: tbTestClient)
+    }
 }
