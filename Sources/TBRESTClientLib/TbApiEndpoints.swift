@@ -21,7 +21,7 @@ enum TbAPIEndpointsV1: String, TbAPIEndpointsEnum {
 
 
 // MARK: - Query Parameters
-enum TbQuerySortProperty: String {
+public enum TbQuerySortProperty: String {
     case createdTime = "createdTime"
     case name = "name"
     case deviceProfileName = "deviceProfileName"
@@ -29,12 +29,12 @@ enum TbQuerySortProperty: String {
     case customerTitle = "customerTitle"
 }
 
-enum TbQuerysortOrder: String {
+public enum TbQuerysortOrder: String {
     case ascending = "ASC"
     case descending = "DESC"
 }
 
-enum TbQueryTransportType: String {
+public enum TbQueryTransportType: String {
     case standard = "DEFAULT"
     case mqtt = "MQTT"
     case coap = "COAP"
@@ -48,7 +48,7 @@ enum TbAttributeScope: String {
     case shared = "SHARED_SCOPE" /// for devices
 }
 
-enum TbEntityTypes: String {
+public enum TbEntityTypes: String {
     case tenant = "TENANT"
     case customer = "CUSTOMER"
     case user = "USER"

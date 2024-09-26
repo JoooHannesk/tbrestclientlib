@@ -73,7 +73,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Returns: Void
      - Note: for supported data models as parameters see: TbDataModels.swift
      */
-    func getUser(responseHandler: ((User) -> Void)? = nil) -> Void {
+    public func getUser(responseHandler: ((User) -> Void)? = nil) -> Void {
         tbApiRequest(fromEndpoint: AEM.getEndpointURL(TBApiEndpoints.getUser),
                      usingMethod: .get,
                      authToken: self.authData,
@@ -98,7 +98,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Returns: Void
      - Note: for supported data models as parameters see: TbDataModels.swift
      */
-    func getCustomerDevices(customerId: String,
+    public func getCustomerDevices(customerId: String,
                             pageSize: Int32 = Int32.max,
                             page: Int32 = 0,
                             type: String? = nil,
@@ -134,7 +134,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Returns: Void
      - Note: for supported data models as parameters see: TbDataModels.swift
      */
-    func getCustomerDeviceInfos(customerId: String,
+    public func getCustomerDeviceInfos(customerId: String,
                                 pageSize: Int32 = Int32.max,
                                 page: Int32 = 0,
                                 type: String? = nil,
@@ -172,7 +172,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter responseHandler: takes a 'PageDataContainer<DeviceProfile>' as parameter and is called upon successful server response
      - Returns: void
      */
-    func getDeviceProfileInfos(
+    public func getDeviceProfileInfos(
         pageSize: Int32 = Int32.max,
         page: Int32 = 0,
         textSearch: String? = nil,
@@ -204,7 +204,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Returns: void
      - Note: works with 'TENANT\_ADMIN' authority only!
      */
-    func getDeviceProfiles(
+    public func getDeviceProfiles(
         pageSize: Int32 = Int32.max,
         page: Int32 = 0,
         textSearch: String? = nil,
@@ -230,7 +230,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter responseHandler: takes an 'Array<String>' as parameter and is called upon successful server response
      - Note: The response will include merged key names set for all attribute scopes: server - for all entity types, client - for devices, shared - for devices
      */
-    func getAttributeKeys(for entityType: TbEntityTypes, entityId: String, responseHandler: ((Array<String>) -> Void)?)
+    public func getAttributeKeys(for entityType: TbEntityTypes, entityId: String, responseHandler: ((Array<String>) -> Void)?)
     -> Void {
         let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getAttributeKeys, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
