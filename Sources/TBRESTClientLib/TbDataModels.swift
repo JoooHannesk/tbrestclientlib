@@ -176,13 +176,13 @@ public struct AdditionalInfo: TBDataModel {
     public let userCredentialsEnabled: Bool?
 }
 
-struct PaginationDataContainer<T>: TBDataModel, PaginationDataResponse where T: TBDataModel {
+struct PaginationDataContainer<T: TBDataModel>: TBDataModel, PaginationDataResponse {
     let data: Array<T>?
     let totalPages: Int
     let totalElements: Int
     let hasNext: Bool
 // alternative way to define this struct:
-// struct PaginationDataContainer<T: TBDataModel>: TBDataModel, PaginationDataResponse {
+// struct PaginationDataContainer<T>: TBDataModel, PaginationDataResponse where T: TBDataModel {
 }
 
 // MARK: - Application Error Data Models
