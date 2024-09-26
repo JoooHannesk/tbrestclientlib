@@ -11,7 +11,7 @@ import Foundation
 // MARK: - Protocols & Extensions
 
 /// Represent all TB data models and make them printable for debug purposes
-protocol TBDataModel: Codable, CustomStringConvertible {
+public protocol TBDataModel: Codable, CustomStringConvertible {
     var description: String { get }
 }
 extension TBDataModel {
@@ -118,7 +118,7 @@ public struct User: TBDataModel, EntityEquatable {
  - Device objects
  - DeviceInfo objects
  */
-struct Device: TBDataModel, EntityEquatable {
+public struct Device: TBDataModel, EntityEquatable {
     let id: ID
     let createdTime: Int
     let tenantId: ID
@@ -135,7 +135,7 @@ struct Device: TBDataModel, EntityEquatable {
     let active: Bool?
 }
 
-struct DeviceProfile: TBDataModel, EntityEquatable {
+public struct DeviceProfile: TBDataModel, EntityEquatable {
     let id: ID
     let createdTime: Int?
     let tenantId: ID
@@ -176,7 +176,7 @@ public struct AdditionalInfo: TBDataModel {
     public let userCredentialsEnabled: Bool?
 }
 
-struct PaginationDataContainer<T: TBDataModel>: TBDataModel, PaginationDataResponse {
+public struct PaginationDataContainer<T: TBDataModel>: TBDataModel, PaginationDataResponse {
     let data: Array<T>?
     let totalPages: Int
     let totalElements: Int
