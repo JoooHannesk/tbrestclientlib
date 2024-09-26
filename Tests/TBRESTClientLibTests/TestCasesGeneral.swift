@@ -60,13 +60,13 @@ class FunctionalTestCases: XCTestCase {
      */
     @discardableResult
     func getUser(apiClient: TBUserApiClient?, expectedUsername: String) -> User? {
-        let expectResponseWithUserInfo = XCTestExpectation(description: "Expected response containing own user info!")
+        let expectedResponseWithUserInfo = XCTestExpectation(description: "Expected response containing own user info!")
         apiClient?.getUser() { userinfo in
             self.tbUser = userinfo
             XCTAssertEqual(userinfo.name, expectedUsername)
-            expectResponseWithUserInfo.fulfill()
+            expectedResponseWithUserInfo.fulfill()
         }
-        wait(for: [expectResponseWithUserInfo], timeout: 3.0)
+        wait(for: [expectedResponseWithUserInfo], timeout: 3.0)
         return self.tbUser
     }
     
@@ -77,7 +77,7 @@ class FunctionalTestCases: XCTestCase {
      */
     @discardableResult
     func getCustomerDevices(apiClient: TBUserApiClient?) -> Array<Device>? {
-        let expectResponseWithCustomerDevices = XCTestExpectation(description: "Expected response containing customer Device objects!")
+        let expectedResponseWithCustomerDevices = XCTestExpectation(description: "Expected response containing customer Device objects!")
         if let customerId = self.tbUser?.customerId.id, let tenantId = self.tbUser?.tenantId.id {
             apiClient?.getCustomerDevices(customerId: customerId) { customerDevices in
                 XCTAssertGreaterThanOrEqual(customerDevices.itemsOnPage, 2)
@@ -85,10 +85,10 @@ class FunctionalTestCases: XCTestCase {
                 XCTAssertEqual(customerDevices[0]?.customerId.id , customerId)
                 XCTAssertEqual(customerDevices[0]?.tenantId.id , tenantId)
                 self.tbDevices = customerDevices.getItemsInsideArray()
-                expectResponseWithCustomerDevices.fulfill()
+                expectedResponseWithCustomerDevices.fulfill()
             }
         }
-        wait(for: [expectResponseWithCustomerDevices], timeout: 3.0)
+        wait(for: [expectedResponseWithCustomerDevices], timeout: 3.0)
         return self.tbDevices
     }
     
@@ -96,17 +96,17 @@ class FunctionalTestCases: XCTestCase {
      Test getCustomerDeviceInfos() - for a given customer ID
      */
     func getCustomerDeviceInfos(apiClient: TBUserApiClient?) {
-        let expectResponseWithCustomerDeviceInfos = XCTestExpectation(description: "Expected response containing customer's DeviceInfo objects!")
+        let expectedResponseWithCustomerDeviceInfos = XCTestExpectation(description: "Expected response containing customer's DeviceInfo objects!")
         if let customerId = self.tbUser?.customerId.id, let tenantId = self.tbUser?.tenantId.id {
             apiClient?.getCustomerDeviceInfos(customerId: customerId) { customerDevices in
                 XCTAssertGreaterThanOrEqual(customerDevices.totalElements, 1)
                 XCTAssertEqual(customerDevices[0]?.customerId.id , customerId)
                 XCTAssertEqual(customerDevices[0]?.tenantId.id , tenantId)
                 XCTAssertEqual(customerDevices[0]?.type , self.tbDevice?.type)
-                expectResponseWithCustomerDeviceInfos.fulfill()
+                expectedResponseWithCustomerDeviceInfos.fulfill()
             }
         }
-        wait(for: [expectResponseWithCustomerDeviceInfos], timeout: 3.0)
+        wait(for: [expectedResponseWithCustomerDeviceInfos], timeout: 3.0)
     }
     
     /**
@@ -128,27 +128,39 @@ class FunctionalTestCases: XCTestCase {
     
     /**
      Test getDeviceProfiles()
-     - Note: works with 'TENANT\_ADMIN' authority only!
+     - Note: works with 'TENANT\_ADMIN' authority only! Make sure to use a user with this authority when performing integration tests.
      */
     func getDeviceProfiles(apiClient: TBUserApiClient?) {
-        let expectResponseWithCustomerDeviceProfiles = XCTestExpectation(description: "Expected response containing tenant's Device Profile objects!")
+        let expectedResponseWithCustomerDeviceProfiles = XCTestExpectation(description: "Expected response containing tenant's Device Profile objects!")
         apiClient?.registerAppErrorHandler { tbAppError in
             // fulfill with permission denied - not so good practice but do not let the test fail just in case we do not use a 'TENANT\_ADMIN' authority
             XCTAssertNotNil(tbAppError)
             XCTAssertEqual(tbAppError.status, 403)
             XCTAssertEqual(tbAppError.errorCode, 20)
-            expectResponseWithCustomerDeviceProfiles.fulfill()
+            expectedResponseWithCustomerDeviceProfiles.fulfill()
         }
         apiClient?.getDeviceProfiles() { deviceProfiles in
             if deviceProfiles.totalElements > 0 {
                 // fulfill for received device profiles
                 XCTAssertEqual(deviceProfiles[0]?.id.entityType, "DEVICE_PROFILE")
-                expectResponseWithCustomerDeviceProfiles.fulfill()
+                expectedResponseWithCustomerDeviceProfiles.fulfill()
             }
             else {
                 XCTFail("Empty Device Profile Container is not helpful for integration testing...!")
             }
         }
-        wait(for: [expectResponseWithCustomerDeviceProfiles], timeout: 3.0)
+        wait(for: [expectedResponseWithCustomerDeviceProfiles], timeout: 3.0)
+    }
+    
+    /**
+     Test getAttributeKeys()
+     */
+    func getAttributeKeys(apiClient: TBUserApiClient?) {
+        let expectedResponseWithAttributes = XCTestExpectation(description: "Expected response containing entity id's attributes keys")
+        apiClient?.getAttributeKeys(for: .device, entityId: self.tbDevice!.id.id) { attrArray -> Void in
+            print(attrArray)
+            expectedResponseWithAttributes.fulfill()
+        }
+        wait(for: [expectedResponseWithAttributes], timeout: 3.0)
     }
 }
