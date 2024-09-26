@@ -112,12 +112,11 @@ public struct User: TBDataModel, EntityEquatable {
     public let additionalInfo: AdditionalInfo?
 }
 
+/** represent
+ - Device objects
+ - DeviceInfo objects
+ */
 struct Device: TBDataModel, EntityEquatable {
-    /** represent
-     - Device objects
-     - DeviceInfo objects
-     */
-    // TODO: implement equality check because there exists more than one API call to receive devices
     let id: ID
     let createdTime: Int
     let tenantId: ID
@@ -134,8 +133,7 @@ struct Device: TBDataModel, EntityEquatable {
     let active: Bool?
 }
 
-struct DeviceProfile: TBDataModel {
-    // TODO: implement equality check because there exists more than one API call to receive object
+struct DeviceProfile: TBDataModel, EntityEquatable {
     let id: ID
     let createdTime: Int?
     let tenantId: ID
