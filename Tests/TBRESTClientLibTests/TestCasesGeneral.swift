@@ -163,4 +163,16 @@ class FunctionalTestCases: XCTestCase {
         }
         wait(for: [expectedResponseWithAttributes], timeout: 3.0)
     }
+    
+    /**
+     Test getAttributeKeysByScope()
+     */
+    func getAttributeKeysByScope(apiClient: TBUserApiClient?) {
+        let expectedResponseWithAttributesScoped = XCTestExpectation(description: "Expected response containing entity id's attributes keys")
+        apiClient?.getAttributeKeysByScope(for: .device, entityId: self.tbDevice!.id.id, scope: .client) { attrArray -> Void in
+            print(attrArray)
+            expectedResponseWithAttributesScoped.fulfill()
+        }
+        wait(for: [expectedResponseWithAttributesScoped], timeout: 3.0)
+    }
 }
