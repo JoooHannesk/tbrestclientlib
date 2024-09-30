@@ -13,13 +13,11 @@ import Foundation
 enum TBHTTPClientRequestError: Error {
     case badURL
     case improperPayloadDataFormat
-    case emptyResponsePayloadData
     case httpRequestFailure
     case emptyLogin
     case badLogin
-    case unknownError
-    case tbAppError(apperror: TBAppError)
-    case tbAppResponseUndefinedDataModelMatch
+    case tbAppError(appError: TBAppError)
+    case tbGenericError(genericError: TBAppError)
 }
 
 enum SupportedHTTPMethods: String {
@@ -74,6 +72,10 @@ class SimpleHTTPClient {
         }
         
         let requestTask = sessionHandler.dataTask(with: request) { (responseData, response, error) in
+            if let httpResponse = response as? HTTPURLResponse {
+                // TODO: add logger
+                print("HTTP status response: \(httpResponse.statusCode)")
+            }
             if let error = error {
                 // TODO: add logger
                 print("HTTP request failed: \(error)")
@@ -98,11 +100,18 @@ class SimpleHTTPClient {
         guard let responseDataStr = String(data: responseData, encoding: .utf8) else {
             return .failure(.improperPayloadDataFormat)
         }
-        guard !responseDataStr.isEmpty else {
-            return .failure(.emptyResponsePayloadData)
-        }
+        
         var localError: String = ""
         let decoder = JSONDecoder()
+        
+        
+        if responseData.isEmpty {
+            // some server side responses are empty, therefor return an empty string arra<
+            // empty responses do NOT indicate errors (at least not for the current API version in this lib)
+            let emptyResponseArray: Array<String> = []
+            return .success(emptyResponseArray)
+        }
+        
         // try converting to data model object
         do {
             let tbResponse = try decoder.decode(expectedResponseObject.self, from: responseData)
@@ -113,12 +122,14 @@ class SimpleHTTPClient {
         // try converting to app error model object
         do {
             let tbapperror = try decoder.decode(TBAppError.self, from: responseData)
-            return .failure(.tbAppError(apperror: tbapperror))
+            return .failure(.tbAppError(appError: tbapperror))
         } catch {
             localError += "\(error.localizedDescription): \(error)\nAPI Response: \(responseDataStr)\n"
         }
         // TODO: – add logger here
         print(localError)
-        return .failure(.tbAppResponseUndefinedDataModelMatch)
+        // create error object to keep in convention with other errors – even delivered in other format from server
+        let genErr = TBAppError(status: 999, message: responseDataStr, errorCode: 999, timestamp: 0)
+        return .failure(.tbGenericError(genericError: genErr))
     }
 }

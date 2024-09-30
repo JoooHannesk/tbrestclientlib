@@ -189,4 +189,58 @@ class FunctionalTestCases: XCTestCase {
         }
         wait(for: [expectedResponseWithAttributesScoped], timeout: 3.0)
     }
+    
+    /**
+     Test saveEntityAttributes() – success
+     Run with integration tests only
+     */
+    func saveEntityAttributesSuccess(apiClient: TBUserApiClient?) {
+        let expectedResponse = XCTestExpectation(description: "Expected response...")
+        let sampleAttributes = ["sampleAtt1String":"Hello Server", "sampleAtt2String": "Hello Client"]
+        if let tbDevice = self.tbDevice?.id.id {
+            apiClient?.saveEntityAttributes(for: .device, entityId: tbDevice, attributesData: sampleAttributes, scope: .shared) {
+                expectedResponse.fulfill()
+            }
+        } else {
+            XCTFail("""
+                    Device empty, test cannot continue! Make sure to have at least two devices in your tenant, assigned to the \
+                    current user which is authenticating for this integration test!
+                """)
+        }
+        wait(for: [expectedResponse], timeout: 3.0)
+    }
+    
+    /**
+     Test saveEntityAttributes() – fails with unmatched Device ID
+     Fails because device is not known
+     */
+    func saveEntityAttributesFailureUnmatchedDeviceID(apiClient: TBUserApiClient?) {
+        let expectedResponseDeviceUnknown = XCTestExpectation(description: "Expected unknown device response...")
+        apiClient?.registerAppErrorHandler { tbAppError in
+            print("Test failed with error: \(tbAppError)")
+            expectedResponseDeviceUnknown.fulfill()
+        }
+        let sampleAttributes = ["sampleAtt1String":"Hello Server", "sampleAtt2String": "Hello Client"]
+        apiClient?.saveEntityAttributes(for: .device, entityId: "784f394c-42b6-435a-983c-b7beff2784f9", attributesData: sampleAttributes, scope: .shared) {
+            XCTFail("Expected server to respond with an error data model.")
+        }
+        wait(for: [expectedResponseDeviceUnknown], timeout: 3)
+    }
+    
+    /**
+     Test saveEntityAttributes() – fails with nonconforming UUID
+     Fails because device is not known
+     */
+    func saveEntityAttributesFailureNonConformingUUID(apiClient: TBUserApiClient?) {
+        let expectedResponseDeviceUnknown = XCTestExpectation(description: "Expected unknown device response...")
+        apiClient?.registerAppErrorHandler { tbAppError in
+            print("Test failed with error: \(tbAppError)")
+            expectedResponseDeviceUnknown.fulfill()
+        }
+        let sampleAttributes = ["sampleAtt1String":"Hello Server", "sampleAtt2String": "Hello Client"]
+        apiClient?.saveEntityAttributes(for: .device, entityId: "7null3928", attributesData: sampleAttributes, scope: .shared) {
+            XCTFail("Expected server to respond with an error data model.")
+        }
+        wait(for: [expectedResponseDeviceUnknown], timeout: 3)
+    }
 }

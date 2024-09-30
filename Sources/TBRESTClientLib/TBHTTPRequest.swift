@@ -55,7 +55,12 @@ public class TBHTTPRequest {
                     // run registered app error handler
                     self.errorHandler?(apperror)
                     // TODO: add logger
-                    print("App Error Message: \(apperror)")
+                    print("App Error Message: \(error)")
+                } else if case TBHTTPClientRequestError.tbGenericError(let apperror) = error {
+                    // run registered app error handler
+                    self.errorHandler?(apperror)
+                    // TODO: add logger
+                    print("App Error Message: \(error)")
                 } else {
                     // TODO: add logger
                     print("HTTP Request Error: \(error)")
