@@ -157,9 +157,16 @@ class FunctionalTestCases: XCTestCase {
      */
     func getAttributeKeys(apiClient: TBUserApiClient?) {
         let expectedResponseWithAttributes = XCTestExpectation(description: "Expected response containing entity id's attributes keys")
-        apiClient?.getAttributeKeys(for: .device, entityId: self.tbDevice!.id.id) { attrArray -> Void in
-            print(attrArray)
-            expectedResponseWithAttributes.fulfill()
+        if let tbDevice = self.tbDevice?.id.id {
+            apiClient?.getAttributeKeys(for: .device, entityId: tbDevice) { attrArray -> Void in
+                print("Attribute Keys: \(attrArray)")
+                expectedResponseWithAttributes.fulfill()
+            }
+        } else {
+            XCTFail("""
+                    Device empty, test cannot continue! Make sure to have at least two devices in your tenant, assigned to the \
+                    current user which is authenticating for this integration test!
+                """)
         }
         wait(for: [expectedResponseWithAttributes], timeout: 3.0)
     }
@@ -169,9 +176,16 @@ class FunctionalTestCases: XCTestCase {
      */
     func getAttributeKeysByScope(apiClient: TBUserApiClient?) {
         let expectedResponseWithAttributesScoped = XCTestExpectation(description: "Expected response containing entity id's attributes keys")
-        apiClient?.getAttributeKeysByScope(for: .device, entityId: self.tbDevice!.id.id, scope: .client) { attrArray -> Void in
-            print(attrArray)
-            expectedResponseWithAttributesScoped.fulfill()
+        if let tbDevice = self.tbDevice?.id.id {
+            apiClient?.getAttributeKeysByScope(for: .device, entityId: tbDevice, scope: .client) { attrArray -> Void in
+                print("Attribute Keys by Scope (.client): \(attrArray)")
+                expectedResponseWithAttributesScoped.fulfill()
+            }
+        } else {
+            XCTFail("""
+                    Device empty, test cannot continue! Make sure to have at least two devices in your tenant, assigned to the \
+                    current user which is authenticating for this integration test!
+                """)
         }
         wait(for: [expectedResponseWithAttributesScoped], timeout: 3.0)
     }
