@@ -46,7 +46,8 @@ extension PaginationDataResponse {
      - Returns: item T? at index, where T conforms to TBDataModel
      */
     subscript(idx: Int) -> T? {
-        return data?[idx]
+        if itemsOnPage > 0 { return data?[idx] }
+        else { return nil }
     }
     
     /**
