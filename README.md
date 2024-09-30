@@ -18,6 +18,7 @@ This project was started as part of larger project which required API access to 
 
 ## Integration Tests
 * TODO: describe how to edit ServerSettings.sample.json to run integration tests against own ThingsBoard installation / server
+* ( Comment: Perform Integration Test with users which have TENANT_ADMIN, and CUSTOMER_USER authority )
 
 ## License
 * MIT License

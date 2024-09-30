@@ -265,4 +265,27 @@ public class TBUserApiClient: TBHTTPRequest {
         }
     }
     
+    /**
+     Create or update the attributes based on entity id and the specified attribute scope – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
+     Implementes the endpoint saveEntityAttributesV2
+     - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityId: entitiy id
+     - Parameter attributesData: attributes with values as key value pairs, contained inside a dictionary
+     - Parameter scope: scope in which the attribute is managed as defined in ``TbAttributesScope``
+     - Parameter responseHandler: takes no parameters and is called upon successful server response
+     - Note: Attribute scopes depend on the entity type: .server - supported for all entity; .shared - supported for devices
+     */
+    public func saveEntityAttributes(for entityType: TbEntityTypes, entityId: String, attributesData:  Dictionary<String, String>,
+                                     scope: TbAttributesScope, responseHandler: (() -> Void)? = nil)
+    -> Void {
+        let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.saveEntityAttributes, replacePaths: [
+            URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
+            URLModifier(searchString: "{?entityId?}", replaceString: entityId),
+            URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
+        ])
+        tbApiRequest(fromEndpoint: endpointURL, withPayload: attributesData,
+                     authToken: self.authData, expectedTBResponseObject: Array<String>.self) { _ in
+            responseHandler?()
+        }
+    }
 }

@@ -18,6 +18,7 @@ enum TbAPIEndpointsV1: String, TbAPIEndpointsEnum {
     case getDeviceProfiles = "/api/deviceProfiles"
     case getAttributeKeys = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/keys/attributes"
     case getAttributeKeysByScope = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/keys/attributes/{?scope?}"
+    case saveEntityAttributes = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/attributes/{?scope?}"
 }
 
 

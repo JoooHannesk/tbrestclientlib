@@ -104,4 +104,37 @@ final class IntegrationTests: FunctionalTestCases {
         getCustomerDevices(apiClient: tbTestClient)
         getAttributeKeysByScope(apiClient: tbTestClient)
     }
+    
+    /**
+     Test saveEntityAttributes() – Success
+     */
+    func testSaveEntityAttributesSuccess() {
+        let (tbTestClient, serversettings) = prepare()
+        loginSucceeds(apiClient: tbTestClient)
+        getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        getCustomerDevices(apiClient: tbTestClient)
+        saveEntityAttributesSuccess(apiClient: tbTestClient)
+    }
+    
+    /**
+     Test saveEntityAttributes() – Fails with unmatched device ID
+     TB server responds with two different messages for unmatched device ID (ID not found on server) and
+     ID was not given as valid UUID string.
+     */
+    func testSaveEntityAttributesFailureUnmatchedDeviceID() {
+        let tbTestClient = prepare().0
+        loginSucceeds(apiClient: tbTestClient)
+        saveEntityAttributesFailureUnmatchedDeviceID(apiClient: tbTestClient)
+    }
+    
+    /**
+     Test saveEntityAttributes() – Fails with non-UUID conforming string as identifier
+     TB server responds with two different messages for unmatched device ID (ID not found on server) and
+     ID was not given as valid UUID string.
+     */
+    func testSaveEntityAttributesFailureNonConformingUUID() {
+        let tbTestClient = prepare().0
+        loginSucceeds(apiClient: tbTestClient)
+        saveEntityAttributesFailureNonConformingUUID(apiClient: tbTestClient)
+    }
 }
