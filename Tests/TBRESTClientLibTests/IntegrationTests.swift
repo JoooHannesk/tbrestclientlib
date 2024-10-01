@@ -149,4 +149,16 @@ final class IntegrationTests: FunctionalTestCases {
         saveEntityAttributesSuccess(apiClient: tbTestClient)
         getAttributesSuccess(apiClient: tbTestClient)
     }
+    
+    /**
+     Test getAttributesByScopeSuccess()
+     */
+    func testGetAttributesByScopeSuccess() {
+        let (tbTestClient, serversettings) = prepare()
+        loginSucceeds(apiClient: tbTestClient)
+        getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        getCustomerDevices(apiClient: tbTestClient)
+        saveEntityAttributesSuccess(apiClient: tbTestClient)
+        getAttributesByScopeSuccess(apiClient: tbTestClient)
+    }
 }
