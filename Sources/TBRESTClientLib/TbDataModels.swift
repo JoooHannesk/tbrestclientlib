@@ -117,9 +117,7 @@ public struct User: TBDataModel, EntityEquatable {
     public let additionalInfo: AdditionalInfo?
 }
 
-/** represent
- - Device objects
- - DeviceInfo objects
+/** represent **Device** and **DeviceInfo** objects
  */
 public struct Device: TBDataModel, EntityEquatable {
     let id: ID
@@ -186,6 +184,70 @@ public struct PaginationDataContainer<T: TBDataModel>: TBDataModel, PaginationDa
     let hasNext: Bool
 // alternative way to define this struct:
 // struct PaginationDataContainer<T>: TBDataModel, PaginationDataResponse where T: TBDataModel {
+}
+
+/**
+ TB-Entitiy-Attributes have values of different types. This library supports: Bool, Int, Double, String (JSON is currenlty unsupported).
+ Access the values as described in ``value``
+ */
+public struct AttributesResponse: TBDataModel {
+    /// attribute key as string
+    public let key: String
+    /**
+     TBAttribute value inside associated value as enum case, depending on the expected return type,
+     access the value using the following members: *value.boolVal*, *value.intVal*, *value.doubleVal*, *value.stringVal*
+     For further implementation details, refer to ``MValue``
+     */
+    public let value: MValue
+    /// last updated time
+    public let lastUpdateTs: Int
+}
+
+public enum MValue: TBDataModel {
+    case bool(Bool)
+    case int(Int)
+    case double(Double)
+    case string(String)
+    
+    public var boolVal: Bool? {
+        if case .bool(let val) = self {
+            return val
+        }
+        return nil
+    }
+    public var intVal: Int? {
+        if case .int(let val) = self {
+            return val
+        }
+        return nil
+    }
+    public var doubleVal: Double? {
+        if case .double(let val) = self {
+            return val
+        }
+        return nil
+    }
+    public var stringVal: String? {
+        if case .string(let val) = self {
+            return val
+        }
+        return nil
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let x = try? container.decode(Bool.self) {
+            self = .bool(x)
+        } else if let x = try? container.decode(Int.self) {
+            self = .int(x)
+        } else if let x = try? container.decode(Double.self) {
+            self = .double(x)
+        } else if let x = try? container.decode(String.self) {
+            self = .string(x)
+        } else {
+            throw DecodingError.typeMismatch(MValue.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for value, failed to convert server response JSON!"))
+        }
+    }
 }
 
 // MARK: - Application Error Data Models

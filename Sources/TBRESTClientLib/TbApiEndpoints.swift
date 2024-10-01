@@ -19,6 +19,8 @@ enum TbAPIEndpointsV1: String, TbAPIEndpointsEnum {
     case getAttributeKeys = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/keys/attributes"
     case getAttributeKeysByScope = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/keys/attributes/{?scope?}"
     case saveEntityAttributes = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/attributes/{?scope?}"
+    case getAttributes = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/values/attributes"
+    case getAttributesByScope = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/values/attributes/{?scope?}"
 }
 
 
@@ -125,6 +127,7 @@ struct APIEndpointManager {
         deviceProfileId: String? = nil,
         active: Bool? = nil,
         textSearch: String? = nil,
+        keys: [String]? = nil,
         transportType: TbQueryTransportType? = nil,
         sortProperty: TbQuerySortProperty? = .name,
         sortOrder: TbQuerysortOrder? = .ascending
@@ -139,6 +142,7 @@ struct APIEndpointManager {
         if let active = active { queryParameter += "&active=\(active)" }
         if let textSearch = textSearch { queryParameter += "&textSearch=\(textSearch)" }
         if let transportType = transportType { queryParameter += "&transportType=\(transportType.rawValue)"}
+        if let keys = keys { queryParameter += "&keys=\(keys.joined(separator: ","))" }
         return getEndpointURL(apiPath, replacePaths: replacePaths, appendQuery: queryParameter)
     }
 }

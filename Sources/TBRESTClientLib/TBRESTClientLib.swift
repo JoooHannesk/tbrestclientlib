@@ -168,7 +168,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter textSearch: The case insensitive 'substring' filter based on the device name
      - Parameter sortProperty: sort resutls according to enumeration 'TbQuerySortProperty'; default: .name
      - Parameter sortOrder: sort results in ascending or descending order, state according to 'TbQuerysortOrder'; default: .ascending
-     - Parameter transportType: Type of the transport the device profile support: DEFAULT, MQTT, COAP, LWM2M, SNMP
+     - Parameter transportType: Type of the transport the device profiles support: DEFAULT, MQTT, COAP, LWM2M, SNMP
      - Parameter responseHandler: takes a 'PageDataContainer<DeviceProfile>' as parameter and is called upon successful server response
      - Returns: void
      */
@@ -275,7 +275,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter responseHandler: takes no parameters and is called upon successful server response
      - Note: Attribute scopes depend on the entity type: .server - supported for all entity; .shared - supported for devices
      */
-    public func saveEntityAttributes(for entityType: TbEntityTypes, entityId: String, attributesData:  Dictionary<String, String>,
+    public func saveEntityAttributes(for entityType: TbEntityTypes, entityId: String, attributesData:  Dictionary<String, Any>,
                                      scope: TbAttributesScope, responseHandler: (() -> Void)? = nil)
     -> Void {
         let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.saveEntityAttributes, replacePaths: [
@@ -286,6 +286,23 @@ public class TBUserApiClient: TBHTTPRequest {
         tbApiRequest(fromEndpoint: endpointURL, withPayload: attributesData,
                      authToken: self.authData, expectedTBResponseObject: Array<String>.self) { _ in
             responseHandler?()
+        }
+    }
+    
+    /**
+     Get all attributes (scope-independent)  by keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
+     - Parameter entityType:tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityId: entitiy id
+     - Parameter keys: array of strings containing the keys
+     - Parameter responseHandler: takes an array containing items of type ``AttributesResponse``
+     */
+    public func getAttributes(for entityType: TbEntityTypes, entityId: String, keys: [String] = [], responseHandler: (([AttributesResponse]) -> Void)?) {
+        let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getAttributes, replacePaths: [
+            URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
+            URLModifier(searchString: "{?entityId?}", replaceString: entityId)
+        ], keys: keys)
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, authToken: self.authData, expectedTBResponseObject: [AttributesResponse].self) { responseObject in
+            responseHandler?(responseObject as! [AttributesResponse])
         }
     }
 }
