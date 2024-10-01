@@ -305,4 +305,24 @@ public class TBUserApiClient: TBHTTPRequest {
             responseHandler?(responseObject as! [AttributesResponse])
         }
     }
+    
+    /**
+     Get attributes by scope and by keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
+     - Parameter entityType:tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityId: entitiy id
+     - Parameter keys: array of strings containing the keys
+     - Parameter scope: scope in which the attribute is managed as defined in ``TbAttributesScope``
+     - Parameter responseHandler: takes an array containing items of type ``AttributesResponse``
+     */
+    public func getAttributesByScope(for entityType: TbEntityTypes, entityId: String, keys: [String] = [], scope: TbAttributesScope, responseHandler: (([AttributesResponse]) -> Void)?) {
+        let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getAttributesByScope, replacePaths: [
+            URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
+            URLModifier(searchString: "{?entityId?}", replaceString: entityId),
+            URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
+        ], keys: keys)
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, authToken: self.authData, expectedTBResponseObject: [AttributesResponse].self) { responseObject in
+            responseHandler?(responseObject as! [AttributesResponse])
+        }
+    }
+    
 }

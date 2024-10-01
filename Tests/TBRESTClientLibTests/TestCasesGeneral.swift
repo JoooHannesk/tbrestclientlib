@@ -291,4 +291,48 @@ class FunctionalTestCases: XCTestCase {
         }
         wait(for: [expectedResponse], timeout: 3.0)
     }
+    
+    /**
+     Test getAttributesByScope
+     For integration test to succeed requires that **saveEntityAttributesSuccess()** was run successfully
+     */
+    func getAttributesByScopeSuccess(apiClient: TBUserApiClient?) {
+        let expectedResponse = XCTestExpectation(description: "Expected response with attributes...")
+        apiClient?.registerAppErrorHandler { tbAppError in
+            print("Test failed with error: \(tbAppError)")
+            XCTFail(tbAppError.message)
+        }
+        if let tbDevice = self.tbDevice?.id.id {
+            apiClient?.getAttributesByScope(for: .device, entityId: tbDevice, keys: ["sampleAtt1String", "sampleAtt2Bool", "sampleAtt3Int", "sampleAtt4Double"], scope: .shared) { responseObject in
+                var att1 = false, att2 = false, att3 = false, att4 = false
+                if let index = responseObject.firstIndex(where: {$0.key == "sampleAtt1String"}) {
+                    XCTAssertEqual(responseObject[index].value.stringVal, "Hello Server")
+                    att1 = true
+                }
+                if let index = responseObject.firstIndex(where: {$0.key == "sampleAtt2Bool"}) {
+                    XCTAssertEqual(responseObject[index].value.boolVal, true)
+                    att2 = true
+                }
+                if let index = responseObject.firstIndex(where: {$0.key == "sampleAtt3Int"}) {
+                    XCTAssertEqual(responseObject[index].value.intVal, 4)
+                    att3 = true
+                }
+                if let index = responseObject.firstIndex(where: {$0.key == "sampleAtt4Double"}) {
+                    XCTAssertEqual(responseObject[index].value.doubleVal, 3.1415926)
+                    att4 = true
+                }
+                if att1 && att2 && att3 && att4 {
+                    expectedResponse.fulfill()
+                } else {
+                    XCTFail("Some of the expected attributes could not be retrieved")
+                }
+            }
+        } else {
+            XCTFail("""
+                Device empty, test cannot continue! Make sure to have at least two devices in your tenant, assigned to
+                current user which is authenticating for this integration test!
+                """)
+        }
+        wait(for: [expectedResponse], timeout: 3.0)
+    }
 }
