@@ -1,0 +1,6 @@
+[
+  {"key": "sampleAtt1String", "value": "Hello Server", "lastUpdateTs": 1609459200000},
+  {"key": "sampleAtt2Bool", "value": true, "lastUpdateTs": 1609459200001},
+  {"key": "sampleAtt3Int", "value": 4, "lastUpdateTs": 1609459200002},
+  {"key": "sampleAtt4Double", "value": 3.1415926, "lastUpdateTs": 1609459200003}
+]

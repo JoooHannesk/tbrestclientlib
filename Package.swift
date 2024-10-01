@@ -17,7 +17,7 @@ let package = Package(
         .target(
             name: "TBRESTClientLib"),
         .testTarget(
-            name: "TBRESTClientLibUnitTests",
+            name: "TBRESTClientLibTests",
             dependencies: ["TBRESTClientLib"]),
     ]
 )

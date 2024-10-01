@@ -192,11 +192,11 @@ class FunctionalTestCases: XCTestCase {
     
     /**
      Test saveEntityAttributes() – success
-     Run with integration tests only
+     **Run with integration tests only**
      */
     func saveEntityAttributesSuccess(apiClient: TBUserApiClient?) {
         let expectedResponse = XCTestExpectation(description: "Expected response...")
-        let sampleAttributes = ["sampleAtt1String":"Hello Server", "sampleAtt2String": "Hello Client"]
+        let sampleAttributes = ["sampleAtt1String":"Hello Server", "sampleAtt2Bool": true, "sampleAtt3Int": 4, "sampleAtt4Double": 3.1415926] as [String : Any]
         if let tbDevice = self.tbDevice?.id.id {
             apiClient?.saveEntityAttributes(for: .device, entityId: tbDevice, attributesData: sampleAttributes, scope: .shared) {
                 expectedResponse.fulfill()
@@ -213,11 +213,13 @@ class FunctionalTestCases: XCTestCase {
     /**
      Test saveEntityAttributes() – fails with unmatched Device ID
      Fails because device is not known
+     **Run with integration tests only**
      */
     func saveEntityAttributesFailureUnmatchedDeviceID(apiClient: TBUserApiClient?) {
         let expectedResponseDeviceUnknown = XCTestExpectation(description: "Expected unknown device response...")
         apiClient?.registerAppErrorHandler { tbAppError in
             print("Test failed with error: \(tbAppError)")
+            XCTAssertEqual(tbAppError.status, 999)
             expectedResponseDeviceUnknown.fulfill()
         }
         let sampleAttributes = ["sampleAtt1String":"Hello Server", "sampleAtt2String": "Hello Client"]
@@ -230,17 +232,63 @@ class FunctionalTestCases: XCTestCase {
     /**
      Test saveEntityAttributes() – fails with nonconforming UUID
      Fails because device is not known
+     **Run with integration tests only**
      */
     func saveEntityAttributesFailureNonConformingUUID(apiClient: TBUserApiClient?) {
         let expectedResponseDeviceUnknown = XCTestExpectation(description: "Expected unknown device response...")
         apiClient?.registerAppErrorHandler { tbAppError in
             print("Test failed with error: \(tbAppError)")
+            XCTAssertEqual(tbAppError.status, 400)
             expectedResponseDeviceUnknown.fulfill()
         }
-        let sampleAttributes = ["sampleAtt1String":"Hello Server", "sampleAtt2String": "Hello Client"]
+        let sampleAttributes = ["sampleAtt1String":"Hello Server", "sampleAtt2Bool": true, "sampleAtt3Int": 4, "sampleAtt4Double": 3.1415926] as [String : Any]
         apiClient?.saveEntityAttributes(for: .device, entityId: "7null3928", attributesData: sampleAttributes, scope: .shared) {
             XCTFail("Expected server to respond with an error data model.")
         }
         wait(for: [expectedResponseDeviceUnknown], timeout: 3)
+    }
+    
+    /**
+     Test getAttributes
+     For integration test to succeed requires that **saveEntityAttributesSuccess()** was run successfully
+     */
+    func getAttributesSuccess(apiClient: TBUserApiClient?) {
+        let expectedResponse = XCTestExpectation(description: "Expected response with attributes...")
+        apiClient?.registerAppErrorHandler { tbAppError in
+            print("Test failed with error: \(tbAppError)")
+            XCTFail(tbAppError.message)
+        }
+        if let tbDevice = self.tbDevice?.id.id {
+            apiClient?.getAttributes(for: .device, entityId: tbDevice, keys: ["sampleAtt1String", "sampleAtt2Bool", "sampleAtt3Int", "sampleAtt4Double"]) { responseObject in
+                var att1 = false, att2 = false, att3 = false, att4 = false
+                if let index = responseObject.firstIndex(where: {$0.key == "sampleAtt1String"}) {
+                    XCTAssertEqual(responseObject[index].value.stringVal, "Hello Server")
+                    att1 = true
+                }
+                if let index = responseObject.firstIndex(where: {$0.key == "sampleAtt2Bool"}) {
+                    XCTAssertEqual(responseObject[index].value.boolVal, true)
+                    att2 = true
+                }
+                if let index = responseObject.firstIndex(where: {$0.key == "sampleAtt3Int"}) {
+                    XCTAssertEqual(responseObject[index].value.intVal, 4)
+                    att3 = true
+                }
+                if let index = responseObject.firstIndex(where: {$0.key == "sampleAtt4Double"}) {
+                    XCTAssertEqual(responseObject[index].value.doubleVal, 3.1415926)
+                    att4 = true
+                }
+                if att1 && att2 && att3 && att4 {
+                    expectedResponse.fulfill()
+                } else {
+                    XCTFail("Some of the expected attributes could be retrieved")
+                }
+            }
+        } else {
+            XCTFail("""
+                Device empty, test cannot continue! Make sure to have at least two devices in your tenant, assigned to
+                current user which is authenticating for this integration test!
+                """)
+        }
+        wait(for: [expectedResponse], timeout: 3.0)
     }
 }
