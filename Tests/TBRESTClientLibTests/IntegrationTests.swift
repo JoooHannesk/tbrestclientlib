@@ -161,4 +161,17 @@ final class IntegrationTests: FunctionalTestCases {
         saveEntityAttributesSuccess(apiClient: tbTestClient)
         getAttributesByScopeSuccess(apiClient: tbTestClient)
     }
+    
+    /**
+     Test `deleteEntityAttributes()` – Fails with non-UUID conforming string as identifier
+     TB server responds with two different messages for unmatched device ID (ID not found on server) and
+     ID was not given as valid UUID string.
+     */
+    func testdeleteEntityAttributes() {
+        let (tbTestClient, serversettings) = prepare()
+        loginSucceeds(apiClient: tbTestClient)
+        getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        getCustomerDevices(apiClient: tbTestClient)
+        deleteEntityAttributes(apiClient: tbTestClient)
+    }
 }

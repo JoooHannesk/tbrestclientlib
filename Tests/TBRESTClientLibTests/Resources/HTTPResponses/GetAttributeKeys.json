@@ -3,6 +3,5 @@
   "inactivityAlarmTime",
   "lastConnectTime",
   "lastActivityTime",
-  "active",
-  "disabled"
+  "active"
 ]
