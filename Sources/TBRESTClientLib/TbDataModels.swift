@@ -187,8 +187,8 @@ public struct PaginationDataContainer<T: TBDataModel>: TBDataModel, PaginationDa
 }
 
 /**
- TB-Entitiy-Attributes have values of different types. This library supports: Bool, Int, Double, String (JSON is currenlty unsupported).
- Access the values as described in ``value``
+ TB-Entitiy-Attributes have **values** of **different types**. This library supports: Bool, Int, Double, String (JSON is currenlty unsupported).
+ Access the values as described in ``AttributesResponse/value``
  */
 public struct AttributesResponse: TBDataModel {
     /// attribute key as string

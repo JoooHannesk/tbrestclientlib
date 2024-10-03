@@ -1,6 +1,6 @@
 # ``TBRESTClientLib``
 
-Simple client library for [ThingsBoard](https://thingsboard.io) server installations implementing the administration / user-space API (not device API) – written in Swift.
+Simple client library for ThingsBoard server installations implementing the administration / user-space API (not device API) – written in Swift.
 
 ## Overview
 
@@ -10,4 +10,6 @@ Simple client library for [ThingsBoard](https://thingsboard.io) server installat
 - <doc:ReleaseNotes>
 - <doc:Installation>
 - <doc:Usage>
+- <doc:Tests>
+- <doc:Development>
 - <doc:License>
