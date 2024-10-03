@@ -343,4 +343,28 @@ public class TBUserApiClient: TBHTTPRequest {
             responseHandler?()
         }
     }
+    
+    // TODO: implement saveEntityTelemetry
+    
+    /**
+     Get unique time-series key names for the given entity – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
+     - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityId: entitiy id
+     - Parameter responseHandler: takes an 'Array<String>' as parameter and is called upon successful server response
+     */
+    public func getTimeseriesKeys(for entityType: TbEntityTypes, entityId: String, responseHandler: ((Array<String>) -> Void)?)
+    -> Void {
+        let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getTimeseriesKeys, replacePaths: [
+            URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
+            URLModifier(searchString: "{?entityId?}", replaceString: entityId)
+        ])
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                     authToken: self.authData, expectedTBResponseObject: Array<String>.self) { responseObject -> Void in
+            responseHandler?(responseObject as! Array<String>)
+        }
+    }
+    
+    
+    // TODO: implement deleteEntityTimeseries
+    
 }

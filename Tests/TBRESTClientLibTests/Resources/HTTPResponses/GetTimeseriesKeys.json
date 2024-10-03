@@ -1,0 +1,12 @@
+[
+  "IMEI",
+  "Model",
+  "battery",
+  "signal",
+  "interrupt",
+  "interrupt_level",
+  "temperature",
+  "distance",
+  "latitude",
+  "longitude"
+]

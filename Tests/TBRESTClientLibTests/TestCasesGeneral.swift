@@ -362,4 +362,28 @@ class FunctionalTestCases: XCTestCase {
         }
         wait(for: [expectedResponse], timeout: 3.0)
     }
+    
+    // TODO: implement test case for saveEntityTelemetry
+    
+    /**
+     Test getAttributeKeys()
+     */
+    func getTimeseriesKeys(apiClient: TBUserApiClient?) {
+        let expectedResponseWithKeyNames = XCTestExpectation(description: "Expected response containing entity id's time-series keys")
+        if let tbDevice = self.tbDevice?.id.id {
+            apiClient?.getTimeseriesKeys(for: .device, entityId: tbDevice) { keyNames -> Void in
+                if keyNames.contains("battery"), keyNames.contains("IMEI") {
+                    expectedResponseWithKeyNames.fulfill()
+                } else {
+                    XCTFail("Expected key missing in response!")
+                }
+            }
+        } else {
+            XCTFail("""
+                    Device empty, test cannot continue! Make sure to have at least one device in your tenant, assigned to the \
+                    current user which is authenticating for this integration test!
+                """)
+        }
+        wait(for: [expectedResponseWithKeyNames], timeout: 3.0)
+    }
 }
