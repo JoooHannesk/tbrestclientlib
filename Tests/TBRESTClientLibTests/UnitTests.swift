@@ -89,8 +89,8 @@ final class UnitTests: FunctionalTestCases {
     /**
      Test 'Device' data model equality check
      Equality check (==) was moved to a protocol extension to support all conforming entity data models in commit
-     Test compatibility for 'Device' data model - for sake of an additional test using a different type
-     This test requires to have **at least two different devices** in the GetCustomerDevices.json resource file
+     Test compatibility for 'Device' data model.
+     This test requires to have **at least two different devices** in the `GetCustomerDevices.json` resource file
      */
     func testDeviceEqualityCheck() {
         let devices = testGetCustomerDevices()
@@ -100,7 +100,6 @@ final class UnitTests: FunctionalTestCases {
         // expect devices to be unequal
         XCTAssertNotEqual(devices?[0], devices?[1])
     }
-    
     
     /**
      Test getCustomerDeviceInfos()
@@ -163,6 +162,15 @@ final class UnitTests: FunctionalTestCases {
         testGetCustomerDevices()
         let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "GetAttributes", expectedHTTPStatusCode: 200)
         getAttributesByScopeSuccess(apiClient: tbTestClient)
+    }
+    
+    /**
+     Test getTimeseriesKeys()
+     */
+    func testGetTimeseriesKeys() {
+        testGetCustomerDevices()
+        let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "GetTimeseriesKeys", expectedHTTPStatusCode: 200)
+        getTimeseriesKeys(apiClient: tbTestClient)
     }
     
 }
