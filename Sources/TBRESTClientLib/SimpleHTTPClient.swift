@@ -106,7 +106,7 @@ class SimpleHTTPClient {
         
         
         if responseData.isEmpty {
-            // some server side responses are empty, therefor return an empty string arra<
+            // some server side responses are empty, therefore return an empty array of type Array<String>
             // empty responses do NOT indicate errors (at least not for the current API version in this lib)
             let emptyResponseArray: Array<String> = []
             return .success(emptyResponseArray)
