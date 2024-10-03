@@ -247,7 +247,7 @@ public class TBUserApiClient: TBHTTPRequest {
      Get a set of unique attribute keys for the requested entity and given scope
      - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
      - Parameter entityId: entitiy id
-     - Parameter scope: scope in which the attribute is managed as defined in ``TbAttributesScope``
+     - Parameter scope: scope in which the attribute is managed, as defined in ``TbAttributesScope``
      - Parameter responseHandler: takes an 'Array<String>' as parameter and is called upon successful server response
      - Note: The response will include merged key names set for all attribute scopes: server - for all entity types, client - for devices, shared - for devices
      */
@@ -284,13 +284,13 @@ public class TBUserApiClient: TBHTTPRequest {
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ])
         tbApiRequest(fromEndpoint: endpointURL, withPayload: attributesData,
-                     authToken: self.authData, expectedTBResponseObject: Array<String>.self) { _ in
+                     authToken: self.authData, expectedTBResponseObject: [String].self) { _ in
             responseHandler?()
         }
     }
     
     /**
-     Get all attributes (scope-independent)  by keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
+     Get all entity attributes (scope-independent)  by keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
      - Parameter entityType:tb entity types as defined in ``TbEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the keys
@@ -307,7 +307,7 @@ public class TBUserApiClient: TBHTTPRequest {
     }
     
     /**
-     Get attributes by scope and by keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
+     Get entity attributes by scope and by keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
      - Parameter entityType:tb entity types as defined in ``TbEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the keys
@@ -325,4 +325,22 @@ public class TBUserApiClient: TBHTTPRequest {
         }
     }
     
+    /**
+     Delete entity attributes by scope and keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
+     - Parameter entityType:tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityId: entitiy id
+     - Parameter keys: array of strings containing the keys
+     - Parameter scope: scope in which the attribute is managed as defined in ``TbAttributesScope``
+     - Parameter responseHandler: takes no parameters, is called on success
+     */
+    public func deleteEntityAttributes(for entityType: TbEntityTypes, entityId: String, keys: [String], scope: TbAttributesScope, responseHandler: (() -> Void)? = nil) {
+        let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.deleteEntityAttributes, replacePaths: [
+            URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
+            URLModifier(searchString: "{?entityId?}", replaceString: entityId),
+            URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
+        ], keys: keys)
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete, authToken: self.authData, expectedTBResponseObject: [String].self) { _ in
+            responseHandler?()
+        }
+    }
 }

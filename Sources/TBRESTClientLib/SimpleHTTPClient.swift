@@ -23,6 +23,7 @@ enum TBHTTPClientRequestError: Error {
 enum SupportedHTTPMethods: String {
     case post = "POST"
     case get = "GET"
+    case delete = "DELETE"
 }
 
 class SimpleHTTPClient {

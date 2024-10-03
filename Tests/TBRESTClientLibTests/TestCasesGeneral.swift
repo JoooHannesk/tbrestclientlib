@@ -4,7 +4,7 @@
 //
 //  Created by Johannes Kinzig on 28.08.24.
 //
-// Adopted API for Version: CE 3.7.0
+// Adopted API for library version: CE 3.7.0
 
 import XCTest
 @testable import TBRESTClientLib
@@ -159,8 +159,11 @@ class FunctionalTestCases: XCTestCase {
         let expectedResponseWithAttributes = XCTestExpectation(description: "Expected response containing entity id's attributes keys")
         if let tbDevice = self.tbDevice?.id.id {
             apiClient?.getAttributeKeys(for: .device, entityId: tbDevice) { attrArray -> Void in
-                print("Attribute Keys: \(attrArray)")
-                expectedResponseWithAttributes.fulfill()
+                if attrArray.contains("lastActivityTime"), attrArray.contains("lastConnectTime")  {
+                    expectedResponseWithAttributes.fulfill()
+                } else {
+                    XCTFail("Expected keys missing in response!")
+                }
             }
         } else {
             XCTFail("""
@@ -177,8 +180,12 @@ class FunctionalTestCases: XCTestCase {
     func getAttributeKeysByScope(apiClient: TBUserApiClient?) {
         let expectedResponseWithAttributesScoped = XCTestExpectation(description: "Expected response containing entity id's attributes keys")
         if let tbDevice = self.tbDevice?.id.id {
-            apiClient?.getAttributeKeysByScope(for: .device, entityId: tbDevice, scope: .client) { attrArray -> Void in
-                print("Attribute Keys by Scope (.client): \(attrArray)")
+            apiClient?.getAttributeKeysByScope(for: .device, entityId: tbDevice, scope: .server) { attrArray -> Void in
+                if attrArray.contains("lastActivityTime"), attrArray.contains("lastConnectTime")  {
+                    expectedResponseWithAttributesScoped.fulfill()
+                } else {
+                    XCTFail("Expected keys missing in response!")
+                }
                 expectedResponseWithAttributesScoped.fulfill()
             }
         } else {
@@ -203,8 +210,8 @@ class FunctionalTestCases: XCTestCase {
             }
         } else {
             XCTFail("""
-                    Device empty, test cannot continue! Make sure to have at least two devices in your tenant, assigned to the \
-                    current user which is authenticating for this integration test!
+                    Device empty, test cannot continue! Make sure that the first device in your tenant has shared attributes as required by \
+                    this test case and is assigned to the current user which is authenticating for this integration test!
                 """)
         }
         wait(for: [expectedResponse], timeout: 3.0)
@@ -250,7 +257,7 @@ class FunctionalTestCases: XCTestCase {
     
     /**
      Test getAttributes
-     For integration test to succeed requires that **saveEntityAttributesSuccess()** was run successfully
+     For integration test to succeed requires that `saveEntityAttributesSuccess()` was run successfully
      */
     func getAttributesSuccess(apiClient: TBUserApiClient?) {
         let expectedResponse = XCTestExpectation(description: "Expected response with attributes...")
@@ -285,8 +292,8 @@ class FunctionalTestCases: XCTestCase {
             }
         } else {
             XCTFail("""
-                Device empty, test cannot continue! Make sure to have at least two devices in your tenant, assigned to
-                current user which is authenticating for this integration test!
+                Device empty, test cannot continue! Make sure that the first device in your tenant has shared attributes as required by \
+                this test case and is assigned to the current user which is authenticating for this integration test!
                 """)
         }
         wait(for: [expectedResponse], timeout: 3.0)
@@ -294,7 +301,7 @@ class FunctionalTestCases: XCTestCase {
     
     /**
      Test getAttributesByScope
-     For integration test to succeed requires that **saveEntityAttributesSuccess()** was run successfully
+     For integration test to succeed requires that `saveEntityAttributesSuccess()` was run successfully
      */
     func getAttributesByScopeSuccess(apiClient: TBUserApiClient?) {
         let expectedResponse = XCTestExpectation(description: "Expected response with attributes...")
@@ -329,8 +336,28 @@ class FunctionalTestCases: XCTestCase {
             }
         } else {
             XCTFail("""
-                Device empty, test cannot continue! Make sure to have at least two devices in your tenant, assigned to
-                current user which is authenticating for this integration test!
+                Device empty, test cannot continue! Make sure that the first device in your tenant has shared attributes as required by \
+                this test case and is assigned to the current user which is authenticating for this integration test!
+                """)
+        }
+        wait(for: [expectedResponse], timeout: 3.0)
+    }
+    
+    /**
+     Test deleteEntityAttributes **Run with integration tests only**
+     Test requires  that `saveEntityAttributesSuccess()` was run successfully!
+     */
+    func deleteEntityAttributes(apiClient: TBUserApiClient?) {
+        let expectedResponse = XCTestExpectation(description: "Expected response...")
+        let sampleAttributeKeys = ["sampleAtt1String", "sampleAtt2Bool"]
+        if let tbDevice = self.tbDevice?.id.id {
+            apiClient?.deleteEntityAttributes(for: .device, entityId: tbDevice, keys: sampleAttributeKeys, scope: .shared) {
+                expectedResponse.fulfill()
+            }
+        } else {
+            XCTFail("""
+                    Device empty, test cannot continue! Make sure that the first device in your tenant has shared attributes as required by \
+                    this test case and is assigned to the current user which is authenticating for this integration test!
                 """)
         }
         wait(for: [expectedResponse], timeout: 3.0)

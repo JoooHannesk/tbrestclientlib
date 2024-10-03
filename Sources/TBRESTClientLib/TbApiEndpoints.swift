@@ -21,6 +21,7 @@ enum TbAPIEndpointsV1: String, TbAPIEndpointsEnum {
     case saveEntityAttributes = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/attributes/{?scope?}"
     case getAttributes = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/values/attributes"
     case getAttributesByScope = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/values/attributes/{?scope?}"
+    case deleteEntityAttributes = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/{?scope?}"
 }
 
 
