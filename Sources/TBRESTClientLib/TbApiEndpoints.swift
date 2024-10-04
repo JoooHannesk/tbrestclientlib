@@ -23,6 +23,7 @@ enum TbAPIEndpointsV1: String, TbAPIEndpointsEnum {
     case getAttributesByScope = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/values/attributes/{?scope?}"
     case deleteEntityAttributes = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/{?scope?}"
     case getTimeseriesKeys = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/keys/timeseries"
+    case saveEntityTelemetry = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/timeseries/{?scope?}"
 }
 
 
@@ -48,10 +49,11 @@ public enum TbQueryTransportType: String {
     case snmp = "SNMP"
 }
 
-public enum TbAttributesScope: String {
+public enum TbEntityScopes: String {
     case server = "SERVER_SCOPE" /// for all entity types
     case client = "CLIENT_SCOPE" /// for devices
     case shared = "SHARED_SCOPE" /// for devices
+    case any = "ANY" /// required by server to stay backwards compatible
 }
 
 public enum TbEntityTypes: String {

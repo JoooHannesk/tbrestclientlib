@@ -173,8 +173,17 @@ final class IntegrationTests: FunctionalTestCases {
         deleteEntityAttributes(apiClient: tbTestClient)
     }
     
-    // TODO: implement test case for saveEntityTelemetry
-    
+    /**
+     Test saveEntityTelemetrySuccess() – Success
+     */
+    func testSaveEntityTelemetrySuccess() {
+        let (tbTestClient, serversettings) = prepare()
+        loginSucceeds(apiClient: tbTestClient)
+        getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        getCustomerDevices(apiClient: tbTestClient)
+        saveEntityTelemetrySuccess(apiClient: tbTestClient)
+    }
+
     /**
      Test `testGetTimeseriesKeys()`
      */
@@ -183,6 +192,7 @@ final class IntegrationTests: FunctionalTestCases {
         loginSucceeds(apiClient: tbTestClient)
         getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
         getCustomerDevices(apiClient: tbTestClient)
+        saveEntityTelemetrySuccess(apiClient: tbTestClient)
         getTimeseriesKeys(apiClient: tbTestClient)
     }
 }
