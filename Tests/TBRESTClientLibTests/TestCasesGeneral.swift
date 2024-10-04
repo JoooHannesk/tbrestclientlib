@@ -406,4 +406,25 @@ class FunctionalTestCases: XCTestCase {
         }
         wait(for: [expectedResponseWithKeyNames], timeout: 3.0)
     }
+    
+    /**
+     Test deleteEntityTimeseries()
+     Delete time-series data for given time interval: Epoche 0 until now
+     */
+    func deleteEntityTimeseries(apiClient: TBUserApiClient?) {
+        let expectedResponse = XCTestExpectation(description: "Expected response...")
+        let dateTimeNow = Int64(Date().timeIntervalSince1970) * 1000
+        let sampleKeys = ["SampleIMEI", "SampleBattery"]
+        if let tbDevice = self.tbDevice?.id.id {
+            apiClient?.deleteEntityTimeseries(for: .device, entityId: tbDevice, keys: sampleKeys, startTs: 0, endTs: dateTimeNow, deleteLatest: true) {
+                expectedResponse.fulfill()
+            }
+        } else {
+            XCTFail("""
+                    Device empty, test cannot continue! Make sure that the first device in your tenant time-series keys as required by \
+                    this test case and is assigned to the current user which is authenticating for this integration test!
+                """)
+        }
+        wait(for: [expectedResponse], timeout: 3.0)
+    }
 }

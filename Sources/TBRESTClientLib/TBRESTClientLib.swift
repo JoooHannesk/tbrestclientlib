@@ -5,6 +5,7 @@
 //  Created by Johannes Kinzig on 30.07.24.
 //
 // Thingsboard Client Library - implementing the thingsboard administration / user-space api (not device api)
+//
 
 import Foundation
 
@@ -132,7 +133,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter sortOrder: sort results in ascending or descending order, state according to 'TbQuerysortOrder'; default: .ascending
      - Parameter responseHandler: takes a 'PageDataContainer<Device>' as parameter and is called upon successful server response
      - Returns: Void
-     - Note: for supported data models as parameters see: TbDataModels.swift
+     - Note: for supported data models as parameters see: `TbDataModels.swift`
      */
     public func getCustomerDeviceInfos(customerId: String,
                                 pageSize: Int32 = Int32.max,
@@ -223,7 +224,7 @@ public class TBUserApiClient: TBHTTPRequest {
     
     // MARK: - Attributes and Telemetry
     /**
-     Get Attribute Keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
+     Get Attribute Keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
      Get a set of unique attribute keys for the requested entity.
      - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
      - Parameter entityId: entitiy id
@@ -243,7 +244,7 @@ public class TBUserApiClient: TBHTTPRequest {
     }
     
     /**
-     Get Attribute Keys by Scope – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
+     Get Attribute Keys by Scope – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
      Get a set of unique attribute keys for the requested entity and given scope
      - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
      - Parameter entityId: entitiy id
@@ -266,7 +267,7 @@ public class TBUserApiClient: TBHTTPRequest {
     }
     
     /**
-     Create or update the attributes based on entity id and the specified attribute scope – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
+     Create or update the attributes based on entity id and the specified attribute scope – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
      Implementes the endpoint saveEntityAttributesV2
      - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
      - Parameter entityId: entitiy id
@@ -290,7 +291,7 @@ public class TBUserApiClient: TBHTTPRequest {
     }
     
     /**
-     Get all entity attributes (scope-independent)  by keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
+     Get all entity attributes (scope-independent)  by keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
      - Parameter entityType:tb entity types as defined in ``TbEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the keys
@@ -307,7 +308,7 @@ public class TBUserApiClient: TBHTTPRequest {
     }
     
     /**
-     Get entity attributes by scope and by keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
+     Get entity attributes by scope and by keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
      - Parameter entityType:tb entity types as defined in ``TbEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the keys
@@ -326,7 +327,7 @@ public class TBUserApiClient: TBHTTPRequest {
     }
     
     /**
-     Delete entity attributes by scope and keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
+     Delete entity attributes by scope and keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
      - Parameter entityType:tb entity types as defined in ``TbEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the keys
@@ -344,9 +345,8 @@ public class TBUserApiClient: TBHTTPRequest {
         }
     }
     
-    
     /**
-     Save entity telemetry data for the given entity – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
+     Save entity telemetry data for the given entity – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
      - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter timeseriesData: timeseries data as key-value pairs (as dictionary)
@@ -368,7 +368,7 @@ public class TBUserApiClient: TBHTTPRequest {
     }
     
     /**
-     Get unique time-series key names for the given entity – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
+     Get unique time-series key names for the given entity – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
      - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter responseHandler: takes an 'Array<String>' as parameter and is called upon successful server response
@@ -386,6 +386,34 @@ public class TBUserApiClient: TBHTTPRequest {
     }
     
     
-    // TODO: implement deleteEntityTimeseries
+    /**
+     Delete entity time-series data – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     Delete time-series data for selected entity based on its id, type and keys
+     - Parameter entityType:tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityId: entitiy id
+     - Parameter keys: array of strings containing the keys
+     - Parameter deleteAllDataForKeys: delete all time-series data for given key (should be false when used with `startTs`/`endTs`)
+     - Parameter startTs: delete time-series data for given periode – specified by startTs and endTs (milliseconds, int64)
+     - Parameter endTs: delete time-series data for given periode – specified by startTs and endTs (milliseconds, int64)
+     - Parameter deleteLatest: delete latest value (stored in separate table for performance), if the value's timestamp matches the time-frame
+     - Parameter rewriteLatestIfDeleted: rewrite latest value (stored in separate table for performance) if the value's timestamp matches the time-frame and `deleteLatest` is true;
+     the replacement value will be fetched from the 'time-series' table, and its timestamp will be the most recent one before the defined time-range
+     */
+    public func deleteEntityTimeseries(for entityType: TbEntityTypes, entityId: String, keys: [String],
+                                       deleteAllDataForKeys: Bool? = nil,
+                                       startTs: Int64? = nil, endTs: Int64? = nil,
+                                       deleteLatest: Bool? = nil, rewriteLatestIfDeleted: Bool? = nil,
+                                       responseHandler: (() -> Void)? = nil) {
+        let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.deleteEntityTimeseries,
+                                                                replacePaths: [
+                                                                    URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
+                                                                    URLModifier(searchString: "{?entityId?}", replaceString: entityId)
+                                                                ],
+                                                                keys: keys, deleteAllDataForKeys: deleteAllDataForKeys, startTs: startTs, endTs: endTs,
+                                                                deleteLatest: deleteLatest, rewriteLatestIfDeleted: rewriteLatestIfDeleted)
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete, authToken: self.authData, expectedTBResponseObject: [String].self) { _ in
+            responseHandler?()
+        }
+    }
     
 }
