@@ -349,7 +349,7 @@ class FunctionalTestCases: XCTestCase {
      */
     func deleteEntityAttributes(apiClient: TBUserApiClient?) {
         let expectedResponse = XCTestExpectation(description: "Expected response...")
-        let sampleAttributeKeys = ["sampleAtt1String", "sampleAtt2Bool"]
+        let sampleAttributeKeys = ["sampleAtt1String", "sampleAtt2Bool", "sampleAtt3Int", "sampleAtt4Double"]
         if let tbDevice = self.tbDevice?.id.id {
             apiClient?.deleteEntityAttributes(for: .device, entityId: tbDevice, keys: sampleAttributeKeys, scope: .shared) {
                 expectedResponse.fulfill()
@@ -372,7 +372,7 @@ class FunctionalTestCases: XCTestCase {
         let expectedResponseWithKeyNames = XCTestExpectation(description: "Expected response containing entity id's time-series keys")
         if let tbDevice = self.tbDevice?.id.id {
             apiClient?.getTimeseriesKeys(for: .device, entityId: tbDevice) { keyNames -> Void in
-                if keyNames.contains("battery"), keyNames.contains("IMEI") {
+                if keyNames.contains("SampleIMEI"), keyNames.contains("SampleBattery") {
                     expectedResponseWithKeyNames.fulfill()
                 } else {
                     XCTFail("Expected key missing in response!")
