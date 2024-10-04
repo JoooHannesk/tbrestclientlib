@@ -363,7 +363,27 @@ class FunctionalTestCases: XCTestCase {
         wait(for: [expectedResponse], timeout: 3.0)
     }
     
-    // TODO: implement test case for saveEntityTelemetry
+    /**
+     Test saveEntityTelemetry() – success
+     **Run with integration tests only**
+     */
+    func saveEntityTelemetrySuccess(apiClient: TBUserApiClient?) {
+        let expectedResponse = XCTestExpectation(description: "Expected response...")
+        let sampleTimeseriesData = ["SampleIMEI": 999999999999999, "SampleBattery": 100] as [String : Any]
+        // works as well
+        // let sampleTimeseriesData = ["ts":1634712287000, "values": ["SampleIMEI": 999999999999999, "SampleBattery": 100]] as [String : Any]
+        if let tbDevice = self.tbDevice?.id.id {
+            apiClient?.saveEntityTelemetry(for: .device, entityId: tbDevice, timeseriesData: sampleTimeseriesData) {
+                expectedResponse.fulfill()
+            }
+        } else {
+            XCTFail("""
+                    Device empty, test cannot continue! Make sure that the first device in your tenant has time-series keys as required by \
+                    this test case and is assigned to the current user which is authenticating for this integration test!
+                """)
+        }
+        wait(for: [expectedResponse], timeout: 3.0)
+    }
     
     /**
      Test getAttributeKeys()

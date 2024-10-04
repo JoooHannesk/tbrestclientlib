@@ -252,7 +252,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Note: The response will include merged key names set for all attribute scopes: server - for all entity types, client - for devices, shared - for devices
      */
     public func getAttributeKeysByScope(for entityType: TbEntityTypes, entityId: String,
-                                        scope: TbAttributesScope, responseHandler: ((Array<String>) -> Void)?)
+                                        scope: TbEntityScopes, responseHandler: ((Array<String>) -> Void)?)
     -> Void {
         let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getAttributeKeysByScope, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
@@ -276,7 +276,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Note: Attribute scopes depend on the entity type: .server - supported for all entity; .shared - supported for devices
      */
     public func saveEntityAttributes(for entityType: TbEntityTypes, entityId: String, attributesData:  Dictionary<String, Any>,
-                                     scope: TbAttributesScope, responseHandler: (() -> Void)? = nil)
+                                     scope: TbEntityScopes, responseHandler: (() -> Void)? = nil)
     -> Void {
         let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.saveEntityAttributes, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
@@ -314,7 +314,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter scope: scope in which the attribute is managed as defined in ``TbAttributesScope``
      - Parameter responseHandler: takes an array containing items of type ``AttributesResponse``
      */
-    public func getAttributesByScope(for entityType: TbEntityTypes, entityId: String, keys: [String] = [], scope: TbAttributesScope, responseHandler: (([AttributesResponse]) -> Void)?) {
+    public func getAttributesByScope(for entityType: TbEntityTypes, entityId: String, keys: [String] = [], scope: TbEntityScopes, responseHandler: (([AttributesResponse]) -> Void)?) {
         let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getAttributesByScope, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
             URLModifier(searchString: "{?entityId?}", replaceString: entityId),
@@ -333,7 +333,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter scope: scope in which the attribute is managed as defined in ``TbAttributesScope``
      - Parameter responseHandler: takes no parameters, is called on success
      */
-    public func deleteEntityAttributes(for entityType: TbEntityTypes, entityId: String, keys: [String], scope: TbAttributesScope, responseHandler: (() -> Void)? = nil) {
+    public func deleteEntityAttributes(for entityType: TbEntityTypes, entityId: String, keys: [String], scope: TbEntityScopes, responseHandler: (() -> Void)? = nil) {
         let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.deleteEntityAttributes, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
             URLModifier(searchString: "{?entityId?}", replaceString: entityId),
@@ -344,7 +344,28 @@ public class TBUserApiClient: TBHTTPRequest {
         }
     }
     
-    // TODO: implement saveEntityTelemetry
+    
+    /**
+     Save entity telemetry data for the given entity – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
+     - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityId: entitiy id
+     - Parameter timeseriesData: timeseries data as key-value pairs (as dictionary)
+     - Parameter responseHandler: takes no parameters and is called upon successful server response
+     - Note: This library supports pushing time-series data to server but with limited functionality (simple json object).
+     This limitation is accepted, as the main scope of this library is not to mimic client device functionality. In principle, this function
+     may be used to push mass-data to the server – which results in repetitive function-calls leading to repetitive http requests.
+     */
+    func saveEntityTelemetry(for entityType: TbEntityTypes, entityId: String, timeseriesData: Dictionary<String, Any>, responseHandler: (() -> Void)? = nil) {
+        let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.saveEntityTelemetry, replacePaths: [
+            URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
+            URLModifier(searchString: "{?entityId?}", replaceString: entityId),
+            URLModifier(searchString: "{?scope?}", replaceString: TbEntityScopes.any.rawValue)
+        ])
+        tbApiRequest(fromEndpoint: endpointURL, withPayload: timeseriesData,
+                     authToken: self.authData, expectedTBResponseObject: [String].self) { _ in
+            responseHandler?()
+        }
+    }
     
     /**
      Get unique time-series key names for the given entity – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority.
