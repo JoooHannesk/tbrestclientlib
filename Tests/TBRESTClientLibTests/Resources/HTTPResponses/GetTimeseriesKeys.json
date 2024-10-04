@@ -1,7 +1,7 @@
 [
-  "IMEI",
+  "SampleIMEI",
   "Model",
-  "battery",
+  "SampleBattery",
   "signal",
   "interrupt",
   "interrupt_level",
