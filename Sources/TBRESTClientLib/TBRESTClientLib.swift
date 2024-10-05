@@ -248,7 +248,7 @@ public class TBUserApiClient: TBHTTPRequest {
      Get a set of unique attribute keys for the requested entity and given scope
      - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
      - Parameter entityId: entitiy id
-     - Parameter scope: scope in which the attribute is managed, as defined in ``TbAttributesScope``
+     - Parameter scope: scope in which the attribute is managed, as defined in ``TbEntityScopes``
      - Parameter responseHandler: takes an 'Array<String>' as parameter and is called upon successful server response
      - Note: The response will include merged key names set for all attribute scopes: server - for all entity types, client - for devices, shared - for devices
      */
@@ -272,7 +272,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter attributesData: attributes with values as key value pairs, contained inside a dictionary
-     - Parameter scope: scope in which the attribute is managed as defined in ``TbAttributesScope``
+     - Parameter scope: scope in which the attribute is managed as defined in ``TbEntityScopes``
      - Parameter responseHandler: takes no parameters and is called upon successful server response
      - Note: Attribute scopes depend on the entity type: .server - supported for all entity; .shared - supported for devices
      */
@@ -312,7 +312,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter entityType:tb entity types as defined in ``TbEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the keys
-     - Parameter scope: scope in which the attribute is managed as defined in ``TbAttributesScope``
+     - Parameter scope: scope in which the attribute is managed as defined in ``TbEntityScopes``
      - Parameter responseHandler: takes an array containing items of type ``AttributesResponse``
      */
     public func getAttributesByScope(for entityType: TbEntityTypes, entityId: String, keys: [String] = [], scope: TbEntityScopes, responseHandler: (([AttributesResponse]) -> Void)?) {
@@ -331,7 +331,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter entityType:tb entity types as defined in ``TbEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the keys
-     - Parameter scope: scope in which the attribute is managed as defined in ``TbAttributesScope``
+     - Parameter scope: scope in which the attribute is managed as defined in ``TbEntityScopes``
      - Parameter responseHandler: takes no parameters, is called on success
      */
     public func deleteEntityAttributes(for entityType: TbEntityTypes, entityId: String, keys: [String], scope: TbEntityScopes, responseHandler: (() -> Void)? = nil) {
@@ -385,6 +385,12 @@ public class TBUserApiClient: TBHTTPRequest {
         }
     }
     
+    /**
+     
+     */
+    public func getLatestTimeseries() {
+        
+    }
     
     /**
      Delete entity time-series data – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
@@ -415,5 +421,4 @@ public class TBUserApiClient: TBHTTPRequest {
             responseHandler?()
         }
     }
-    
 }
