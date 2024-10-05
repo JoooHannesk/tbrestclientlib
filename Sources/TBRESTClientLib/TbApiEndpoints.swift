@@ -23,6 +23,7 @@ enum TbAPIEndpointsV1: String, TbAPIEndpointsEnum {
     case deleteEntityAttributes = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/{?scope?}"
     case getTimeseriesKeys = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/keys/timeseries"
     case saveEntityTelemetry = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/timeseries/{?scope?}"
+    case getLatestTimeseries = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/values/timeseries"
     case deleteEntityTimeseries = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/timeseries/delete"
 }
 

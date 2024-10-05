@@ -21,11 +21,11 @@ extension TBDataModel {
 extension Array: TBDataModel where Element: Codable { }
 
 /// Support subscript access for conforming types
-protocol PaginationDataResponse {
+public protocol PaginationDataResponse {
     associatedtype T
     var data: Array<T>?  { get }
 }
-extension PaginationDataResponse {
+public extension PaginationDataResponse {
     /**
      Return number of items on this page
      - Returns: number of items on this page, Int
@@ -178,32 +178,42 @@ public struct AdditionalInfo: TBDataModel {
 }
 
 public struct PaginationDataContainer<T: TBDataModel>: TBDataModel, PaginationDataResponse {
-    let data: Array<T>?
-    let totalPages: Int
-    let totalElements: Int
-    let hasNext: Bool
+    public let data: Array<T>?
+    public let totalPages: Int
+    public let totalElements: Int
+    public let hasNext: Bool
 // alternative way to define this struct:
 // struct PaginationDataContainer<T>: TBDataModel, PaginationDataResponse where T: TBDataModel {
 }
 
-/**
- TB-Entitiy-Attributes have **values** of **different types**. This library supports: Bool, Int, Double, String (JSON is currenlty unsupported).
- Access the values as described in ``AttributesResponse/value``
- */
+/// Represent a swift-native type for: ThingsBoard entity attribute
 public struct AttributesResponse: TBDataModel {
     /// attribute key as string
     public let key: String
-    /**
-     TBAttribute value inside associated value as enum case, depending on the expected return type,
-     access the value using the following members: *value.boolVal*, *value.intVal*, *value.doubleVal*, *value.stringVal*
-     For further implementation details, refer to ``MValue``
-     */
-    public let value: MValue
-    /// last updated time
+    /// ThingsBoard data points have **values** of **different types**. This library supports: Bool, Int, Double, String (JSON is currenlty unsupported).
+    /// Access the values as described in ``MplValueType``
+    public let value: MplValueType
+    /// last updated timestamp in milliseconds unix time
     public let lastUpdateTs: Int
 }
 
-public enum MValue: TBDataModel {
+/// Represent a swift-native type for: ThingsBoard time-series data value
+public struct TimeseriesResponse: TBDataModel {
+    /// ThingsBoard data points have **values** of **different types**. This library supports: Bool, Int, Double, String (JSON is currenlty unsupported).
+    /// Access the values as described in ``MplValueType``
+    public let value: MplValueType
+    /// Value's timestamp in milliseconds unix time
+    public let ts: Int
+}
+
+/**
+ ThingsBoard data (e.g. attributes or time-series data) retrieved from the server have values of different types, wrapped inside a JSON response.
+ `MplValueType` is designed to automatically detect the value's type and cast it into swift-native datatypes. Currently **Bool**, **Int**, **Double**, **String**
+ is supported, a **JSON-String as a value is currenlty unsupported**.
+ Depending on the value's expected type, use the following members to get the value from the `value` property:
+ `value.intVal`, `value.doubleVal`, `value.stringVal`, `value.boolVal`
+ */
+public enum MplValueType: TBDataModel {
     case bool(Bool)
     case int(Int)
     case double(Double)
@@ -245,7 +255,7 @@ public enum MValue: TBDataModel {
         } else if let x = try? container.decode(String.self) {
             self = .string(x)
         } else {
-            throw DecodingError.typeMismatch(MValue.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for value, failed to convert server response JSON!"))
+            throw DecodingError.typeMismatch(MplValueType.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for value, failed to convert JSON response!"))
         }
     }
 }
