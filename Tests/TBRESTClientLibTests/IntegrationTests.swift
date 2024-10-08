@@ -197,6 +197,32 @@ final class IntegrationTests: FunctionalTestCases {
     }
     
     /**
+     Test `getLatestTimeseries()`
+     Values as strings  (useStrictDataTypes = false)
+     */
+    func testGetLatestTimeseriesValuesAsStrings() {
+        let (tbTestClient, serversettings) = prepare()
+        loginSucceeds(apiClient: tbTestClient)
+        getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        getCustomerDevices(apiClient: tbTestClient)
+        saveEntityTelemetrySuccess(apiClient: tbTestClient)
+        getLatestTimeseries(apiClient: tbTestClient, getValuesAsStrings: true, keys: ["SampleIMEI", "SampleBattery"])
+    }
+    
+    /**
+     Test `getLatestTimeseries()`
+     Values as native datatypes (useStrictDataTypes = true)
+     */
+    func testGetLatestTimeseriesValuesAsNativeTypes() {
+        let (tbTestClient, serversettings) = prepare()
+        loginSucceeds(apiClient: tbTestClient)
+        getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        getCustomerDevices(apiClient: tbTestClient)
+        saveEntityTelemetrySuccess(apiClient: tbTestClient)
+        getLatestTimeseries(apiClient: tbTestClient, getValuesAsStrings: false, keys: ["SampleIMEI", "SampleBattery"])
+    }
+    
+    /**
      Test `deleteEntityTimeseries()`
      */
     func testdeleteEntityTimeseries() {

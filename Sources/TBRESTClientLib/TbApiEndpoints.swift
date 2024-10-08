@@ -144,6 +144,7 @@ struct APIEndpointManager {
         endTs: Int64? = nil,
         deleteLatest: Bool? = nil,
         rewriteLatestIfDeleted: Bool? = nil,
+        useStrictDataTypes: Bool? = nil,
         transportType: TbQueryTransportType? = nil,
         sortProperty: TbQuerySortProperty? = nil,
         sortOrder: TbQuerysortOrder? = nil
@@ -161,6 +162,7 @@ struct APIEndpointManager {
         if let endTs = endTs { queryParameter += "&endTs=\(endTs)" }
         if let deleteLatest = deleteLatest { queryParameter += "&deleteLatest=\(deleteLatest)" }
         if let rewriteLatestIfDeleted = rewriteLatestIfDeleted { queryParameter += "&rewriteLatestIfDeleted=\(rewriteLatestIfDeleted)"}
+        if let useStrictDataTypes = useStrictDataTypes { queryParameter += "&useStrictDataTypes=\(useStrictDataTypes)" }
         if let transportType = transportType { queryParameter += "&transportType=\(transportType.rawValue)"}
         if let sortProperty = sortProperty { queryParameter += "&sortProperty=\(sortProperty.rawValue)" }
         if let sortOrder = sortOrder { queryParameter += "&sortOrder=\(sortOrder.rawValue)" }

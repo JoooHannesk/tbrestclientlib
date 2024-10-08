@@ -386,10 +386,28 @@ public class TBUserApiClient: TBHTTPRequest {
     }
     
     /**
-     
+     Get the **latest** time-series data from server – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     Latest time-series data is stored in a different table for performance reasons (according to ThingsBoard docs) and can therefore be retrieved
+     via a seperate API call.
+     - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityId: entitiy id
+     - Parameter keys: array of strings containing the keys
+     - Parameter getValuesAsString: Get values from servers as strings (not as native datatypes)
+     - Parameter responseHandler: takes an 'Dictionary<String, [TimeseriesResponse]>' as parameter and is called upon successful server response
+     - Note: Retrieving values as strings is recommended if a time-series value is e.g. of type JSON-String.
+     JSON-String values cannot be treated by this library as native datatypes currently and should therefore be retrieved as strings. To get the value from a ``TimeseriesResponse`` object, refer to
+     ``TimeseriesResponse/value`` and ``MplValueType``.
      */
-    public func getLatestTimeseries() {
-        
+    public func getLatestTimeseries(for entityType: TbEntityTypes, entityId: String, keys: Array<String>? = nil,
+                                    getValuesAsStrings: Bool = true, responseHandler: ((Dictionary<String, [TimeseriesResponse]>) -> Void)?) {
+        let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getLatestTimeseries, replacePaths: [
+            URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
+            URLModifier(searchString: "{?entityId?}", replaceString: entityId)],
+                                                                keys: keys, useStrictDataTypes: !getValuesAsStrings)
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                     authToken: self.authData, expectedTBResponseObject: Dictionary<String, [TimeseriesResponse]>.self) { responseObject -> Void in
+            responseHandler?(responseObject as! Dictionary<String, [TimeseriesResponse]>)
+        }
     }
     
     /**
