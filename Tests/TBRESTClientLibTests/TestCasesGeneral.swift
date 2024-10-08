@@ -386,7 +386,7 @@ class FunctionalTestCases: XCTestCase {
     }
     
     /**
-     Test getAttributeKeys()
+     Test getTimeseriesKeys()
      */
     func getTimeseriesKeys(apiClient: TBUserApiClient?) {
         let expectedResponseWithKeyNames = XCTestExpectation(description: "Expected response containing entity id's time-series keys")
@@ -405,6 +405,46 @@ class FunctionalTestCases: XCTestCase {
                 """)
         }
         wait(for: [expectedResponseWithKeyNames], timeout: 3.0)
+    }
+    
+    /**
+     Test getLatestTimeseries()
+     */
+    func getLatestTimeseries(apiClient: TBUserApiClient?, getValuesAsStrings: Bool, keys: [String]? = nil) {
+        let expectedResponseLatestTimeseries = XCTestExpectation(description: "Expected response with timeseries data...")
+        apiClient?.registerAppErrorHandler { tbAppError in
+            print("Test failed with error: \(tbAppError)")
+            XCTFail(tbAppError.message)
+        }
+        if let tbDevice = self.tbDevice?.id.id {
+            apiClient?.getLatestTimeseries(for: .device, entityId: tbDevice, keys: keys, getValuesAsStrings: getValuesAsStrings) { responseObject in
+                if let sampleimei = responseObject["SampleIMEI"], let samplebattery = responseObject["SampleBattery"] {
+                    if getValuesAsStrings {
+                        // reflect values-as-string case
+                        if sampleimei[0].value.stringVal == "999999999999999", samplebattery[0].value.stringVal == "100" {
+                            expectedResponseLatestTimeseries.fulfill()
+                        } else {
+                            XCTFail("Expected different value/type!")
+                        }
+                    } else {
+                        // reflect values-as-native-types case
+                        if sampleimei[0].value.intVal == 999999999999999, samplebattery[0].value.intVal == 100 {
+                            expectedResponseLatestTimeseries.fulfill()
+                        } else {
+                            XCTFail("Expected different value/type!")
+                        }
+                    }
+                } else {
+                    XCTFail("Expected key missing in response!")
+                }
+            }
+        } else {
+            XCTFail("""
+                Device empty, test cannot continue! Make sure that the first device in your tenant has shared attributes as required by \
+                this test case and is assigned to the current user which is authenticating for this integration test!
+                """)
+        }
+        wait(for: [expectedResponseLatestTimeseries], timeout: 3.0)
     }
     
     /**

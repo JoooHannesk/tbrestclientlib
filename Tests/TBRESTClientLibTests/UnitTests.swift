@@ -165,6 +165,26 @@ final class UnitTests: FunctionalTestCases {
     }
     
     /**
+     Test getLatestTimeseries()
+     Values as strings  (useStrictDataTypes = false)
+     */
+    func testGetLatestTimeseriesValuesAsStrings() {
+        testGetCustomerDevices()
+        let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "GetLatestTimeseriesAsStrings", expectedHTTPStatusCode: 200)
+        getLatestTimeseries(apiClient: tbTestClient, getValuesAsStrings: true)
+    }
+    
+    /**
+     Test getLatestTimeseries()
+     Values as native datatypes (useStrictDataTypes = true)
+     */
+    func testGetLatestTimeseriesValuesAsNativeTypes() {
+        testGetCustomerDevices()
+        let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "GetLatestTimeseriesAsNativeTypes", expectedHTTPStatusCode: 200)
+        getLatestTimeseries(apiClient: tbTestClient, getValuesAsStrings: false)
+    }
+    
+    /**
      Test getTimeseriesKeys()
      */
     func testGetTimeseriesKeys() {

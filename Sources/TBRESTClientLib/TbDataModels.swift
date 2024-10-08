@@ -19,6 +19,7 @@ extension TBDataModel {
 }
 
 extension Array: TBDataModel where Element: Codable { }
+extension Dictionary: TBDataModel where Key: Codable, Value: Codable { }
 
 /// Support subscript access for conforming types
 public protocol PaginationDataResponse {
