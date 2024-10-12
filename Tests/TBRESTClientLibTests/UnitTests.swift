@@ -76,7 +76,7 @@ final class UnitTests: FunctionalTestCases {
     }
     
     /**
-     Test getCustomerDevices()
+     Test `getCustomerDevices()`
      */
     @discardableResult
     func testGetCustomerDevices() -> Array<Device>? {
@@ -102,7 +102,7 @@ final class UnitTests: FunctionalTestCases {
     }
     
     /**
-     Test getCustomerDeviceInfos()
+     Test `getCustomerDeviceInfos()`
      */
     func testGetCustomerDeviceInfos() {
         testGetUser()
@@ -112,7 +112,7 @@ final class UnitTests: FunctionalTestCases {
     }
     
     /**
-     Test getDeviceProfileInfos()
+     Test `getDeviceProfileInfos()`
      */
     func testGetDeviceProfileInfos() {
         let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "GetDeviceProfileInfos", expectedHTTPStatusCode: 200)
@@ -120,7 +120,7 @@ final class UnitTests: FunctionalTestCases {
     }
     
     /**
-     Test getDeviceProfiles()
+     Test `getDeviceProfiles()`
      - Note: works with 'TENANT\_ADMIN' authority only!
      */
     func testGetDeviceProfiles() {
@@ -129,7 +129,7 @@ final class UnitTests: FunctionalTestCases {
     }
     
     /**
-     Test getAttributeKeys()
+     Test `getAttributeKeys()`
      */
     func testGetAttributeKeys() {
         testGetCustomerDevices()
@@ -138,7 +138,7 @@ final class UnitTests: FunctionalTestCases {
     }
     
     /**
-     Test getAttributeKeysByScope()
+     Test `getAttributeKeysByScope()`
      */
     func testGetAttributeKeysByScope() {
         testGetCustomerDevices()
@@ -147,7 +147,7 @@ final class UnitTests: FunctionalTestCases {
     }
     
     /**
-     Test getAttributesSuccess()
+     Test `getAttributesSuccess()`
      */
     func testGetAttributesSuccess() {
         testGetCustomerDevices()
@@ -156,7 +156,7 @@ final class UnitTests: FunctionalTestCases {
     }
     
     /**
-     Test getAttributesByScopeSuccess()
+     Test `getAttributesByScopeSuccess()`
      */
     func testGetAttributesByScopeSuccess() {
         testGetCustomerDevices()
@@ -165,8 +165,8 @@ final class UnitTests: FunctionalTestCases {
     }
     
     /**
-     Test getLatestTimeseries()
-     Values as strings  (useStrictDataTypes = false)
+     Test `getLatestTimeseries()`
+     Values as strings  (`useStrictDataTypes = false`)
      */
     func testGetLatestTimeseriesValuesAsStrings() {
         testGetCustomerDevices()
@@ -175,8 +175,8 @@ final class UnitTests: FunctionalTestCases {
     }
     
     /**
-     Test getLatestTimeseries()
-     Values as native datatypes (useStrictDataTypes = true)
+     Test `getLatestTimeseries()`
+     Values as native datatypes (`useStrictDataTypes = true`)
      */
     func testGetLatestTimeseriesValuesAsNativeTypes() {
         testGetCustomerDevices()
@@ -185,7 +185,27 @@ final class UnitTests: FunctionalTestCases {
     }
     
     /**
-     Test getTimeseriesKeys()
+     Test `getTimeseries()`
+     Values as strings  (`useStrictDataTypes = false`)
+     */
+    func testGetTimeseriesValuesAsStrings() {
+        testGetCustomerDevices()
+        let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "GetTimeseriesAsStrings", expectedHTTPStatusCode: 200)
+        getTimeseries(apiClient: tbTestClient, getValuesAsStrings: true)
+    }
+    
+    /**
+     Test `getTimeseries()`
+     Values as native datatypes (`useStrictDataTypes = true`)
+     */
+    func testGetTimeseriesValuesAsNativeTypes() {
+        testGetCustomerDevices()
+        let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "GetTimeseriesAsNativeTypes", expectedHTTPStatusCode: 200)
+        getTimeseries(apiClient: tbTestClient, getValuesAsStrings: false)
+    }
+    
+    /**
+     Test `getTimeseriesKeys()`
      */
     func testGetTimeseriesKeys() {
         testGetCustomerDevices()

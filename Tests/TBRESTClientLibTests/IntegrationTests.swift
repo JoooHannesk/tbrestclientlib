@@ -198,7 +198,7 @@ final class IntegrationTests: FunctionalTestCases {
     
     /**
      Test `getLatestTimeseries()`
-     Values as strings  (useStrictDataTypes = false)
+     Values as strings  (`useStrictDataTypes = false`)
      */
     func testGetLatestTimeseriesValuesAsStrings() {
         let (tbTestClient, serversettings) = prepare()
@@ -206,12 +206,12 @@ final class IntegrationTests: FunctionalTestCases {
         getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
         getCustomerDevices(apiClient: tbTestClient)
         saveEntityTelemetrySuccess(apiClient: tbTestClient)
-        getLatestTimeseries(apiClient: tbTestClient, getValuesAsStrings: true, keys: ["SampleIMEI", "SampleBattery"])
+        getLatestTimeseries(apiClient: tbTestClient, getValuesAsStrings: true)
     }
     
     /**
      Test `getLatestTimeseries()`
-     Values as native datatypes (useStrictDataTypes = true)
+     Values as native datatypes (`useStrictDataTypes = true`)
      */
     func testGetLatestTimeseriesValuesAsNativeTypes() {
         let (tbTestClient, serversettings) = prepare()
@@ -219,7 +219,33 @@ final class IntegrationTests: FunctionalTestCases {
         getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
         getCustomerDevices(apiClient: tbTestClient)
         saveEntityTelemetrySuccess(apiClient: tbTestClient)
-        getLatestTimeseries(apiClient: tbTestClient, getValuesAsStrings: false, keys: ["SampleIMEI", "SampleBattery"])
+        getLatestTimeseries(apiClient: tbTestClient, getValuesAsStrings: false)
+    }
+    
+    /**
+     Test `getTimeseries()`
+     Values as strings  (`useStrictDataTypes = false`)
+     */
+    func testGetTimeseriesValuesAsStrings() {
+        let (tbTestClient, serversettings) = prepare()
+        loginSucceeds(apiClient: tbTestClient)
+        getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        getCustomerDevices(apiClient: tbTestClient)
+        saveEntityTelemetrySuccess(apiClient: tbTestClient)
+        getTimeseries(apiClient: tbTestClient, getValuesAsStrings: true)
+    }
+    
+    /**
+     Test `getTimeseries()`
+     Values as native datatypes (`useStrictDataTypes = true`)
+     */
+    func testGetTimeseriesValuesAsNativeTypes() {
+        let (tbTestClient, serversettings) = prepare()
+        loginSucceeds(apiClient: tbTestClient)
+        getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        getCustomerDevices(apiClient: tbTestClient)
+        saveEntityTelemetrySuccess(apiClient: tbTestClient)
+        getTimeseries(apiClient: tbTestClient, getValuesAsStrings: false)
     }
     
     /**
