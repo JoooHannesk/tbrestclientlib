@@ -409,15 +409,18 @@ class FunctionalTestCases: XCTestCase {
     
     /**
      Test getLatestTimeseries()
+     getLatestTimeseries() receives at **max one value per key**
      */
     func getLatestTimeseries(apiClient: TBUserApiClient?, getValuesAsStrings: Bool, keys: [String]? = nil) {
         let expectedResponseLatestTimeseries = XCTestExpectation(description: "Expected response with timeseries data...")
+        var requested_keys = ["SampleIMEI", "SampleBattery"]
+        if let keys = keys { requested_keys = keys }
         apiClient?.registerAppErrorHandler { tbAppError in
             print("Test failed with error: \(tbAppError)")
             XCTFail(tbAppError.message)
         }
         if let tbDevice = self.tbDevice?.id.id {
-            apiClient?.getLatestTimeseries(for: .device, entityId: tbDevice, keys: keys, getValuesAsStrings: getValuesAsStrings) { responseObject in
+            apiClient?.getLatestTimeseries(for: .device, entityId: tbDevice, keys: requested_keys, getValuesAsStrings: getValuesAsStrings) { responseObject in
                 if let sampleimei = responseObject["SampleIMEI"], let samplebattery = responseObject["SampleBattery"] {
                     if getValuesAsStrings {
                         // reflect values-as-string case
@@ -445,6 +448,57 @@ class FunctionalTestCases: XCTestCase {
                 """)
         }
         wait(for: [expectedResponseLatestTimeseries], timeout: 3.0)
+    }
+    
+    /**
+     Test getTimeseries()
+     getTimeSeries() receives **multiple values** for a time-series key **constraint** by its given parameters
+     This test case evaluates simple time-series data retrieval for the last 7 days.
+     Data retrieval with the following paramters is **untested**: *intervalType*, *interval*, *timeZone*, *limit*, *agg*
+     */
+    func getTimeseries(apiClient: TBUserApiClient?, getValuesAsStrings: Bool, keys: [String]? = nil) {
+        let expectedResponseTimeseries = XCTestExpectation(description: "Expected response with timeseries data...")
+        var requested_keys = ["SampleIMEI", "SampleBattery"]
+        if let keys = keys { requested_keys = keys }
+        apiClient?.registerAppErrorHandler { tbAppError in
+            print("Test failed with error: \(tbAppError)")
+            XCTFail(tbAppError.message)
+        }
+        if let tbDevice = self.tbDevice?.id.id {
+            let endTs = Int64(Date().timeIntervalSince1970) * 1000
+            let sevenDaysPast = Calendar.current.date(byAdding: .day, value: -7, to: Date())
+            let startTs = Int64(sevenDaysPast!.timeIntervalSince1970) * 1000
+            apiClient?.getTimeseries(for: .device, entityId: tbDevice,
+                                     keys: requested_keys, startTs: startTs, endTs: endTs,
+                                     limit: 10, getValuesAsStrings: getValuesAsStrings) { responseObject in
+                print(responseObject)
+                if let sampleimei = responseObject["SampleIMEI"], let samplebattery = responseObject["SampleBattery"] {
+                    if getValuesAsStrings {
+                        // reflect values-as-string case
+                        if sampleimei[0].value.stringVal == "999999999999999", samplebattery[0].value.stringVal == "100" {
+                            expectedResponseTimeseries.fulfill()
+                        } else {
+                            XCTFail("Expected different value/type!")
+                        }
+                    } else {
+                        // reflect values-as-native-types case
+                        if sampleimei[0].value.intVal == 999999999999999, samplebattery[0].value.intVal == 100 {
+                            expectedResponseTimeseries.fulfill()
+                        } else {
+                            XCTFail("Expected different value/type!")
+                        }
+                    }
+                } else {
+                    XCTFail("Expected key missing in response!")
+                }
+            }
+        } else {
+            XCTFail("""
+                Device empty, test cannot continue! Make sure that the first device in your tenant has shared attributes as required by \
+                this test case and is assigned to the current user which is authenticating for this integration test!
+                """)
+        }
+        wait(for: [expectedResponseTimeseries], timeout: 3.0)
     }
     
     /**

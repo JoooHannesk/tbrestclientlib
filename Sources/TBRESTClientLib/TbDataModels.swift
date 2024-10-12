@@ -192,7 +192,8 @@ public struct AttributesResponse: TBDataModel {
     /// attribute key as string
     public let key: String
     /// ThingsBoard data points have **values** of **different types**. This library supports: Bool, Int, Double, String (JSON is currenlty unsupported).
-    /// Access the values as described in ``MplValueType``
+    /// Depending on the value's expected type, use the following members to get the value from the `value` property: `value.intVal`, `value.doubleVal`, `value.stringVal`, `value.boolVal`
+    /// For further information, see  ``MplValueType``
     public let value: MplValueType
     /// last updated timestamp in milliseconds unix time
     public let lastUpdateTs: Int
@@ -211,8 +212,6 @@ public struct TimeseriesResponse: TBDataModel {
  ThingsBoard data (e.g. attributes or time-series data) retrieved from the server have values of different types, wrapped inside a JSON response.
  `MplValueType` is designed to automatically detect the value's type and cast it into swift-native datatypes. Currently **Bool**, **Int**, **Double**, **String**
  is supported, a **JSON-String as a value is currenlty unsupported**.
- Depending on the value's expected type, use the following members to get the value from the `value` property:
- `value.intVal`, `value.doubleVal`, `value.stringVal`, `value.boolVal`
  */
 public enum MplValueType: TBDataModel {
     case bool(Bool)

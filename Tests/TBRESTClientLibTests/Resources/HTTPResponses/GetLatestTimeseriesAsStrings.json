@@ -1,9 +1,9 @@
 {
-  "stringTsKey": [{ "value": "value", "ts": 1609459200001}, { "value": "value", "ts": 1609459200010}, { "value": "value", "ts": 1609459200020}],
-  "booleanTsKey": [{ "value": "false", "ts": 1609459200001}, { "value": "false", "ts": 1609459200010}, { "value": "false", "ts": 1609459200020}],
-  "doubleTsKey": [{ "value": "42.2", "ts": 1609459200001}, { "value": "42.2", "ts": 1609459200010}, { "value": "42.2", "ts": 1609459200020}],
-  "longTsKey": [{ "value": "73", "ts": 1609459200001}, { "value": "73", "ts": 1609459200010}, { "value": "73", "ts": 1609459200020}],
-  "jsonTsKey": [{ "value": "{\"someNumber\": 42,\"someArray\": [1,2,3],\"someNestedObject\": {\"key\": \"value\"}}", "ts": 1609459200000}, { "value": "{\"someNumber\": 42,\"someArray\": [1,2,3],\"someNestedObject\": {\"key\": \"value\"}}", "ts": 1609459200010}, { "value": "{\"someNumber\": 42,\"someArray\": [1,2,3],\"someNestedObject\": {\"key\": \"value\"}}", "ts": 1609459200020}],
-  "SampleIMEI": [{ "value": "999999999999999", "ts": 1609459200001}, { "value": "999999999999999", "ts": 1609459200010}, { "value": "999999999999999", "ts": 1609459200020}],
-  "SampleBattery": [{ "value": "100", "ts": 1609459200001}, { "value": "75", "ts": 1609459200010}, { "value": "50", "ts": 1609459200020}]
+  "stringTsKey": [{ "value": "value", "ts": 1609459200001}],
+  "booleanTsKey": [{ "value": "false", "ts": 1609459200001}],
+  "doubleTsKey": [{ "value": "42.2", "ts": 1609459200001}],
+  "longTsKey": [{ "value": "73", "ts": 1609459200001}],
+  "jsonTsKey": [{ "value": "{\"someNumber\": 42,\"someArray\": [1,2,3],\"someNestedObject\": {\"key\": \"value\"}}", "ts": 1609459200000}],
+  "SampleIMEI": [{ "value": "999999999999999", "ts": 1609459200001}],
+  "SampleBattery": [{ "value": "100", "ts": 1609459200001}]
 }
