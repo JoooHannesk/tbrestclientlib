@@ -135,6 +135,8 @@ public struct Device: TBDataModel, EntityEquatable {
     let customerIsPublic: Bool?
     let deviceProfileName: String?
     let active: Bool?
+    
+    // TODO: Think about adding `public let additionalInfo: AdditionalInfo?`
 }
 
 public struct DeviceProfile: TBDataModel, EntityEquatable {
