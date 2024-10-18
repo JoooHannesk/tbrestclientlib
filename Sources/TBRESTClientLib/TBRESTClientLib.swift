@@ -44,7 +44,6 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter baseUrlStr: server url as utf8 string without trailing slash (no API endpoint, just base server URL)
      - Parameter usernameStr: user's username as utf8 string
      - Parameter passwordStr: user's password as utf8 string
-     - Parameter httpSessionHandler: HTTP session handler to use for http request
      */
     public convenience init?(baseUrlStr: String, usernameStr: String, passwordStr: String) throws {
         try self.init(baseUrlStr: baseUrlStr, usernameStr: usernameStr, passwordStr: passwordStr, httpSessionHandler: URLSession.shared)
@@ -54,7 +53,6 @@ public class TBUserApiClient: TBHTTPRequest {
     /**
      Request authentication with the thingsboard server to optain an authentication token
      - Parameter responseHandler: takes an 'AuthLogin' as parameter and is called upon successful server response
-     - Returns: Void
      - Note: authData contains token and refreshToken after login succeeded
      */
     public func login(responseHandler: ((AuthLogin) -> Void)? = nil) -> Void {
@@ -71,7 +69,6 @@ public class TBUserApiClient: TBHTTPRequest {
     /**
      Get currently logged in user info
      - Parameter responseHandler: takes a 'User' as parameter and is called upon successful server response
-     - Returns: Void
      - Note: for supported data models as parameters see: TbDataModels.swift
      */
     public func getUser(responseHandler: ((User) -> Void)? = nil) -> Void {
@@ -96,7 +93,6 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter sortProperty: sort resutls according to enumeration 'TbQuerySortProperty'; default: .name
      - Parameter sortOrder: sort results in ascending or descending order, state according to ``TbQuerySortOrder``; default: `.ascending`
      - Parameter responseHandler: takes a 'PageDataContainer<Device>' as parameter and is called upon successful server response
-     - Returns: Void
      - Note: for supported data models as parameters see: TbDataModels.swift
      */
     public func getCustomerDevices(customerId: String,
@@ -123,6 +119,7 @@ public class TBUserApiClient: TBHTTPRequest {
      Get Customer Device Infos – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
      Receives a page of devices info objects assigned to the customer (by ID). Specify parameters to filter the results, which are wrapped inside a PageData object that
      allows to iterate over the result set using pagination.
+     - Parameter customerId: customer id (UUID) as string
      - Parameter pageSize: Maximum amount of entities in a one page
      - Parameter page: Sequence number of page starting from 0
      - Parameter type: Device type as the name of the device profile
@@ -132,7 +129,6 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter sortProperty: sort resutls according to enumeration 'TbQuerySortProperty'; default: .name
      - Parameter sortOrder: sort results in ascending or descending order, state according to ``TbQuerySortOrder``; default: `.ascending`
      - Parameter responseHandler: takes a 'PageDataContainer<Device>' as parameter and is called upon successful server response
-     - Returns: Void
      - Note: for supported data models as parameters see: `TbDataModels.swift`
      */
     public func getCustomerDeviceInfos(customerId: String,
@@ -171,7 +167,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter sortOrder: sort results in ascending or descending order, state according to ``TbQuerySortOrder``; default: `.ascending`
      - Parameter transportType: Type of the transport the device profiles support: DEFAULT, MQTT, COAP, LWM2M, SNMP
      - Parameter responseHandler: takes a 'PageDataContainer<DeviceProfile>' as parameter and is called upon successful server response
-     - Returns: void
+     
      */
     public func getDeviceProfileInfos(
         pageSize: Int32 = Int32.max,
@@ -202,7 +198,6 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter sortProperty: sort resutls according to enumeration 'TbQuerySortProperty'; default: .name
      - Parameter sortOrder: sort results in ascending or descending order, state according to ``TbQuerySortOrder``; default: `.ascending`
      - Parameter responseHandler: takes a 'PageDataContainer<DeviceProfile>' as parameter and is called upon successful server response
-     - Returns: void
      - Note: works with 'TENANT\_ADMIN' authority only!
      */
     public func getDeviceProfiles(
@@ -226,7 +221,7 @@ public class TBUserApiClient: TBHTTPRequest {
     /**
      Get Attribute Keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
      Get a set of unique attribute keys for the requested entity.
-     - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter responseHandler: takes an 'Array<String>' as parameter and is called upon successful server response
      - Note: The response will include merged key names set for all attribute scopes: server - for all entity types, client - for devices, shared - for devices
@@ -246,9 +241,9 @@ public class TBUserApiClient: TBHTTPRequest {
     /**
      Get Attribute Keys by Scope – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
      Get a set of unique attribute keys for the requested entity and given scope
-     - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
-     - Parameter scope: scope in which the attribute is managed, as defined in ``TbEntityScopes``
+     - Parameter scope: scope in which the attribute is managed, as defined in ``TbQueryEntityScopes``
      - Parameter responseHandler: takes an 'Array<String>' as parameter and is called upon successful server response
      - Note: The response will include merged key names set for all attribute scopes: server - for all entity types, client - for devices, shared - for devices
      */
@@ -269,10 +264,10 @@ public class TBUserApiClient: TBHTTPRequest {
     /**
      Create or update the attributes based on entity id and the specified attribute scope – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
      Implementes the endpoint saveEntityAttributesV2
-     - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter attributesData: attributes with values as key value pairs, contained inside a dictionary
-     - Parameter scope: scope in which the attribute is managed as defined in ``TbEntityScopes``
+     - Parameter scope: scope in which the attribute is managed as defined in ``TbQueryEntityScopes``
      - Parameter responseHandler: takes no parameters and is called upon successful server response
      - Note: Attribute scopes depend on the entity type: .server - supported for all entity; .shared - supported for devices
      */
@@ -292,7 +287,7 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Get all entity attributes (scope-independent)  by keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     - Parameter entityType:tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityType:tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the keys
      - Parameter responseHandler: takes an array containing items of type ``AttributesResponse``
@@ -309,10 +304,10 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Get entity attributes by scope and by keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     - Parameter entityType:tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityType:tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the keys
-     - Parameter scope: scope in which the attribute is managed as defined in ``TbEntityScopes``
+     - Parameter scope: scope in which the attribute is managed as defined in ``TbQueryEntityScopes``
      - Parameter responseHandler: takes an array containing items of type ``AttributesResponse``
      */
     public func getAttributesByScope(for entityType: TbQueryEntityTypes, entityId: String, keys: [String] = [], scope: TbQueryEntityScopes, responseHandler: (([AttributesResponse]) -> Void)?) {
@@ -328,10 +323,10 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Delete entity attributes by scope and keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     - Parameter entityType:tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityType:tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the keys
-     - Parameter scope: scope in which the attribute is managed as defined in ``TbEntityScopes``
+     - Parameter scope: scope in which the attribute is managed as defined in ``TbQueryEntityScopes``
      - Parameter responseHandler: takes no parameters, is called on success
      */
     public func deleteEntityAttributes(for entityType: TbQueryEntityTypes, entityId: String, keys: [String], scope: TbQueryEntityScopes, responseHandler: (() -> Void)? = nil) {
@@ -369,7 +364,7 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Get unique time-series key names for the given entity – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter responseHandler: takes an 'Array<String>' as parameter and is called upon successful server response
      */
@@ -389,10 +384,10 @@ public class TBUserApiClient: TBHTTPRequest {
      Get the **latest** time-series data from server – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
      Latest time-series data is stored in a different table for performance reasons (according to ThingsBoard docs) and can therefore be retrieved
      via a seperate API call.
-     - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the time-series keys
-     - Parameter getValuesAsString: Get values from servers as strings (not as native datatypes)
+     - Parameter getValuesAsStrings: Get values from servers as strings (not as native datatypes)
      - Parameter responseHandler: takes an 'Dictionary<String, [TimeseriesResponse]>' as parameter and is called upon successful server response
      - Note: Retrieving values as strings is recommended if a time-series value is e.g. of type JSON-String.
      JSON-String values cannot be treated by this library as native datatypes currently and should therefore be retrieved as strings. To get the value from a ``TimeseriesResponse`` object, refer to
@@ -413,7 +408,7 @@ public class TBUserApiClient: TBHTTPRequest {
     /**
      Get time-series data from server – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
      Retrieve time-series data according to specified time interval and (optional) aggregation functions:
-     - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the time-series keys
      - Parameter startTs: delete time-series data for given periode – specified by startTs and endTs (unix time in milliseconds, int64)
@@ -424,7 +419,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter limit: Int value to limit time-series datapoint retrival. Not more than `limit` datapoints wil be fetched – used only in combination with `aggregation` set to `.none`
      - Parameter aggregation: Value specifying the aggregation function, if `interval` or `intervalType`is not given `aggregation` parameter will use `.none`
      - Parameter sortOrder: sort results in ascending or descending order, state according to ``TbQuerySortOrder``; default: `.ascending`
-     - Parameter getValuesAsString: Get values from servers as strings (not as native datatypes)
+     - Parameter getValuesAsStrings: Get values from servers as strings (not as native datatypes)
      - Parameter responseHandler: takes an 'Dictionary<String, [TimeseriesResponse]>' as parameter and is called upon successful server response
      - Note: Retrieving values as strings is recommended if a time-series value is e.g. of type JSON-String.
      JSON-String values cannot be treated by this library as native datatype currently and should therefore be retrieved as strings. To get the value from a ``TimeseriesResponse`` object, refer to
@@ -453,7 +448,7 @@ public class TBUserApiClient: TBHTTPRequest {
     /**
      Delete entity time-series data – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
      Delete time-series data for selected entity based on its id, type and keys
-     - Parameter entityType:tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityType:tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the keys
      - Parameter deleteAllDataForKeys: delete all time-series data for given key (should be false when used with `startTs`/`endTs`)
@@ -462,6 +457,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter deleteLatest: delete latest value (stored in separate table for performance), if the value's timestamp matches the time-frame
      - Parameter rewriteLatestIfDeleted: rewrite latest value (stored in separate table for performance) if the value's timestamp matches the time-frame and `deleteLatest` is true;
      the replacement value will be fetched from the 'time-series' table, and its timestamp will be the most recent one before the defined time-range
+     - Parameter responseHandler: takes no parameters and is called upon successful server response
      */
     public func deleteEntityTimeseries(for entityType: TbQueryEntityTypes, entityId: String, keys: [String],
                                        deleteAllDataForKeys: Bool? = nil,
