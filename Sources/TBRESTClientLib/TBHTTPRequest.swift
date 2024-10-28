@@ -34,19 +34,19 @@ public class TBHTTPRequest {
      - Parameter usingMethod: Give the desired HTTP method, default: .post
      - Parameter withPayload: HTTP request payload given as Dictionary<String, Any>
      - Parameter authData: Authentication data
-     - Parameter expectedTBResponseObject: expected TB Data Model Object
+     - Parameter expectedTBResponseType: expected TB Data Model instance Type
      - Parameter successHandler: function to run in case of success
      */
     internal func tbApiRequest(fromEndpoint endpointURL: String,
                               usingMethod httpMethod: SupportedHTTPMethods = .post,
                               withPayload payload: Dictionary<String, Any>? = nil,
                               authToken authData: AuthLogin? = nil,
-                              expectedTBResponseObject responseObject: TBDataModel.Type,
+                              expectedTBResponseType responseType: TBDataModel.Type,
                               successHandler: @escaping (TBDataModel) -> Void)
     -> Void {
         var tbheaders = ["Content-Type": "application/json", "Accept": "application/json"]
         if let token = authData?.token { tbheaders["x-authorization"] = "Bearer \(token)" }
-        httpClient.doHttpRequest(from: endpointURL, usingMethod: httpMethod, withhttpHeaders: tbheaders, withPayload: payload, expectedTBResponseObject: responseObject) { result in
+        httpClient.doHttpRequest(from: endpointURL, usingMethod: httpMethod, withhttpHeaders: tbheaders, withPayload: payload, expectedTBResponseType: responseType) { result in
             switch result {
             case .success(let responseObject):
                 successHandler(responseObject)

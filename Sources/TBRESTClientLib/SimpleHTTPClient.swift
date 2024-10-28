@@ -40,15 +40,16 @@ class SimpleHTTPClient {
      - Parameter usingMethod: (httpMethod)  .get, .post
      - Parameter withhttpHeaders: (httpHeaders) http header as dictionary [String: String]
      - Parameter withPayload: (payload) payload in http request as dictionary [String: String]
+     - Parameter expectedTBResponseType: expected TB Data Model instance Type
      - Parameter completionHandler: function wich is executed once request completes of type (Result<TBDataModels, TBHTTPClientRequestError>) -> Void)
      - Note: Result type contains a TBDataModels conforming type in case of success and an item of TBHTTPClientRequestError as error description
      */
     func doHttpRequest(from urlString: String,
-                        usingMethod httpMethod: SupportedHTTPMethods,
-                        withhttpHeaders httpHeaders: Dictionary<String, String>?,
-                        withPayload payload: Dictionary<String, Any>?,
-                        expectedTBResponseObject responseObject: TBDataModel.Type,
-                        completionHandler: @escaping (Result<TBDataModel, TBHTTPClientRequestError>) -> Void)
+                       usingMethod httpMethod: SupportedHTTPMethods,
+                       withhttpHeaders httpHeaders: Dictionary<String, String>?,
+                       withPayload payload: Dictionary<String, Any>?,
+                       expectedTBResponseType responseType: TBDataModel.Type,
+                       completionHandler: @escaping (Result<TBDataModel, TBHTTPClientRequestError>) -> Void)
     -> Void {
         guard let url = URL(string: urlString) else {
             completionHandler(.failure(.badURL))
@@ -82,7 +83,7 @@ class SimpleHTTPClient {
                 print("HTTP request failed: \(error)")
                 completionHandler(.failure(.httpRequestFailure))
             } else if let responseData = responseData {
-                let responseDataResultDict = self.convertResponseToTbDataModelObject(responseData, expectedResponseObject: responseObject)
+                let responseDataResultDict = self.convertResponseToTbDataModelObject(responseData, expectedResponseType: responseType)
                 completionHandler(responseDataResultDict)
             }
         }
@@ -94,9 +95,10 @@ class SimpleHTTPClient {
     /**
      Convert server response from json string to dictionary
      - Parameter responseData: json string from webserver as response to http request
+     - Parameter expectedResponseType: expected TB Data Model instance Type
      - Returns: Result object containing dictionary
      */
-    fileprivate func convertResponseToTbDataModelObject(_ responseData: Data, expectedResponseObject: TBDataModel.Type)
+    fileprivate func convertResponseToTbDataModelObject(_ responseData: Data, expectedResponseType: TBDataModel.Type)
     -> Result<TBDataModel, TBHTTPClientRequestError> {
         guard let responseDataStr = String(data: responseData, encoding: .utf8) else {
             return .failure(.improperPayloadDataFormat)
@@ -115,7 +117,7 @@ class SimpleHTTPClient {
         
         // try converting to data model object
         do {
-            let tbResponse = try decoder.decode(expectedResponseObject.self, from: responseData)
+            let tbResponse = try decoder.decode(expectedResponseType.self, from: responseData)
             return .success(tbResponse)
         } catch {
             localError = "\(error.localizedDescription): \(error)\nAPI Response: \(responseDataStr)\n"
