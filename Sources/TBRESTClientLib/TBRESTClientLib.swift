@@ -59,7 +59,7 @@ public class TBUserApiClient: TBHTTPRequest {
         let authDataDict: Dictionary<String, String> = ["username": serverSettings.username, "password": serverSettings.password]
         tbApiRequest(fromEndpoint: AEM.getEndpointURL(TBApiEndpoints.login),
                      withPayload: authDataDict,
-                     expectedTBResponseObject: AuthLogin.self) { responseObject -> Void in
+                     expectedTBResponseType: AuthLogin.self) { responseObject -> Void in
             self.authData = responseObject as! AuthLogin
             responseHandler?(self.authData)
         }
@@ -75,7 +75,7 @@ public class TBUserApiClient: TBHTTPRequest {
         tbApiRequest(fromEndpoint: AEM.getEndpointURL(TBApiEndpoints.getUser),
                      usingMethod: .get,
                      authToken: self.authData,
-                     expectedTBResponseObject: User.self) { responseObject -> Void in
+                     expectedTBResponseType: User.self) { responseObject -> Void in
             responseHandler?(responseObject as! User)
         }
     }
@@ -110,7 +110,7 @@ public class TBUserApiClient: TBHTTPRequest {
                                                                 textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseObject: PaginationDataContainer<Device>.self) { responseObject -> Void in
+                     authToken: self.authData, expectedTBResponseType: PaginationDataContainer<Device>.self) { responseObject -> Void in
             responseHandler?(responseObject as! PaginationDataContainer<Device>)
         }
     }
@@ -149,7 +149,7 @@ public class TBUserApiClient: TBHTTPRequest {
                                                                 active: active, textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseObject: PaginationDataContainer<Device>.self) { responseObject -> Void in
+                     authToken: self.authData, expectedTBResponseType: PaginationDataContainer<Device>.self) { responseObject -> Void in
             responseHandler?(responseObject as! PaginationDataContainer<Device>)
         }
     }
@@ -183,7 +183,7 @@ public class TBUserApiClient: TBHTTPRequest {
                                                                 textSearch: textSearch, transportType: transportType,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseObject: PaginationDataContainer<DeviceProfile>.self) { responseObject -> Void in
+                     authToken: self.authData, expectedTBResponseType: PaginationDataContainer<DeviceProfile>.self) { responseObject -> Void in
             responseHandler?(responseObject as! PaginationDataContainer<DeviceProfile>)
         }
     }
@@ -212,7 +212,7 @@ public class TBUserApiClient: TBHTTPRequest {
                                                                 pageSize: pageSize, page: page, textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseObject: PaginationDataContainer<DeviceProfile>.self) { responseObject -> Void in
+                     authToken: self.authData, expectedTBResponseType: PaginationDataContainer<DeviceProfile>.self) { responseObject -> Void in
             responseHandler?(responseObject as! PaginationDataContainer<DeviceProfile>)
         }
     }
@@ -233,7 +233,7 @@ public class TBUserApiClient: TBHTTPRequest {
             URLModifier(searchString: "{?entityId?}", replaceString: entityId)
         ])
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseObject: Array<String>.self) { responseObject -> Void in
+                     authToken: self.authData, expectedTBResponseType: Array<String>.self) { responseObject -> Void in
             responseHandler?(responseObject as! Array<String>)
         }
     }
@@ -256,7 +256,7 @@ public class TBUserApiClient: TBHTTPRequest {
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ])
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseObject: Array<String>.self) { responseObject -> Void in
+                     authToken: self.authData, expectedTBResponseType: Array<String>.self) { responseObject -> Void in
             responseHandler?(responseObject as! Array<String>)
         }
     }
@@ -280,7 +280,7 @@ public class TBUserApiClient: TBHTTPRequest {
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ])
         tbApiRequest(fromEndpoint: endpointURL, withPayload: attributesData,
-                     authToken: self.authData, expectedTBResponseObject: [String].self) { _ in
+                     authToken: self.authData, expectedTBResponseType: [String].self) { _ in
             responseHandler?()
         }
     }
@@ -297,7 +297,7 @@ public class TBUserApiClient: TBHTTPRequest {
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
             URLModifier(searchString: "{?entityId?}", replaceString: entityId)
         ], keys: keys)
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, authToken: self.authData, expectedTBResponseObject: [AttributesResponse].self) { responseObject in
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, authToken: self.authData, expectedTBResponseType: [AttributesResponse].self) { responseObject in
             responseHandler?(responseObject as! [AttributesResponse])
         }
     }
@@ -316,7 +316,7 @@ public class TBUserApiClient: TBHTTPRequest {
             URLModifier(searchString: "{?entityId?}", replaceString: entityId),
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ], keys: keys)
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, authToken: self.authData, expectedTBResponseObject: [AttributesResponse].self) { responseObject in
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, authToken: self.authData, expectedTBResponseType: [AttributesResponse].self) { responseObject in
             responseHandler?(responseObject as! [AttributesResponse])
         }
     }
@@ -335,7 +335,7 @@ public class TBUserApiClient: TBHTTPRequest {
             URLModifier(searchString: "{?entityId?}", replaceString: entityId),
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ], keys: keys)
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete, authToken: self.authData, expectedTBResponseObject: [String].self) { _ in
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete, authToken: self.authData, expectedTBResponseType: [String].self) { _ in
             responseHandler?()
         }
     }
@@ -357,7 +357,7 @@ public class TBUserApiClient: TBHTTPRequest {
             URLModifier(searchString: "{?scope?}", replaceString: TbQueryEntityScopes.any.rawValue)
         ])
         tbApiRequest(fromEndpoint: endpointURL, withPayload: timeseriesData,
-                     authToken: self.authData, expectedTBResponseObject: [String].self) { _ in
+                     authToken: self.authData, expectedTBResponseType: [String].self) { _ in
             responseHandler?()
         }
     }
@@ -375,7 +375,7 @@ public class TBUserApiClient: TBHTTPRequest {
             URLModifier(searchString: "{?entityId?}", replaceString: entityId)
         ])
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseObject: Array<String>.self) { responseObject -> Void in
+                     authToken: self.authData, expectedTBResponseType: Array<String>.self) { responseObject -> Void in
             responseHandler?(responseObject as! Array<String>)
         }
     }
@@ -400,7 +400,7 @@ public class TBUserApiClient: TBHTTPRequest {
             URLModifier(searchString: "{?entityId?}", replaceString: entityId)],
                                                                 keys: keys, useStrictDataTypes: !getValuesAsStrings)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseObject: Dictionary<String, [TimeseriesResponse]>.self) { responseObject -> Void in
+                     authToken: self.authData, expectedTBResponseType: Dictionary<String, [TimeseriesResponse]>.self) { responseObject -> Void in
             responseHandler?(responseObject as! Dictionary<String, [TimeseriesResponse]>)
         }
     }
@@ -440,7 +440,7 @@ public class TBUserApiClient: TBHTTPRequest {
                                                                 aggregation: aggregation, orderBy: sortOrder,
                                                                 useStrictDataTypes: !getValuesAsStrings)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseObject: Dictionary<String, [TimeseriesResponse]>.self) { responseObject -> Void in
+                     authToken: self.authData, expectedTBResponseType: Dictionary<String, [TimeseriesResponse]>.self) { responseObject -> Void in
             responseHandler?(responseObject as! Dictionary<String, [TimeseriesResponse]>)
         }
     }
@@ -471,7 +471,7 @@ public class TBUserApiClient: TBHTTPRequest {
                                                                 ],
                                                                 keys: keys, deleteAllDataForKeys: deleteAllDataForKeys, startTs: startTs, endTs: endTs,
                                                                 deleteLatest: deleteLatest, rewriteLatestIfDeleted: rewriteLatestIfDeleted)
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete, authToken: self.authData, expectedTBResponseObject: [String].self) { _ in
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete, authToken: self.authData, expectedTBResponseType: [String].self) { _ in
             responseHandler?()
         }
     }
