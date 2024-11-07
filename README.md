@@ -1,4 +1,4 @@
-<img src="https://bitbucket.org/swift-projects/tbrestclientlib/raw/main/Meta/tbrestclientlib-project-avatar.png">
+<p align="center"><img src="https://bitbucket.org/swift-projects/tbrestclientlib/raw/main/Meta/tbrestclientlib-project-avatar.png"></p>
 
 # TBRESTClientLib
 
