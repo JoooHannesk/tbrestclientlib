@@ -1,3 +1,5 @@
+<img src="https://bitbucket.org/swift-projects/tbrestclientlib/raw/main/Meta/tbrestclientlib-project-avatar.png">
+
 # TBRESTClientLib
 
 Simple client library for [ThingsBoard](https://thingsboard.io) server installations implementing the administration / user-space API (not device API) – written in Swift.
