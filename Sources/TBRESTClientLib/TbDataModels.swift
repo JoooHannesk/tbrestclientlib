@@ -121,41 +121,41 @@ public struct User: TBDataModel, EntityEquatable {
 /** represent **Device** and **DeviceInfo** objects
  */
 public struct Device: TBDataModel, EntityEquatable {
-    let id: ID
-    let createdTime: Int
-    let tenantId: ID
-    let customerId: ID
-    let name: String
-    let type: String
-    let label: String?
-    let deviceProfileId: ID
+    public let id: ID
+    public let createdTime: Int
+    public let tenantId: ID
+    public let customerId: ID
+    public let name: String
+    public let type: String
+    public let label: String?
+    public let deviceProfileId: ID
     
     // the following properties are defined for DeviceInfo objects only
-    let customerTitle: String?
-    let customerIsPublic: Bool?
-    let deviceProfileName: String?
-    let active: Bool?
+    public let customerTitle: String?
+    public let customerIsPublic: Bool?
+    public let deviceProfileName: String?
+    public let active: Bool?
     
     // TODO: Think about adding `public let additionalInfo: AdditionalInfo?`
 }
 
 public struct DeviceProfile: TBDataModel, EntityEquatable {
-    let id: ID
-    let createdTime: Int?
-    let tenantId: ID
-    let name: String
-    let description: String?
-    let image: String?
-    let type: String
-    let transportType: String
-    let provisionType: String?
-    let defaultRuleChainId: ID?
-    let defaultDashboardId: ID?
-    let defaultQueueName: String?
-    let provisionDeviceKey: String?
-    let firmwareId: ID?
-    let softwareId: ID?
-    let defaultEdgeRuleChainId: ID?
+    public let id: ID
+    public let createdTime: Int?
+    public let tenantId: ID
+    public let name: String
+    public let description: String?
+    public let image: String?
+    public let type: String
+    public let transportType: String
+    public let provisionType: String?
+    public let defaultRuleChainId: ID?
+    public let defaultDashboardId: ID?
+    public let defaultQueueName: String?
+    public let provisionDeviceKey: String?
+    public let firmwareId: ID?
+    public let softwareId: ID?
+    public let defaultEdgeRuleChainId: ID?
 }
 
 public struct ID: TBDataModel, Equatable {
@@ -264,8 +264,8 @@ public enum MplValueType: TBDataModel {
 
 // MARK: - Application Error Data Models
 public struct TBAppError: TBDataModel {
-    let status: Int
-    let message: String
-    let errorCode: Int
-    let timestamp: Int
+    public let status: Int
+    public let message: String
+    public let errorCode: Int
+    public let timestamp: Int
 }
