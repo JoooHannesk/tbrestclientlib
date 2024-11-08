@@ -263,7 +263,7 @@ public enum MplValueType: TBDataModel {
 }
 
 // MARK: - Application Error Data Models
-struct TBAppError: TBDataModel {
+public struct TBAppError: TBDataModel {
     let status: Int
     let message: String
     let errorCode: Int
