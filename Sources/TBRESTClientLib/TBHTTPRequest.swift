@@ -24,7 +24,7 @@ public class TBHTTPRequest {
      - Parameter errorHandler: callable which taks a single argument of type conforming to 'TBErrorDataModel' protocol
      - Returns: Void
      */
-    func registerAppErrorHandler(errorHandler: @escaping (TBAppError) -> Void) {
+    public func registerAppErrorHandler(errorHandler: @escaping (TBAppError) -> Void) {
         self.errorHandler = errorHandler
     }
     
