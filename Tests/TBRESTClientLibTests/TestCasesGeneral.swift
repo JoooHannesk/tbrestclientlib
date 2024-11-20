@@ -424,14 +424,14 @@ class FunctionalTestCases: XCTestCase {
                 if let sampleimei = responseObject["SampleIMEI"], let samplebattery = responseObject["SampleBattery"] {
                     if getValuesAsStrings {
                         // reflect values-as-string case
-                        if sampleimei[0].value.stringVal == "999999999999999", samplebattery[0].value.stringVal == "100" {
+                        if sampleimei?.value.stringVal == "999999999999999", samplebattery?.value.stringVal == "100" {
                             expectedResponseLatestTimeseries.fulfill()
                         } else {
                             XCTFail("Expected different value/type!")
                         }
                     } else {
                         // reflect values-as-native-types case
-                        if sampleimei[0].value.intVal == 999999999999999, samplebattery[0].value.intVal == 100 {
+                        if sampleimei?.value.intVal == 999999999999999, samplebattery?.value.intVal == 100 {
                             expectedResponseLatestTimeseries.fulfill()
                         } else {
                             XCTFail("Expected different value/type!")
