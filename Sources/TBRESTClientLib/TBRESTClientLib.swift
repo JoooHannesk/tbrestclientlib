@@ -388,20 +388,22 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the time-series keys
      - Parameter getValuesAsStrings: Get values from servers as strings (not as native datatypes)
-     - Parameter responseHandler: takes an 'Dictionary<String, [TimeseriesResponse]>' as parameter and is called upon successful server response
+     - Parameter responseHandler: takes an 'Dictionary<String, TimeseriesResponse?>' as parameter and is called upon successful server response
      - Note: Retrieving values as strings is recommended if a time-series value is e.g. of type JSON-String.
      JSON-String values cannot be treated by this library as native datatypes currently and should therefore be retrieved as strings. To get the value from a ``TimeseriesResponse`` object, refer to
      ``TimeseriesResponse/value`` and ``MplValueType``.
      */
     public func getLatestTimeseries(for entityType: TbQueryEntityTypes, entityId: String, keys: Array<String>? = nil,
-                                    getValuesAsStrings: Bool = true, responseHandler: ((Dictionary<String, [TimeseriesResponse]>) -> Void)?) {
+                                    getValuesAsStrings: Bool = true, responseHandler: ((Dictionary<String, TimeseriesResponse?>) -> Void)?) {
         let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getTimeseries, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
             URLModifier(searchString: "{?entityId?}", replaceString: entityId)],
                                                                 keys: keys, useStrictDataTypes: !getValuesAsStrings)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
                      authToken: self.authData, expectedTBResponseType: Dictionary<String, [TimeseriesResponse]>.self) { responseObject -> Void in
-            responseHandler?(responseObject as! Dictionary<String, [TimeseriesResponse]>)
+            let responseObjectArray = responseObject as! Dictionary<String, [TimeseriesResponse]>
+            let responseTimeseries: Dictionary<String, TimeseriesResponse?> = responseObjectArray.mapValues { $0.last }
+            responseHandler?(responseTimeseries)
         }
     }
     
