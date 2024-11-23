@@ -26,8 +26,8 @@ struct MockURLResponse {
 
 struct MockAPIClientFactory {
     let baseUrlStr: String
-    let usernameStr: String
-    let passwordStr: String
+    let username: String
+    let password: String
     
     let mhs = MockURLResponse()
     
@@ -40,7 +40,7 @@ struct MockAPIClientFactory {
      */
     func getMockApiClient(expectedHTTPResponse: String, expectedHTTPStatusCode: Int, expectedError: Error? = nil) -> TBUserApiClient? {
         let mockLoginHTTPSession = mhs.createMockHttpSession(jsonFileName: expectedHTTPResponse, httpStatusCode: expectedHTTPStatusCode, error: expectedError)
-        let tbTestClient = try? TBUserApiClient(baseUrlStr: baseUrlStr, usernameStr: usernameStr, passwordStr: passwordStr, httpSessionHandler: mockLoginHTTPSession!)
+        let tbTestClient = try? TBUserApiClient(baseUrlStr: baseUrlStr, username: username, password: password, httpSessionHandler: mockLoginHTTPSession!)
         return tbTestClient
     }
 }

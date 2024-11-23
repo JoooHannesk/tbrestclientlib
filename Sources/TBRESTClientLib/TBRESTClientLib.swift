@@ -14,27 +14,28 @@ public class TBUserApiClient: TBHTTPRequest {
     // MARK: - Properties
     typealias TBApiEndpoints = TbAPIEndpointsV1
     typealias AEM = APIEndpointManager
-    private let serverSettings: ServerSettings
+    private var serverSettings: ServerSettings
     private(set) var authData: AuthLogin?
     
     
-    // MARK: - Initialization
+    // MARK: - Initializers
     /**
      Initialize TB client
      - Parameter baseUrlStr: server url as utf8 string without trailing slash (no API endpoint, just base server URL)
-     - Parameter usernameStr: user's username as utf8 string
-     - Parameter passwordStr: user's password as utf8 string
+     - Parameter username: user's username as utf8 string
+     - Parameter password: user's password as utf8 string
      - Parameter httpSessionHandler: HTTP session handler to use for http request
      - Note: Intention for httpSessionHandler: can take a mock-http session handler for unit testing the http calls.
      This initializer's intention is mainly to be used when performing unit testing. When using the library it is recommended to use the
      convenience initializer.
      */
-    init?(baseUrlStr: String, usernameStr: String, passwordStr: String, httpSessionHandler: URLSessionProtocol) throws {
-        guard !baseUrlStr.isEmpty && !usernameStr.isEmpty && !passwordStr.isEmpty else {
+    init?(baseUrlStr: String, username: String, password: String, httpSessionHandler: URLSessionProtocol) throws {
+        serverSettings = ServerSettings(baseUrl: baseUrlStr, username: username, password: password)
+        guard serverSettings.allPartsGiven() else {
             throw TBHTTPClientRequestError.emptyLogin
         }
-        serverSettings = ServerSettings(baseUrl: baseUrlStr, username: usernameStr, password: passwordStr)
-        AEM.setTbServerBaseURL(self.serverSettings)
+        
+        AEM.setTbServerBaseURL(serverSettings)
         super.init(httpSessionHandler: httpSessionHandler)
     }
     
@@ -44,8 +45,24 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter usernameStr: user's username as utf8 string
      - Parameter passwordStr: user's password as utf8 string
      */
-    public convenience init?(baseUrlStr: String, usernameStr: String, passwordStr: String) throws {
-        try self.init(baseUrlStr: baseUrlStr, usernameStr: usernameStr, passwordStr: passwordStr, httpSessionHandler: URLSession.shared)
+    public convenience init?(baseUrlStr: String, username: String, password: String) throws {
+        try self.init(baseUrlStr: baseUrlStr, username: username, password: password, httpSessionHandler: URLSession.shared)
+    }
+    
+    /**
+     Initialize TB client by providing access token
+     - Parameter baseUrlStr: server url as utf8 string without trailing slash (no API endpoint, just base server URL)
+     - Parameter accessToken: AuthLogin object containing `token` and `refreshToken`
+     - Note: Re-use tokens from an existing/previous session instead of optaining new ones from the server.
+     */
+    public init?(baseUrlStr: String, accessToken: AuthLogin) throws {
+        serverSettings = ServerSettings(baseUrl: baseUrlStr, username: "", password: "")
+        guard accessToken.allPartsGiven() && serverSettings.urlGiven() else {
+            throw TBHTTPClientRequestError.emptyLogin
+        }
+        authData = accessToken
+        AEM.setTbServerBaseURL(self.serverSettings)
+        super.init(httpSessionHandler: URLSession.shared)
     }
     
     // MARK: – Authentication
@@ -54,7 +71,10 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter responseHandler: takes an 'AuthLogin' as parameter and is called upon successful server response
      - Note: authData contains token and refreshToken after login succeeded
      */
-    public func login(responseHandler: ((AuthLogin) -> Void)? = nil) -> Void {
+    public func login(responseHandler: ((AuthLogin) -> Void)? = nil) throws -> Void {
+        guard serverSettings.allPartsGiven() else {
+            throw TBHTTPClientRequestError.emptyLogin
+        }
         let authDataDict: Dictionary<String, String> = ["username": serverSettings.username, "password": serverSettings.password]
         tbApiRequest(fromEndpoint: AEM.getEndpointURL(TBApiEndpoints.login),
                      withPayload: authDataDict,
@@ -68,6 +88,20 @@ public class TBUserApiClient: TBHTTPRequest {
         }
     }
     
+    /**
+     Request authentication with the thingsboard server to optain/renew the authentication token
+     - Parameter withUsername: user's username as utf8 string
+     - Parameter andPassword: user's password as utf8 string
+     - Parameter responseHandler: takes an 'AuthLogin' as parameter and is called upon successful server response
+     - Note: authData contains **new** tokens after login succeeded
+     */
+    public func login(withUsername username: String, andPassword password: String, responseHandler: ((AuthLogin) -> Void)? = nil) throws -> Void {
+        serverSettings.username = username
+        serverSettings.password = password
+        try login(responseHandler: responseHandler)
+    }
+
+
     // MARK: - User related requests
     /**
      Get currently logged in user info
