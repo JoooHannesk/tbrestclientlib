@@ -15,7 +15,7 @@ public class TBUserApiClient: TBHTTPRequest {
     typealias TBApiEndpoints = TbAPIEndpointsV1
     typealias AEM = APIEndpointManager
     private let serverSettings: ServerSettings
-    private(set) var authData: AuthLogin
+    private(set) var authData: AuthLogin?
     
     
     // MARK: - Initialization
@@ -34,7 +34,6 @@ public class TBUserApiClient: TBHTTPRequest {
             throw TBHTTPClientRequestError.emptyLogin
         }
         serverSettings = ServerSettings(baseUrl: baseUrlStr, username: usernameStr, password: passwordStr)
-        authData = AuthLogin(token: "", refreshToken: "")
         AEM.setTbServerBaseURL(self.serverSettings)
         super.init(httpSessionHandler: httpSessionHandler)
     }
@@ -60,8 +59,12 @@ public class TBUserApiClient: TBHTTPRequest {
         tbApiRequest(fromEndpoint: AEM.getEndpointURL(TBApiEndpoints.login),
                      withPayload: authDataDict,
                      expectedTBResponseType: AuthLogin.self) { responseObject -> Void in
-            self.authData = responseObject as! AuthLogin
-            responseHandler?(self.authData)
+            if responseObject is AuthLogin {
+                self.authData = responseObject as? AuthLogin
+                if let authData = self.authData {
+                    responseHandler?(authData)
+                }
+            }
         }
     }
     
