@@ -93,12 +93,15 @@ fileprivate func getStringRepresentation(for dataModelObject: TBDataModel) -> St
 
 
 // MARK: - Application Data Models
+
+/// hold info required to request login at server
 struct ServerSettings: TBDataModel {
     let baseUrl: String
     let username: String
     let password: String
 }
 
+/// hold authentication tokens received by server upon successful login
 public struct AuthLogin: TBDataModel {
     public let token: String
     public let refreshToken: String
