@@ -33,7 +33,7 @@ class FunctionalTestCases: XCTestCase {
         }
         
         apiClient?.registerAppErrorHandler(errorHandler: showLoginFailed)
-        apiClient?.login()
+        try! apiClient?.login()
         wait(for: [expectation], timeout: 3.0)
     }
     
@@ -48,11 +48,43 @@ class FunctionalTestCases: XCTestCase {
             XCTFail("\(tbAppError)")
         }
         
-        apiClient?.login() { authObject in
+        try! apiClient?.login() { authObject in
             XCTAssertTrue(!authObject.token.isEmpty && !authObject.refreshToken.isEmpty)
             expectLogin.fulfill()
         }
         wait(for: [expectLogin], timeout: 3.0)
+    }
+    
+    /**
+     Test login(withUsername:andPassword:baseUrlStr:) for success
+     */
+    func renewLogin(apiClient: TBUserApiClient?, username: String, password: String) {
+        let expectLogin = XCTestExpectation(description: "Expected login!")
+        XCTAssertNotNil(apiClient)
+        
+        apiClient?.registerAppErrorHandler { tbAppError in
+            XCTFail("\(tbAppError)")
+        }
+        
+        try! apiClient?.login(withUsername: username, andPassword: password) { authObject in
+            XCTAssertTrue(!authObject.token.isEmpty && !authObject.refreshToken.isEmpty)
+            expectLogin.fulfill()
+        }
+        wait(for: [expectLogin], timeout: 3.0)
+    }
+    
+    /**
+     Compare AuthLogin tokens
+     Tokens must be different to pass the test
+     */
+    func compareDifferentAuthLogins(apiClientToken1: AuthLogin, apiClientToken2: AuthLogin) {
+        if !apiClientToken1.allPartsGiven() || !apiClientToken2.allPartsGiven() {
+            XCTFail("Not all parts given in AuthLogin objects")
+        }
+        
+        if apiClientToken1 == apiClientToken2 {
+            XCTFail("Login renewal failed")
+        }
     }
     
     /**
@@ -471,7 +503,7 @@ class FunctionalTestCases: XCTestCase {
             apiClient?.getTimeseries(for: .device, entityId: tbDevice,
                                      keys: requested_keys, startTs: startTs, endTs: endTs,
                                      limit: 10, getValuesAsStrings: getValuesAsStrings) { responseObject in
-                print(responseObject)
+                //print(responseObject)
                 if let sampleimei = responseObject["SampleIMEI"], let samplebattery = responseObject["SampleBattery"] {
                     if getValuesAsStrings {
                         // reflect values-as-string case

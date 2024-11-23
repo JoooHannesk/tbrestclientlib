@@ -13,7 +13,7 @@ final class IntegrationTests: FunctionalTestCases {
     
     func prepare() -> (TBUserApiClient?, ServerSettings?) {
         let serversettings = FileResourceLoader(searchPath: "Resources").loadServerSettingsFromFile(fileName: "ServerSettings")
-        let tbTestClient = try? TBUserApiClient(baseUrlStr: serversettings!.baseUrl, usernameStr: serversettings!.username, passwordStr: serversettings!.password)
+        let tbTestClient = try? TBUserApiClient(baseUrlStr: serversettings!.baseUrl, username: serversettings!.username, password: serversettings!.password)
         return (tbTestClient, serversettings)
     }
     /**
@@ -21,7 +21,7 @@ final class IntegrationTests: FunctionalTestCases {
      */
     func testLoginFails() {
         let serversettings = prepare().1
-        let tbTestClient = try? TBUserApiClient(baseUrlStr: serversettings!.baseUrl, usernameStr: "user@example.com", passwordStr: "mysupersecretpassword")
+        let tbTestClient = try? TBUserApiClient(baseUrlStr: serversettings!.baseUrl, username: "user@example.com", password: "mysupersecretpassword")
         loginFails(apiClient: tbTestClient)
     }
     
@@ -41,6 +41,20 @@ final class IntegrationTests: FunctionalTestCases {
         let (tbTestClient, serversettings) = prepare()
         loginSucceeds(apiClient: tbTestClient)
         getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+    }
+    
+    /**
+     Test loginWithAccessToken()
+     Test login with existing token from previous session
+     */
+    func testLoginWithAccessToken() {
+        let (tbTestClient, serversettings) = prepare()
+        loginSucceeds(apiClient: tbTestClient)
+        let authData = tbTestClient?.authData
+        let newTbTestClient = try! TBUserApiClient(baseUrlStr: serversettings!.baseUrl, accessToken: authData!)
+        getUser(apiClient: newTbTestClient, expectedUsername: serversettings!.username)
+        renewLogin(apiClient: newTbTestClient, username: serversettings!.username, password: serversettings!.password)
+        compareDifferentAuthLogins(apiClientToken1: tbTestClient!.authData!, apiClientToken2: newTbTestClient!.authData!)
     }
     
     /**

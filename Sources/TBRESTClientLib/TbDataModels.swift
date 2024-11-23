@@ -97,14 +97,28 @@ fileprivate func getStringRepresentation(for dataModelObject: TBDataModel) -> St
 /// hold info required to request login at server
 struct ServerSettings: TBDataModel {
     let baseUrl: String
-    let username: String
-    let password: String
+    var username: String
+    var password: String
+    
+    func allPartsGiven() -> Bool {
+        return !baseUrl.isEmpty && !username.isEmpty && !password.isEmpty
+    }
+    
+    func urlGiven() -> Bool {
+        return !baseUrl.isEmpty
+    }
+    
 }
 
 /// hold authentication tokens received by server upon successful login
-public struct AuthLogin: TBDataModel {
+public struct AuthLogin: TBDataModel, Equatable {
     public let token: String
     public let refreshToken: String
+    
+    func allPartsGiven() -> Bool {
+        return !token.isEmpty && !refreshToken.isEmpty
+    }
+    
 }
 
 public struct User: TBDataModel, EntityEquatable {

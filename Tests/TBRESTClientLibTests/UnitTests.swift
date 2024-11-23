@@ -12,20 +12,20 @@ import XCTest
 final class UnitTests: FunctionalTestCases {
     
     // prepare mock api client
-    let testableApiClient = MockAPIClientFactory(baseUrlStr: "url.server.com", usernameStr: "user@example.com", passwordStr: "supersecretpassword")
+    let testableApiClient = MockAPIClientFactory(baseUrlStr: "url.server.com", username: "user@example.com", password: "supersecretpassword")
 
     /**
      Check that initializer runs without throwing when all login fields are given
      */
     func testLoginDataNotEmpty() {
-        XCTAssertNoThrow(try TBUserApiClient(baseUrlStr: "url.server.com", usernameStr: "user@example.com", passwordStr: "supersecretpassword"))
+        XCTAssertNoThrow(try TBUserApiClient(baseUrlStr: "url.server.com", username: "user@example.com", password: "supersecretpassword"))
     }
     
     /**
      Check that initializer is throwing in case a single login field is missing
      */
     func testLoginDataEmpty() {
-        XCTAssertThrowsError(try TBUserApiClient(baseUrlStr: "url.server.com", usernameStr: "", passwordStr: "")) { error in
+        XCTAssertThrowsError(try TBUserApiClient(baseUrlStr: "url.server.com", username: "", password: "")) { error in
             if case TBHTTPClientRequestError.emptyLogin = error {
                 // expected error case returned
                 XCTAssertTrue(true, "Correct error type thrown!")
