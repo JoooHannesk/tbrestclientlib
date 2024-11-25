@@ -7,7 +7,8 @@ let package = Package(
     name: "TBRESTClientLib",
     platforms: [.iOS(.v17),
                 .macOS(.v14),
-                .custom("Debian", versionString: "12")],
+                //.custom("Debian", versionString: "12")
+    ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
