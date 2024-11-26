@@ -42,8 +42,8 @@ public class TBUserApiClient: TBHTTPRequest {
     /**
      Initialize TB client
      - Parameter baseUrlStr: server url as utf8 string without trailing slash (no API endpoint, just base server URL)
-     - Parameter usernameStr: user's username as utf8 string
-     - Parameter passwordStr: user's password as utf8 string
+     - Parameter username: user's username as utf8 string
+     - Parameter password: user's password as utf8 string
      */
     public convenience init?(baseUrlStr: String, username: String, password: String) throws {
         try self.init(baseUrlStr: baseUrlStr, username: username, password: password, httpSessionHandler: URLSession.shared)
@@ -90,8 +90,8 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Request authentication with the thingsboard server to optain/renew the authentication token
-     - Parameter withUsername: user's username as utf8 string
-     - Parameter andPassword: user's password as utf8 string
+     - Parameter username: user's username as utf8 string
+     - Parameter password: user's password as utf8 string
      - Parameter responseHandler: takes an 'AuthLogin' as parameter and is called upon successful server response
      - Note: authData contains **new** tokens after login succeeded
      */
