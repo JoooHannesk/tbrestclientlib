@@ -257,7 +257,7 @@ class FunctionalTestCases: XCTestCase {
     func saveEntityAttributesFailureUnmatchedDeviceID(apiClient: TBUserApiClient?) {
         let expectedResponseDeviceUnknown = XCTestExpectation(description: "Expected unknown device response...")
         apiClient?.registerAppErrorHandler { tbAppError in
-            print("Test failed with error: \(tbAppError)")
+            print("Operation failed with error: \(tbAppError)")
             XCTAssertEqual(tbAppError.status, 999)
             expectedResponseDeviceUnknown.fulfill()
         }
