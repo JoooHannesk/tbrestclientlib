@@ -8,7 +8,11 @@ Simple client library for [ThingsBoard](https://thingsboard.io) server installat
 * Integration tests executed using ThingsBoard CE 3.7.0 with an on-premise installation – [v.3.7.0 API Reference](https://app.swaggerhub.com/apis-docs/johannes_kinzig/thingsboard-rest-api/3.7.0)
 
 ## Project Status
-This project was started as part of larger project which required API access to ThingsBoard instances – this library is continuously growing but **has not implemented all ThingsBoard API endpoints**. I tried to grab all elements for each endpoint as defined by the ThingsBoard api-schema but omitted the ones which seemed too far away for my current use case. Check ´TbDataModels.swift´ for detailed properties contained in each schema model.  
+This library was initiated as a sub-project of a larger project which required API access to ThingsBoard server instances. As library development can be seen as a whole project by itself, this part then was open-sourced and released to the public.
+
+Please note: This library is continuously growing but **has not implemented all API endpoints** yet. The same applies to the endpoints responses: This library does not process every fetched element inside the JSON response string (as described by the official API scheme) but neglects the ones which were out of scope at the time of development. Check ´TbDataModels.swift´ for further details about the properties contained in each schema response model.
+
+Please refer to the [library documentation](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib)
 
 ## Installation
 * Please refer to official documentation: [Installation](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/installation)
