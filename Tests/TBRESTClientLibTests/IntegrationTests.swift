@@ -50,8 +50,11 @@ final class IntegrationTests: FunctionalTestCases {
     func testLoginWithAccessToken() {
         let (tbTestClient, serversettings) = prepare()
         loginSucceeds(apiClient: tbTestClient)
-        let authData = tbTestClient?.authData
+        let authData = tbTestClient!.authData
         let newTbTestClient = try! TBUserApiClient(baseUrlStr: serversettings!.baseUrl, accessToken: authData!)
+        newTbTestClient!.registerAppErrorHandler() { errorMsg in
+            XCTFail("Unexpected error: \(errorMsg)")
+        }
         getUser(apiClient: newTbTestClient, expectedUsername: serversettings!.username)
         renewLogin(apiClient: newTbTestClient, username: serversettings!.username, password: serversettings!.password)
         compareDifferentAuthLogins(apiClientToken1: tbTestClient!.authData!, apiClientToken2: newTbTestClient!.authData!)
