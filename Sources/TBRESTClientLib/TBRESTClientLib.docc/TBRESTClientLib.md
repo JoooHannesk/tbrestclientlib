@@ -7,11 +7,26 @@ Simple client library for ThingsBoard server installations implementing the admi
 
 This documentation tries to refere to the official ThingsBoard nomenclature as well as official API documentation as close as possible. It may did not work out all the time.
 
+## Repository
+This library is hostet on Bitbucket: [https://bitbucket.org/swift-projects/tbrestclientlib.git](https://bitbucket.org/swift-projects/tbrestclientlib.git)
+
 ## Development Status
 This library was initiated as a sub-project of a larger project which required API access to ThingsBoard server instances. As library development can be seen as a whole project by itself, this part then was open-sourced and released to the public.
 
-Please note: This library is continuously growing but **has not implemented all API endpoints** yet. The same applies to the endpoints responses: This library does not process every fetched element inside the JSON response string (as described by the official API scheme) but neglects the ones which were out of scope at the time of development. Check ´TbDataModels.swift´ for further details about the properties contained in each schema response model.
+Please note: This library is continuously growing but **has not implemented all API endpoints** yet. The same applies to the endpoints responses: This library does not process every fetched element inside the JSON response string (as described by the official API scheme) but neglects the ones which were out of scope at the time of development. Refer to <doc:Usage> for further details about the properties contained in each schema response model.
 
+## Requirements
+This library works with and was tested on:
+* iOS >= 17.5
+* macOS >= 14.0
+
+Linux is currently unsupported bceause of an incompatibility in a way this library uses `URLSession`. A workaround seems to exist but was not further investigated, implemented or tested. (But it was added as a ToDo ;) )
+
+## Contact
+Johannes Kinzig – [Mail](mailto:johannes@parallelogon-software.com) – [Web](https://parallelogon-software.com)
+
+## Contribution
+Contribution is always welcome, please refer to documentation: [Contribution](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/)
 
 ## Topics
 - <doc:ReleaseNotes>

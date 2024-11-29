@@ -67,9 +67,9 @@ public class TBUserApiClient: TBHTTPRequest {
     
     // MARK: – Authentication
     /**
-     Request authentication with the thingsboard server to optain an authentication token
+     Request authentication with server to optain an authentication token
      - Parameter responseHandler: takes an 'AuthLogin' as parameter and is called upon successful server response
-     - Note: authData contains token and refreshToken after login succeeded
+     - Note: Property `authData`  contains token and refreshToken after login succeeded
      */
     public func login(responseHandler: ((AuthLogin) -> Void)? = nil) throws -> Void {
         guard serverSettings.allPartsGiven() else {

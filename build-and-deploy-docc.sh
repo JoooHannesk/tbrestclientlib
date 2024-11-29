@@ -23,3 +23,6 @@ scp -rp ./.doccbuilds/publish/* $SCPDESTINATION
 
 # cleanup local files
 rm -r ./.doccbuilds
+
+# refer to published documentation
+echo "Documentation now available at:\nhttp://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib"

@@ -14,6 +14,13 @@ Please note: This library is continuously growing but **has not implemented all 
 
 Please refer to the [library documentation](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib)
 
+## Requirements
+This library works with and was tested on:
+* iOS >= 17.5
+* macOS >= 14.0
+
+Linux is currently unsupported bceause of an incompatibility in a way this library uses `URLSession`. A workaround seems to exist but was not further investigated or tested.
+
 ## Installation
 * Please refer to official documentation: [Installation](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/installation)
 
