@@ -13,7 +13,7 @@ This library is hostet on Bitbucket: [https://bitbucket.org/swift-projects/tbres
 ## Development Status
 This library was initiated as a sub-project of a larger project which required API access to ThingsBoard server instances. As library development can be seen as a whole project by itself, this part then was open-sourced and released to the public.
 
-Please note: This library is continuously growing but **has not implemented all API endpoints** yet. The same applies to the endpoints responses: This library does not process every fetched element inside the JSON response string (as described by the official API scheme) but neglects the ones which were out of scope at the time of development. Refer to <doc:Usage> for further details about the properties contained in each schema response model.
+Please note: This library is continuously growing but **has not implemented all API endpoints** yet. The same applies to the endpoint's responses: This library does not process every fetched element inside the JSON response string (as described by the official API scheme) but neglects the ones which were out of scope for this project and at the time of development. Refer to <doc:Usage> for further details about the properties contained in each schema response model.
 
 ## Requirements
 This library works with and was tested on:

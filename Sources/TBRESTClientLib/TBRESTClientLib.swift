@@ -89,7 +89,7 @@ public class TBUserApiClient: TBHTTPRequest {
     }
     
     /**
-     Request authentication with the thingsboard server to optain/renew the authentication token
+     Request authentication with the server to optain/renew the authentication token
      - Parameter username: user's username as utf8 string
      - Parameter password: user's password as utf8 string
      - Parameter responseHandler: takes an 'AuthLogin' as parameter and is called upon successful server response

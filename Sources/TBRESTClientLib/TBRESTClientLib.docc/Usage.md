@@ -32,7 +32,7 @@ try? myClient?.login() { authToken in
 Types involved: ``AuthLogin``
 
 #### Initialization with existing access token
-Initialization can also be performed by using a previosuly feteched access token (instead of username/password). Procedure mainly stays the same as described above: init client, then register error handler
+Initialization can also be performed by using a previosuly feteched access token (instead of username/password). The procedure mainly stays the same as described above: init client, then register error handler
 ```swift
 let accessToken = AuthLogin(token: "MyAccessToken", refreshToken: "MyRefreshToken")
 let myClient2 = try? TBUserApiClient(baseUrlStr: "https://my-thingsboard-iot-server.com", accessToken: accessToken)
@@ -52,13 +52,61 @@ try? myClient2?.login(withUsername: "MyUsername", andPassword: "MySuperSecretPas
 ```
 Types involved: ``AuthLogin``
 
+### User Profile
+To perform user-specific requests (e.g. user-accessible devices or profiles) it is mandatorry to include a user-id reference to these requests. Therefore it is required to obtain its own user-id first.
+```swift
+var userInfo: User?
 
-### Users
+self.myClient?.getUser() { userInfo in
+    self.userInfo = userInfo
+    print("\(self.userInfo)")
+}
+```
+Types involved: ``User``
 
+### Devices and device profiles
+Working with devices and device profiles.
 
-## Data Models
-When requesting data from your thingsboard server, the response is wrapped into one or more of the following data models:
+#### Get devices and device infos
+Get devices and device infos for the customer the user belongs to. Response supports pagination. This is automatically neglected when using default arguments for function parameters, assuming a response with decent number of devices. ``TBUserApiClient/getCustomerDeviceInfos(customerId:pageSize:page:type:deviceProfileId:active:textSearch:sortProperty:sortOrder:responseHandler:)`` gives more flexibility compared to ``TBUserApiClient/getCustomerDevices(customerId:pageSize:page:type:textSearch:sortProperty:sortOrder:responseHandler:)``. To minimize complexity, return type is the same for both functions.
 
-### Device Profiles
+##### getCustomerDeviceInfos()
+```swift
+var devices: [Device]! = []
 
-### Devices
+// picking up all devices assuming there are not hundreds/thousands - therefore omitting the use of proper pagination
+myClient?.getCustomerDeviceInfos(customerId: userInfo?.customerId.id ?? "") { tbDevicesPaginated in
+    self.devices = tbDevicesPaginated.data
+    print("\(self.devices)")
+}
+```
+
+##### getCustomerDevices()
+```swift
+myClient?.getCustomerDevices(customerId: userInfo?.customerId.id ?? "") { customerDevices in
+   print("\(customerDevices)")
+}
+```
+Types involved: ``PaginationDataContainer``, ``Device``
+
+#### Get device profiles and device profile infos
+Get device profiles and device profile infos. Response supports pagination. This is automatically neglected when using default arguments for function parameters, assuming a response with decent number of profiles. ``TBUserApiClient/getDeviceProfileInfos(pageSize:page:textSearch:sortProperty:sortOrder:transportType:responseHandler:)`` gives more flexibility compared to ``TBUserApiClient/getDeviceProfiles(pageSize:page:textSearch:sortProperty:sortOrder:responseHandler:)``. To minimize complexity, return type is the same for both functions.
+
+```swift
+myClient?.getDeviceProfileInfos() { deviceProfileInfos in
+    print("\(deviceProfileInfos)")
+}
+```
+
+```swift
+myClient?.getDeviceProfiles() { deviceProfiles in
+    print("\(deviceProfiles)")
+}
+```
+Types involved: ``PaginationDataContainer``, ``DeviceProfile``
+
+### Working with telemetry data
+
+#### Entity attributes
+
+#### Entitiy timeseries data
