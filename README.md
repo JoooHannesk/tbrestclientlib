@@ -16,6 +16,7 @@ Please refer to the [library documentation](http://tbrestclientlib.parallelogon-
 
 ## Requirements
 This library works with and was tested on:
+
 * iOS >= 17.5
 * macOS >= 14.0
 
