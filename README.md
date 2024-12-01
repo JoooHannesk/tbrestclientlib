@@ -22,13 +22,13 @@ This library works with and was tested on:
 Linux is currently unsupported bceause of an incompatibility in a way this library uses `URLSession`. A workaround seems to exist but was not further investigated or tested.
 
 ## Installation
-* Please refer to official documentation: [Installation](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/installation)
+* Please refer to library documentation: [Installation](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/installation)
 
 ## Usage
-* Please refer to official documentation: [Usage](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/usage)
+* Please refer to library documentation: [Usage](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/usage)
 
 ## Unit & Integration Tests
-* Please refer to official documentation: [Testing](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/tests)
+* Please refer to library documentation: [Testing](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/tests)
 
 ## License
 * MIT License
