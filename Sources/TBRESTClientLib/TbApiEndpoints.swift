@@ -67,10 +67,14 @@ public enum TbQueryTransportType: String {
 }
 
 public enum TbQueryEntityScopes: String {
-    case server = "SERVER_SCOPE" /// for all entity types
-    case client = "CLIENT_SCOPE" /// for devices
-    case shared = "SHARED_SCOPE" /// for devices
-    case any = "ANY" /// required by server to stay backwards compatible
+    /// for use with all entity types
+    case server = "SERVER_SCOPE"
+    /// for use with device-entities
+    case client = "CLIENT_SCOPE"
+    /// for use with device-entities
+    case shared = "SHARED_SCOPE"
+    /// required by server to stay backwards compatible
+    case any = "ANY"
 }
 
 public enum TbQueryEntityTypes: String {

@@ -32,6 +32,6 @@ Contribution is always welcome, please refer to documentation: [Contribution](ht
 - <doc:ReleaseNotes>
 - <doc:Installation>
 - <doc:Usage>
-- <doc:Tests>
+- <doc:Testing>
 - <doc:DevelopmentContribution>
 - <doc:License>
