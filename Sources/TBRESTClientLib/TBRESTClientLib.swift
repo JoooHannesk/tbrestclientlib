@@ -21,6 +21,7 @@ public class TBUserApiClient: TBHTTPRequest {
     // MARK: - Initializers
     /**
      Initialize TB client
+     
      - Parameter baseUrlStr: server url as utf8 string without trailing slash (no API endpoint, just base server URL)
      - Parameter username: user's username as utf8 string
      - Parameter password: user's password as utf8 string
@@ -41,6 +42,7 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Initialize TB client
+     
      - Parameter baseUrlStr: server url as utf8 string without trailing slash (no API endpoint, just base server URL)
      - Parameter username: user's username as utf8 string
      - Parameter password: user's password as utf8 string
@@ -51,6 +53,7 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Initialize TB client by providing access token
+     
      - Parameter baseUrlStr: server url as utf8 string without trailing slash (no API endpoint, just base server URL)
      - Parameter accessToken: AuthLogin object containing `token` and `refreshToken`
      - Note: Re-use tokens from an existing/previous session instead of optaining new ones from the server.
@@ -68,6 +71,7 @@ public class TBUserApiClient: TBHTTPRequest {
     // MARK: – Authentication
     /**
      Request authentication with server to optain an authentication token
+     
      - Parameter responseHandler: takes an 'AuthLogin' as parameter and is called upon successful server response
      - Note: Property `authData`  contains token and refreshToken after login succeeded
      */
@@ -90,6 +94,7 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Request authentication with the server to optain/renew the authentication token
+     
      - Parameter username: user's username as utf8 string
      - Parameter password: user's password as utf8 string
      - Parameter responseHandler: takes an 'AuthLogin' as parameter and is called upon successful server response
@@ -105,6 +110,7 @@ public class TBUserApiClient: TBHTTPRequest {
     // MARK: - User related requests
     /**
      Get currently logged in user info
+     
      - Parameter responseHandler: takes a 'User' as parameter and is called upon successful server response
      - Note: for supported data models as parameters see: TbDataModels.swift
      */
@@ -120,6 +126,7 @@ public class TBUserApiClient: TBHTTPRequest {
     // MARK: - Device related requests
     /**
      Get Customer Devices – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     
      Receives a page of devices assigned to the customer (by ID). Specify parameters to filter the results, which are wrapped inside a PageData object that
      allows to iterate over the result set using pagination.
      - Parameter customerId: A string value representing the customer id
@@ -154,6 +161,7 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Get Customer Device Infos – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     
      Receives a page of devices info objects assigned to the customer (by ID). Specify parameters to filter the results, which are wrapped inside a PageData object that
      allows to iterate over the result set using pagination.
      - Parameter customerId: customer id (UUID) as string
@@ -195,6 +203,7 @@ public class TBUserApiClient: TBHTTPRequest {
     // MARK: - Device Profile related requests
     /**
      Get Device Profile Infos – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     
      Receives a page of devices profile info objects defined for the tenant. Specify parameters to filter the results, which are wrapped inside a PageData object that
      allows to iterate over result set using pagination.
      - Parameter pageSize: Maximum amount of entities in a one page
@@ -227,6 +236,7 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Get Device Profiles – requires 'TENANT\_ADMIN' authority
+     
      Receives a page of devices profile objects defined for the tenant. Specify parameters to filter the results which are wrapped insude a PageData object that
      allows to iterate over result set using pagination.
      - Parameter pageSize: Maximum amount of entities in a one page
@@ -257,11 +267,12 @@ public class TBUserApiClient: TBHTTPRequest {
     // MARK: - Attributes and Telemetry
     /**
      Get Attribute Keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     
      Get a set of unique attribute keys for the requested entity.
      - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter responseHandler: takes an 'Array<String>' as parameter and is called upon successful server response
-     - Note: The response will include merged key names set for all attribute scopes: server - for all entity types, client - for devices, shared - for devices
+     - Note: The response includes merged key names for all scopes (supported scopes: ``TbQueryEntityScopes``).
      */
     public func getAttributeKeys(for entityType: TbQueryEntityTypes, entityId: String, responseHandler: ((Array<String>) -> Void)?)
     -> Void {
@@ -277,12 +288,13 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Get Attribute Keys by Scope – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     
      Get a set of unique attribute keys for the requested entity and given scope
      - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter scope: scope in which the attribute is managed, as defined in ``TbQueryEntityScopes``
      - Parameter responseHandler: takes an 'Array<String>' as parameter and is called upon successful server response
-     - Note: The response will include merged key names set for all attribute scopes: server - for all entity types, client - for devices, shared - for devices
+     - Note: The response includes key names for requested scope.
      */
     public func getAttributeKeysByScope(for entityType: TbQueryEntityTypes, entityId: String,
                                         scope: TbQueryEntityScopes, responseHandler: ((Array<String>) -> Void)?)
@@ -300,6 +312,7 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Create or update the attributes based on entity id and the specified attribute scope – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     
      Implementes the endpoint saveEntityAttributesV2
      - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
@@ -324,6 +337,7 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Get all entity attributes (scope-independent)  by keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     
      - Parameter entityType:tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the keys
@@ -341,6 +355,7 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Get entity attributes by scope and by keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     
      - Parameter entityType:tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the keys
@@ -360,6 +375,7 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Delete entity attributes by scope and keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     
      - Parameter entityType:tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the keys
@@ -379,6 +395,7 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Save entity telemetry data for the given entity – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     
      - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter timeseriesData: timeseries data as key-value pairs (as dictionary)
@@ -401,6 +418,7 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Get unique time-series key names for the given entity – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     
      - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter responseHandler: takes an 'Array<String>' as parameter and is called upon successful server response
@@ -419,6 +437,7 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Get the **latest** time-series data from server – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     
      Latest time-series data is stored in a different table for performance reasons (according to ThingsBoard docs) and can therefore be retrieved
      via a seperate API call.
      - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
@@ -446,6 +465,7 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Get time-series data from server – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     
      Retrieve time-series data according to specified time interval and (optional) aggregation functions:
      - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
@@ -486,6 +506,7 @@ public class TBUserApiClient: TBHTTPRequest {
     
     /**
      Delete entity time-series data – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     
      Delete time-series data for selected entity based on its id, type and keys
      - Parameter entityType:tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id

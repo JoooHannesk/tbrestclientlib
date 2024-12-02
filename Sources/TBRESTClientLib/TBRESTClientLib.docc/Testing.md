@@ -1,4 +1,5 @@
-# Test Cases
+# Testing
+This library comes with unit and integration tests.
 
 ## Tests
 
