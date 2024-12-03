@@ -112,7 +112,7 @@ Types involved: ``PaginationDataContainer``, ``DeviceProfile``
 Telemetry data is grouped into *attributes* and *timeseries data*
 
 ### Entity attributes
-Attributes are unique key-value pairs which are time-independant. Attributes can be set within a given scope: ``TbQueryEntityScopes``
+Attributes are unique key-value pairs which are time-independant. Attributes can be set within a given scope ``TbQueryEntityScopes`` and for a given entity type ``TbQueryEntityScopes``.
 
 #### getAttributeKeys()
 Use ``TBUserApiClient/getAttributeKeys(for:entityId:responseHandler:)`` to get attribute keys for an entity type ``TbQueryEntityTypes``. This method does not support filtering by entity scope.
@@ -123,25 +123,41 @@ myClient?.getAttributeKeys(for: .device, entityId: "deviceId-as-UUID-string") { 
 ```
 
 #### getAttributeKeysByScope()
-Use ``TBUserApiClient/getAttributeKeysByScope(for:entityId:scope:responseHandler:)`` to get attribute keys for an entity type ``TbQueryEntityTypes``, **filtered** by entity scope ``TbQueryEntityScopes``
+Use ``TBUserApiClient/getAttributeKeysByScope(for:entityId:scope:responseHandler:)`` to get **attribute keys** for an entity type ``TbQueryEntityTypes``, **filtered** by entity scope ``TbQueryEntityScopes``.
 ```swift
 myClient?.getAttributeKeysByScope(for: .device, entityId: "deviceId-as-UUID-string", scope: .server) { attributesArray in
     print("\(attributesArray)")
 }
 ```
 
+#### getAttributes()
+``TBUserApiClient/getAttributes(for:entityId:keys:responseHandler:)`` retrieves complete attributes: key and its current value. 
+```swift
+myClient?.getAttributes(for: .device, entityId: tbDevice, keys: ["sampleAtt1String", "sampleAtt2Bool", "sampleAtt3Int", "sampleAtt4Double"]) { attributesArray in
+    print("\(attributesArray)")
+}
+```
+Types involved: ``AttributesResponse``
+
+When accessing attributes, make sure to read the documentation for the type ``AttributesResponse``, its property ``AttributesResponse/value`` (and the property implementation ``MplValueType``).
+
+
+#### getAttributesByScope()
+
 #### saveEntityAttributes()
-Add new or modify existing attributes.
+Add new or modify existing attributes. Attributes can be defined as a `[String : Any]` dictionary. The response handler `() -> Void` is called when the operation completes successfully. Attributes are set for a given entity ``TbQueryEntityTypes`` and scope ``TbQueryEntityScopes``.
+```swift
+let sampleAttributes = ["sampleAtt1String":"Hello Server", "sampleAtt2Bool": true, "sampleAtt3Int": 4, "sampleAtt4Double": 3.1415926] as [String : Any]
+myClient?.saveEntityAttributes(for: .device, entityId: "deviceId-as-UUID-string", attributesData: sampleAttributes, scope: .shared) {
+    print("Success!")
+}
+```
 
-
-getAttributes
-getAttributesByScope
-
-deleteEntityAttributes
+#### deleteEntityAttributes()
 
 ### Entitiy timeseries data
-saveEntityTelemetry
-getTimeseriesKeys
-getLatestTimeseries
-getTimeseries
-deleteEntityTimeseries
+#### getTimeseriesKeys()
+#### getLatestTimeseries()
+#### getTimeseries()
+#### saveEntityTelemetry()
+#### deleteEntityTimeseries()
