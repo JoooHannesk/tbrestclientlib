@@ -8,7 +8,7 @@ Simple client library for ThingsBoard server installations implementing the admi
 This documentation tries to refere to the official ThingsBoard nomenclature as well as official API documentation as close as possible. It may did not work out all the time.
 
 ## Disclaimer
-This library is an independent implementation by its authors (see below) and is **not affiliated with, endorsed by, or officially associated with ThingsBoard Inc. in any way**. For further details [mail the author](mailto:johannes@parallelogon-software.com) and/or refer to this libraries <doc:License>.
+This library is an independent implementation developed by its authors (see below) and is **not affiliated with, endorsed by, or officially associated with ThingsBoard Inc. in any way**. For further details [mail the author](mailto:johannes@parallelogon-software.com) and/or refer to this libraries <doc:License>.
 
 ## Repository
 This library is hostet on Bitbucket: [https://bitbucket.org/swift-projects/tbrestclientlib.git](https://bitbucket.org/swift-projects/tbrestclientlib/src/main/)
@@ -30,7 +30,7 @@ Linux is currently unsupported bceause of an incompatibility in a way this libra
 Johannes Kinzig – [Mail](mailto:johannes@parallelogon-software.com) – [Web](https://parallelogon-software.com)
 
 ## Contribution
-Contribution is always welcome, please refer to documentation: [Contribution](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/)
+Contribution is always welcome, please refer to documentation: [Contribution](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/developmentcontribution)
 
 ## Topics
 - <doc:ReleaseNotes>

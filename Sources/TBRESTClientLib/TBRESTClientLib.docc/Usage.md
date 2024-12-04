@@ -287,5 +287,5 @@ myClient?.deleteEntityTimeseries(for: .device, entityId: "entityId-as-UUID-strin
     print("Success!")
 }
 ```
-For further details regarding endpoint parameters, refer to official [API documentation](https://app.swaggerhub.com/apis-docs/johannes_kinzig/thingsboard-rest-api/3.7.0#/telemetry-controller/deleteEntityTimeseries).
+For further details regarding endpoint parameters and their functionality, refer to official [API documentation](https://app.swaggerhub.com/apis-docs/johannes_kinzig/thingsboard-rest-api/3.7.0#/telemetry-controller/deleteEntityTimeseries).
 
