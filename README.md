@@ -8,7 +8,7 @@ Simple client library for [ThingsBoard](https://thingsboard.io) server installat
 * Integration tests executed using ThingsBoard CE 3.7.0 with an on-premise installation – [v.3.7.0 API Reference](https://app.swaggerhub.com/apis-docs/johannes_kinzig/thingsboard-rest-api/3.7.0)
 
 ## Disclaimer
-This library is an independent implementation by [its author(s)](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/#Contact-the-authors) and is **not affiliated with, endorsed by, or officially associated with ThingsBoard Inc. in any way**. For further details [mail the author](mailto:johannes@parallelogon-software.com) and/or refer to this libraries [license](https://bitbucket.org/swift-projects/tbrestclientlib/src/main/LICENSE.txt).
+This library is an independent implementation developed by [its author(s)](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/#Contact-the-authors) and is **not affiliated with, endorsed by, or officially associated with ThingsBoard Inc. in any way**. For further details [mail the author](mailto:johannes@parallelogon-software.com) and/or refer to this libraries [license](https://bitbucket.org/swift-projects/tbrestclientlib/src/main/LICENSE.txt).
 
 ## Project Status
 This library was initiated as a sub-project of a larger project which required API access to ThingsBoard server instances. As library development can be seen as a whole project by itself, this part then was open-sourced and released to the public.
