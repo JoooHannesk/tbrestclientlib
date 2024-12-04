@@ -117,7 +117,7 @@ Attributes are unique key-value pairs which are time-independant. Attributes can
 #### getAttributeKeys()
 Use ``TBUserApiClient/getAttributeKeys(for:entityId:responseHandler:)`` to get attribute keys for an entity type ``TbQueryEntityTypes``. This method does not support filtering by entity scope.
 ```swift
-myClient?.getAttributeKeys(for: .device, entityId: "deviceId-as-UUID-string") { attributesArray in
+myClient?.getAttributeKeys(for: .device, entityId: "entityId-as-UUID-string") { attributesArray in
     print("\(attributesArray)")
 }
 ```
@@ -125,7 +125,7 @@ myClient?.getAttributeKeys(for: .device, entityId: "deviceId-as-UUID-string") { 
 #### getAttributeKeysByScope()
 Use ``TBUserApiClient/getAttributeKeysByScope(for:entityId:scope:responseHandler:)`` to get **attribute keys** for an entity type ``TbQueryEntityTypes``, **filtered** by entity scope ``TbQueryEntityScopes``.
 ```swift
-myClient?.getAttributeKeysByScope(for: .device, entityId: "deviceId-as-UUID-string", scope: .server) { attributesArray in
+myClient?.getAttributeKeysByScope(for: .device, entityId: "entityId-as-UUID-string", scope: .server) { attributesArray in
     print("\(attributesArray)")
 }
 ```
@@ -139,25 +139,153 @@ myClient?.getAttributes(for: .device, entityId: tbDevice, keys: ["sampleAtt1Stri
 ```
 Types involved: ``AttributesResponse``
 
-When accessing attributes, make sure to read the documentation for the type ``AttributesResponse``, its property ``AttributesResponse/value`` (and the property implementation ``MplValueType``).
+When accessing attributes, make sure to read the documentation for the type ``AttributesResponse``, its property ``AttributesResponse/value`` (and the properties type implementation ``MplValueType``).
 
 
 #### getAttributesByScope()
+``TBUserApiClient/getAttributesByScope(for:entityId:keys:scope:responseHandler:)`` retrieves complete attributes: key and its current value. This method requires to provide the desired attribute scope ``TbQueryEntityScopes``.
+```swift
+myClient?.getAttributesByScope(for: .device, entityId: "entityId-as-UUID-string", keys: ["sampleAtt1String", "sampleAtt2Bool", "sampleAtt3Int", "sampleAtt4Double"], scope: .shared) { attributesArray in
+    print("\(attributesArray)")
+}
+```
+Types involved: ``AttributesResponse``
+
+When accessing attributes, make sure to read the documentation for the type ``AttributesResponse``, its property ``AttributesResponse/value`` (and the properties type implementation ``MplValueType``).
 
 #### saveEntityAttributes()
 Add new or modify existing attributes. Attributes can be defined as a `[String : Any]` dictionary. The response handler `() -> Void` is called when the operation completes successfully. Attributes are set for a given entity ``TbQueryEntityTypes`` and scope ``TbQueryEntityScopes``.
 ```swift
 let sampleAttributes = ["sampleAtt1String":"Hello Server", "sampleAtt2Bool": true, "sampleAtt3Int": 4, "sampleAtt4Double": 3.1415926] as [String : Any]
-myClient?.saveEntityAttributes(for: .device, entityId: "deviceId-as-UUID-string", attributesData: sampleAttributes, scope: .shared) {
+myClient?.saveEntityAttributes(for: .device, entityId: "entityId-as-UUID-string", attributesData: sampleAttributes, scope: .shared) {
     print("Success!")
 }
 ```
 
 #### deleteEntityAttributes()
+Existing attributes can be deleted by providing its keys inside an array. ``TBUserApiClient/deleteEntityAttributes(for:entityId:keys:scope:responseHandler:)`` takes a completion handler which is called on success. Attributes are deleted for a given entity ``TbQueryEntityTypes`` and scope ``TbQueryEntityScopes``.
+
+```swift
+let deleteAttributes = ["sampleAtt1String", "sampleAtt2Bool", "sampleAtt3Int", "sampleAtt4Double"]
+myClient?.deleteEntityAttributes(for: .device, entityId: "entityId-as-UUID-string", keys: deleteAttributes, scope: .shared) {
+    print("Success!")
+}
+```
 
 ### Entitiy timeseries data
+Timeseries data work quite similar to attributes but are time-sensitive. It basically consists of a key-value pair but includes a timestamp. Available methods are quite similar to attributes methods. The timestamp is given as integer in milliseconds unix time (time since epoche 1970). In future versions, types containing *integer-timestamp-properties* might be extended to have another timestamp-property of the swift native type *Date*. 
+
 #### getTimeseriesKeys()
+Request timeseries data keys for given entity. ``TBUserApiClient/getTimeseriesKeys(for:entityId:responseHandler:)`` requires to provide entity by its UUID string and calls a completion handler on success. The completion handler takes the retrieved key names as argument (of type `Array<String>`). Keys are retrieved for a given entity ``TbQueryEntityTypes``.
+
+```swift
+myClient?.getTimeseriesKeys(for: .device, entityId: "entityId-as-UUID-string") { keyNames -> Void in
+    print("\(keyNames)")
+}
+```
+
 #### getLatestTimeseries()
+Request latest timeseries data for given entity (``TbQueryEntityTypes``). Response contains last (youngest) timeseries data: a single key-value pair including timestamp. ``TBUserApiClient/getLatestTimeseries(for:entityId:keys:getValuesAsStrings:responseHandler:)`` has a parameter `getValuesAsStrings`. This tells the server to respond with all values as strings and not as native datatypes, such as int, bool, float. When a value contains a JSON string, it is highly recommended to set ` getValuesAsStrings: true` because parsing JSON strings inside response values is currently not supported by this library.
+
+Timeseries data is retrieved for a given entity ``TbQueryEntityTypes``.
+
+```swift
+myClient?.getLatestTimeseries(for: .device, entityId: "entityId-as-UUID-string", keys: ["SampleIMEI", "SampleBattery"], getValuesAsStrings: false) { responseObject in
+    if let sampleimei = responseObject["SampleIMEI"], let samplebattery = responseObject["SampleBattery"] {
+        if getValuesAsStrings {
+            // reflect values-as-string case
+            if sampleimei?.value.stringVal == "999999999999999", samplebattery?.value.stringVal == "100" {
+                print("Success!")
+            } else {
+                print("Expected different value/type!")
+            }
+        } else {
+            // reflect values-as-native-types case
+            if sampleimei?.value.intVal == 999999999999999, samplebattery?.value.intVal == 100 {
+                print("Success!")
+            } else {
+                print("Expected different value/type!")
+            }
+        }
+    } else {
+        print("Expected key is missing in response!")
+    }
+}
+```
+Types involved: ``TimeseriesResponse``
+
+To better understand ``TimeseriesResponse``'s value property, refer to ``TimeseriesResponse/value`` and ``MplValueType``. For further details about this endpoints parameters, please refer to the [API documentation](https://app.swaggerhub.com/apis-docs/johannes_kinzig/thingsboard-rest-api/3.7.0#/telemetry-controller/getLatestTimeseries).
+
 #### getTimeseries()
+Request timeseries data for given entity (``TbQueryEntityTypes``). Response contains timeseries data for given time frame: key-value pairs including timestamp. ``TBUserApiClient/getTimeseries(for:entityId:keys:startTs:endTs:intervalType:interval:timeZone:limit:aggregation:sortOrder:getValuesAsStrings:responseHandler:)`` has a parameter `getValuesAsStrings`. This tells the server to respond with all values as strings and not as native datatypes, such as int, bool, float. When a value contains a JSON string, it is highly recommended to set ` getValuesAsStrings: true` because parsing JSON strings inside response values is currently not supported by this library.
+
+Timeseries data is retrieved for a given entity ``TbQueryEntityTypes``.
+
+```swift
+// request timeseries data for last seven days
+let endTs = Int64(Date().timeIntervalSince1970) * 1000
+let sevenDaysPast = Calendar.current.date(byAdding: .day, value: -7, to: Date())
+let startTs = Int64(sevenDaysPast!.timeIntervalSince1970) * 1000
+
+myClient?.getTimeseries(for: .device,
+                        entityId: "entityId-as-UUID-string",
+                        keys: ["SampleIMEI", "SampleBattery"],
+                        startTs: startTs,
+                        endTs: endTs,
+                        limit: 10,
+                        getValuesAsStrings: getValuesAsStrings) { responseObject in
+    if let sampleimei = responseObject["SampleIMEI"], let samplebattery = responseObject["SampleBattery"] {
+        if getValuesAsStrings {
+            // reflect values-as-string case
+            if sampleimei[0].value.stringVal == "999999999999999", samplebattery[0].value.stringVal == "100" {
+                print("Success!")
+            } else {
+                print("Expected different value/type!")
+            }
+        } else {
+            // reflect values-as-native-types case
+            if sampleimei[0].value.intVal == 999999999999999, samplebattery[0].value.intVal == 100 {
+                print("Success!")
+            } else {
+                print("Expected different value/type!")
+            }
+        }
+    } else {
+        print("Expected key missing in response!")
+    }
+}
+```
+Types involved: ``TimeseriesResponse``
+
+To better understand ``TimeseriesResponse``'s value property, refer to ``TimeseriesResponse/value`` and ``MplValueType``. For further details about this endpoints parameters, please refer to the [API documentation](https://app.swaggerhub.com/apis-docs/johannes_kinzig/thingsboard-rest-api/3.7.0#/telemetry-controller/getTimeseries).
+
 #### saveEntityTelemetry()
+It is also possible to save telemetry data on behalf of a specified entity (e.g. device, refer to ``TbQueryEntityTypes``). The following listings show two examples for ``TBUserApiClient/saveEntityTelemetry(for:entityId:timeseriesData:responseHandler:)``. The completion handler is called on success.
+
+Save timeseries data with server timestamp at time of message arrival:
+```swift
+let sampleTimeseriesData = ["SampleIMEI": 999999999999999, "SampleBattery": 100] as [String : Any]
+myClient?.saveEntityTelemetry(for: .device, entityId: "entityId-as-UUID-string", timeseriesData: sampleTimeseriesData) {
+    print("Success!")
+}
+```
+
+Save timeseries data with specific timestamp (e.g. to push previously recorded data):
+```swift
+let sampleTimeseriesData = ["ts":1634712287000, "values": ["SampleIMEI": 999999999999999, "SampleBattery": 100]] as [String : Any]
+myClient?.saveEntityTelemetry(for: .device, entityId: "entityId-as-UUID-string", timeseriesData: sampleTimeseriesData) {
+    print("Success!")
+}
+```
+
 #### deleteEntityTimeseries()
+Timeseries data can be deleted for a specific timeframe, given the entity (``TbQueryEntityTypes``), identified based on its id, type and key names. To delete all timeseries data for a given entity and key, provide timeframe starting with 0 and ending with current datetime: `startTs: 0`, `endTs: Int64(Date().timeIntervalSince1970) * 1000`. On success, the completion handler is called.
+
+```swift
+let dateTimeNow = Int64(Date().timeIntervalSince1970) * 1000
+myClient?.deleteEntityTimeseries(for: .device, entityId: "entityId-as-UUID-string", keys: ["SampleIMEI", "SampleBattery"], startTs: 0, endTs: dateTimeNow, deleteLatest: true) {
+    print("Success!")
+}
+```
+For further details regarding endpoint parameters, refer to official [API documentation](https://app.swaggerhub.com/apis-docs/johannes_kinzig/thingsboard-rest-api/3.7.0#/telemetry-controller/deleteEntityTimeseries).
+
