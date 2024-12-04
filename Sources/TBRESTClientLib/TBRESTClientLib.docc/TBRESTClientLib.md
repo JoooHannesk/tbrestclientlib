@@ -3,12 +3,16 @@
 Simple client library for ThingsBoard server installations implementing the administration / user-space API (not device API) – written in Swift.
 
 ## Overview
- [ThingsBoard](https://thingsboard.io) is an IoT platform offering device management, device administration and comes with several possibilities to store and visualise time-series data from e.g. sensors, field-devices, machine control systems, etc. This package implements (in parts) the ThingsBoard administration / user-space API (not device API) for comfortable programmatical interaction with a ThingsBoard server. For compatibility with ThingsBoard server refer to <doc:ReleaseNotes>.
+ [ThingsBoard](https://thingsboard.io) is an IoT platform offering device management, device administration and comes with several possibilities to store and visualise time-series data from e.g. sensors, field-devices, machine control systems, etc. This library implements (in parts) the ThingsBoard administration / user-space API (not device API) for comfortable programmatical interaction with a ThingsBoard server. For compatibility with ThingsBoard server refer to <doc:ReleaseNotes>.
 
 This documentation tries to refere to the official ThingsBoard nomenclature as well as official API documentation as close as possible. It may did not work out all the time.
 
+## Disclaimer
+This library is an independent implementation by its authors (see below) and is **not affiliated with, endorsed by, or officially associated with ThingsBoard Inc. in any way**. For further details [mail the author](mailto:johannes@parallelogon-software.com) and/or refer to this libraries <doc:License>.
+
 ## Repository
-This library is hostet on Bitbucket: [https://bitbucket.org/swift-projects/tbrestclientlib.git](https://bitbucket.org/swift-projects/tbrestclientlib.git)
+This library is hostet on Bitbucket: [https://bitbucket.org/swift-projects/tbrestclientlib.git](https://bitbucket.org/swift-projects/tbrestclientlib/src/main/)
+This documentation is served from: [http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib)
 
 ## Development Status
 This library was initiated as a sub-project of a larger project which required API access to ThingsBoard server instances. As library development can be seen as a whole project by itself, this part then was open-sourced and released to the public.
@@ -20,9 +24,9 @@ This library works with and was tested on:
 * iOS >= 17.5
 * macOS >= 14.0
 
-Linux is currently unsupported bceause of an incompatibility in a way this library uses `URLSession`. A workaround seems to exist but was not further investigated, implemented or tested. (But it was added as a ToDo ;) )
+Linux is currently unsupported bceause of an incompatibility in a way this library uses `URLSession`. A workaround seems to exist but was not further investigated, implemented or tested. (But it was added as a ToDo 😉)
 
-## Contact
+## Contact the author(s)
 Johannes Kinzig – [Mail](mailto:johannes@parallelogon-software.com) – [Web](https://parallelogon-software.com)
 
 ## Contribution

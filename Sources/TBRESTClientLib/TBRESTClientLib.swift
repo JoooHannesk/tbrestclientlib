@@ -396,7 +396,7 @@ public class TBUserApiClient: TBHTTPRequest {
     /**
      Save entity telemetry data for the given entity – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
      
-     - Parameter entityType: tb entity types as defined in ``TbEntityTypes`` enum
+     - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter timeseriesData: timeseries data as key-value pairs (as dictionary)
      - Parameter responseHandler: takes no parameters and is called upon successful server response
@@ -404,7 +404,7 @@ public class TBUserApiClient: TBHTTPRequest {
      This limitation is accepted, as the main scope of this library is not to mimic client device functionality. In principle, this function
      may be used to push mass-data to the server – which results in repetitive function-calls leading to repetitive http requests.
      */
-    func saveEntityTelemetry(for entityType: TbQueryEntityTypes, entityId: String, timeseriesData: Dictionary<String, Any>, responseHandler: (() -> Void)? = nil) {
+    public func saveEntityTelemetry(for entityType: TbQueryEntityTypes, entityId: String, timeseriesData: Dictionary<String, Any>, responseHandler: (() -> Void)? = nil) {
         let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.saveEntityTelemetry, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
             URLModifier(searchString: "{?entityId?}", replaceString: entityId),
