@@ -8,12 +8,12 @@ Simple client library for [ThingsBoard](https://thingsboard.io) server installat
 * Integration tests executed using ThingsBoard CE 3.7.0 with an on-premise installation – [v.3.7.0 API Reference](https://app.swaggerhub.com/apis-docs/johannes_kinzig/thingsboard-rest-api/3.7.0)
 
 ## Disclaimer
-This library is an independent implementation developed by [its author(s)](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/#Contact-the-authors) and is **not affiliated with, endorsed by, or officially associated with ThingsBoard Inc. in any way**. For further details [mail the author](mailto:johannes@parallelogon-software.com) and/or refer to this libraries [license](https://bitbucket.org/swift-projects/tbrestclientlib/src/main/LICENSE.txt).
+This library is an independent implementation developed by [its author(s)](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/#Contact-the-authors) and is **not affiliated with, endorsed by, or officially associated with ThingsBoard Inc. in any way**. For further details [mail the author](mailto:johannes@parallelogon-software.com) and/or refer to this library's [license](https://bitbucket.org/swift-projects/tbrestclientlib/src/main/LICENSE.txt).
 
 ## Project Status
-This library was initiated as a sub-project of a larger project which required API access to ThingsBoard server instances. As library development can be seen as a whole project by itself, this part then was open-sourced and released to the public.
+This library was initiated as a sub-project of a larger project which required API access to ThingsBoard server instances. Because library development can be seen as a full project by itself, this part then was open-sourced and released to the public.
 
-Please note: This library is continuously growing but **has not implemented all API endpoints** yet. The same applies to the endpoint's responses: This library does not process every fetched element inside the JSON response string (as described by the official API scheme) but neglects the ones which were out of scope for this project and at the time of development. Check ´TbDataModels.swift´ for further details about the properties contained in each schema response model.
+Please note: This library is continuously growing but **has not implemented all API endpoints** yet. The same applies to the endpoint's responses: This library does not process every fetched element inside the JSON response string (as described by the official API scheme). It neglects the ones which were out of the parent-project's scope. Refer to ´TbDataModels.swift´ for further details about the properties contained in each schema response model.
 
 Please refer to the [library documentation](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib)
 
