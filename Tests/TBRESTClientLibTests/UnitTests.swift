@@ -215,4 +215,4 @@ final class UnitTests: FunctionalTestCases {
     
 }
 
-// TODO: improve client implementation to react to different http status codes
+// TODO: improve client implementation for different http status codes

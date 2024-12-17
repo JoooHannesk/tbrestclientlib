@@ -8,7 +8,7 @@
 # check if SCPDESTINATION is set
 if [ -z ${SCPDESTINATION+x} ]
 then
-echo "Warning: Your scp destination is not set. Script will abort! Please set destination to deploy documentation to a webserver. Use the following format: export SCPDESTINATION=scp://user@host:port/path/tp/folder"
+echo "Warning: Your scp destination is not set. Script will abort! Please set destination to deploy documentation to a webserver. Use the following format: export SCPDESTINATION=scp://user@host:port/path/to/www/folder/on/webserver"
 exit 1
 fi
 
@@ -26,3 +26,4 @@ rm -r ./.doccbuilds
 
 # refer to published documentation
 echo "Documentation now available at:\nhttp://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib"
+echo "(CMD+2*click on URL to open in your default browser)"
