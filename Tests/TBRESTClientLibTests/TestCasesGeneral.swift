@@ -29,6 +29,7 @@ class FunctionalTestCases: XCTestCase {
             XCTAssertNotNil(apperror)
             XCTAssertEqual(apperror.status, 401)
             XCTAssertEqual(apperror.errorCode, 10)
+            XCTAssertLessThanOrEqual(apperror.timestampDt, Date())
             expectation.fulfill()
         }
         
@@ -302,18 +303,22 @@ class FunctionalTestCases: XCTestCase {
                 var att1 = false, att2 = false, att3 = false, att4 = false
                 if let index = responseObject.firstIndex(where: {$0.key == "sampleAtt1String"}) {
                     XCTAssertEqual(responseObject[index].value.stringVal, "Hello Server")
+                    XCTAssertLessThanOrEqual(responseObject[index].lastUpdateDt, Date())
                     att1 = true
                 }
                 if let index = responseObject.firstIndex(where: {$0.key == "sampleAtt2Bool"}) {
                     XCTAssertEqual(responseObject[index].value.boolVal, true)
+                    XCTAssertLessThanOrEqual(responseObject[index].lastUpdateDt, Date())
                     att2 = true
                 }
                 if let index = responseObject.firstIndex(where: {$0.key == "sampleAtt3Int"}) {
                     XCTAssertEqual(responseObject[index].value.intVal, 4)
+                    XCTAssertLessThanOrEqual(responseObject[index].lastUpdateDt, Date())
                     att3 = true
                 }
                 if let index = responseObject.firstIndex(where: {$0.key == "sampleAtt4Double"}) {
                     XCTAssertEqual(responseObject[index].value.doubleVal, 3.1415926)
+                    XCTAssertLessThanOrEqual(responseObject[index].lastUpdateDt, Date())
                     att4 = true
                 }
                 if att1 && att2 && att3 && att4 {
@@ -454,6 +459,8 @@ class FunctionalTestCases: XCTestCase {
         if let tbDevice = self.tbDevice?.id.id {
             apiClient?.getLatestTimeseries(for: .device, entityId: tbDevice, keys: requested_keys, getValuesAsStrings: getValuesAsStrings) { responseObject in
                 if let sampleimei = responseObject["SampleIMEI"], let samplebattery = responseObject["SampleBattery"] {
+                    XCTAssertLessThanOrEqual(sampleimei!.tsDt, Date())
+                    XCTAssertLessThanOrEqual(samplebattery!.tsDt, Date())
                     if getValuesAsStrings {
                         // reflect values-as-string case
                         if sampleimei?.value.stringVal == "999999999999999", samplebattery?.value.stringVal == "100" {
