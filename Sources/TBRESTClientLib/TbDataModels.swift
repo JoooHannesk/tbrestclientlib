@@ -133,9 +133,13 @@ public struct User: TBDataModel, EntityEquatable {
     public let phone: String?
     public let name: String
     public let additionalInfo: AdditionalInfo?
+    /// createdTime as Date type
+    public var createdTimeDt: Date { Date(timeIntervalSince1970: TimeInterval(createdTime/1000)) }
+    
 }
 
-/** represent **Device** and **DeviceInfo** objects
+/**
+ Represent **Device** and **DeviceInfo** objects
  */
 public struct Device: TBDataModel, EntityEquatable {
     public let id: ID
@@ -152,6 +156,9 @@ public struct Device: TBDataModel, EntityEquatable {
     public let customerIsPublic: Bool?
     public let deviceProfileName: String?
     public let active: Bool?
+    
+    /// createdTime as Date type
+    public var createdTimeDt: Date { Date(timeIntervalSince1970: TimeInterval(createdTime/1000)) }
     
     // TODO: Think about adding `public let additionalInfo: AdditionalInfo?`
 }
@@ -173,6 +180,16 @@ public struct DeviceProfile: TBDataModel, EntityEquatable {
     public let firmwareId: ID?
     public let softwareId: ID?
     public let defaultEdgeRuleChainId: ID?
+    
+    /// createdTime as Date type
+    public var createdTimeDt: Date? {
+        if let createdTime = createdTime {
+            return Date(timeIntervalSince1970: TimeInterval(createdTime/1000))
+        }
+        else {
+            return nil
+        }
+    }
 }
 
 public struct ID: TBDataModel, Equatable {
@@ -219,6 +236,8 @@ public struct AttributesResponse: TBDataModel {
     public let value: MplValueType
     /// last updated timestamp in milliseconds unix time
     public let lastUpdateTs: Int
+    /// last updated timestamp as Date type
+    public var lastUpdateDt: Date { Date(timeIntervalSince1970: TimeInterval(lastUpdateTs/1000)) }
 }
 
 /// Represent a swift-native type for: ThingsBoard time-series data value
@@ -232,6 +251,8 @@ public struct TimeseriesResponse: TBDataModel {
     public let value: MplValueType
     /// Value's timestamp in milliseconds unix time
     public let ts: Int
+    /// Value's timestamp as Date type
+    public var tsDt: Date { Date(timeIntervalSince1970: TimeInterval(ts/1000)) }
 }
 
 /**
@@ -293,4 +314,5 @@ public struct TBAppError: TBDataModel {
     public let message: String
     public let errorCode: Int
     public let timestamp: Int
+    public var timestampDt: Date { Date(timeIntervalSince1970: TimeInterval(timestamp/1000)) }
 }
