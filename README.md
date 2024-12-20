@@ -1,4 +1,4 @@
-<p align="center"><img src="https://bitbucket.org/swift-projects/tbrestclientlib/raw/main/Meta/tbrestclientlib-project-avatar.png"></p>
+![project_avatar_icon](https://bitbucket.org/swift-projects/tbrestclientlib/raw/main/Meta/tbrestclientlib-project-avatar.png)
 
 # TBRESTClientLib
 
@@ -43,7 +43,7 @@ Linux is currently unsupported bceause of an incompatibility in a way this libra
 
 ## Contact and Contribution
 * Johannes Kinzig – [Mail](mailto:johannes@parallelogon-software.com) – [Web](https://parallelogon-software.com)
-* for contribution please refer to official documentation: [Contribution](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/)
+* for contribution please refer to official documentation: [Contribution](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/developmentcontribution)
 
 ## About
 I am a software engineer mainly foccussing on application development in Python (and now Swift, as well), for my IoT projects I am using ThingsBoard CE. I recently had the chance (and was given the time) to dive into Swift & iOS / macOS development. Soon, I recognized that Swift (including its tools and language concepts) had potential to optimise my current development workflow, so I continued learning. Due to my affinity (and knwoledge) towards ThingsBoard I started to implement parts of the client API using Swift – which can be seen as my first real-world Swift project.
