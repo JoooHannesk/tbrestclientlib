@@ -1,0 +1,21 @@
+#  Template Swift build
+
+#  This template allows you to validate your Swift code.
+#  It assumes you are using a Self Hosted Mac OS Runner with XCode, SPM and SwiftLint installed.
+
+pipelines:
+  default:
+    - parallel:
+        - step:
+            name: Build and Test
+            runs-on:
+              - macos
+            script:
+              - swift build
+              - swift test
+        - step:
+            name: Code linting
+            runs-on:
+              - macos
+            script:
+              - swiftlint
