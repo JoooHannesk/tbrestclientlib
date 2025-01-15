@@ -19,7 +19,7 @@ let package = Package(
                 .macOS(.v14),
     ],
     dependencies: [
-        .package(url: "https://bitbucket.org/swift-projects/tbrestclientlib.git", from: "0.0.8"),
+        .package(url: "https://bitbucket.org/swift-projects/tbrestclientlib.git", from: "0.0.9"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
