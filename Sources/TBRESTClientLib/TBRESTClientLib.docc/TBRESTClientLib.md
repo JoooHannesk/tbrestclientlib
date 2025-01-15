@@ -14,6 +14,9 @@ This library is an independent implementation developed by its author(s) - see b
 * This library is hostet on Bitbucket: [https://bitbucket.org/swift-projects/tbrestclientlib.git](https://bitbucket.org/swift-projects/tbrestclientlib/src/main/)
 * This documentation is served from: [http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib)
 
+## Compatibility to ThingsBoard Server
+For details regarding ThingsBoard server compatibility, please refer to the <doc:ReleaseNotes>.
+
 ## Development Status
 This library was initiated as a sub-project of a larger project which required API access to ThingsBoard server instances. Because library development can be seen as a full project by itself, this part then was open-sourced and released to the public.
 

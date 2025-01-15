@@ -1,5 +1,12 @@
 # Release Notes
 
+## Client – Version 0.0.9
+* Implementation against the official ThingsBoard API – [ThingsBoard CE Docs](https://thingsboard.io/docs/)
+* Integration tests executed using
+    * ThingsBoard CE 3.9.0 with an private cloud installation
+    * ThingsBoard CE 3.8.0 with an on-premise installation
+* ThingsBoard CE 3.7.0 with an on-premise installation – [v.3.7.0 API Reference](https://app.swaggerhub.com/apis-docs/johannes_kinzig/thingsboard-rest-api/3.7.0)
+
 
 ## Client - Version 0.0.8
 * Implementation against the official ThingsBoard API – [ThingsBoard CE Docs](https://thingsboard.io/docs/)
