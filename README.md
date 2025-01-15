@@ -19,7 +19,8 @@ This library was initiated as a sub-project of a larger project which required A
 
 Please note: This library is continuously growing but **has not implemented all API endpoints** yet. The same applies to the endpoint's responses: This library does not process every fetched element inside the JSON response string (as described by the official API scheme). It neglects the ones which were out of the parent-project's scope. Refer to ´TbDataModels.swift´ for further details about the properties contained in each schema response model.
 
-Please refer to the [library documentation](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib)
+## Library Documentation
+[Library Documentation](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib)
 
 ## Requirements
 This library works with and was tested on:
