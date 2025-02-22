@@ -1,5 +1,5 @@
 //
-//  rest-client.swift
+//  SimpleHTTPClient.swift
 //
 //
 //  Created by Johannes Kinzig on 30.07.24.

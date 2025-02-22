@@ -1,5 +1,5 @@
 //
-//  tb-api-endpoints.swift
+//  TbApiEndpoints.swift
 //
 //
 //  Created by Johannes Kinzig on 12.08.24.

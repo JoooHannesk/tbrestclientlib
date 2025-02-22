@@ -12,7 +12,7 @@ Simple client library for [ThingsBoard](https://thingsboard.io) server installat
     
 
 ## Disclaimer
-This library is an independent implementation developed by [its author(s)](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/#Contact-the-authors) and is **not affiliated with, endorsed by, or officially associated with ThingsBoard Inc. in any way**. For further details [mail the author](mailto:johannes@parallelogon-software.com) and/or refer to this library's [license](https://bitbucket.org/swift-projects/tbrestclientlib/src/main/LICENSE.txt).
+This library is an independent implementation developed by [its author(s)](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/#Contact-the-authors) and is **not affiliated with, endorsed by, or officially associated with ThingsBoard Inc. in any way**. For further details [mail the author](mailto:johannes@parallelogon-software.com) and/or refer to this library's [license](https://bitbucket.org/swift-projects/tbrestclientlib/src/main/LICENSE.txt).
 
 ## Project Status
 This library was initiated as a sub-project of a larger project which required API access to ThingsBoard server instances. Because library development can be seen as a full project by itself, this part then was open-sourced and released to the public.
@@ -20,7 +20,7 @@ This library was initiated as a sub-project of a larger project which required A
 Please note: This library is continuously growing but **has not implemented all API endpoints** yet. The same applies to the endpoint's responses: This library does not process every fetched element inside the JSON response string (as described by the official API scheme). It neglects the ones which were out of the parent-project's scope. Refer to ´TbDataModels.swift´ for further details about the properties contained in each schema response model.
 
 ## Documentation
-[Library Documentation](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib)
+[Library Documentation](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib)
 
 ## Requirements
 This library works with and was tested on:
@@ -30,16 +30,16 @@ This library works with and was tested on:
 
 Linux is currently unsupported bceause of an incompatibility in a way this library uses `URLSession`. A workaround seems to exist but was not further investigated or tested.
 
-* Please refer to library documentation: [Requirements](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/#Requirements)
+* Please refer to library documentation: [Requirements](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/#Requirements)
 
 ## Installation
-* Please refer to library documentation: [Installation](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/installation)
+* Please refer to library documentation: [Installation](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/installation)
 
 ## Usage
-* Please refer to library documentation: [Usage](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/usage)
+* Please refer to library documentation: [Usage](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/usage)
 
 ## Unit & Integration Tests
-* Please refer to library documentation: [Testing](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/tests)
+* Please refer to library documentation: [Testing](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/tests)
 
 ## License
 * MIT License
@@ -47,8 +47,8 @@ Linux is currently unsupported bceause of an incompatibility in a way this libra
 * see LICENSE.txt
 
 ## Contact and Contribution
-* Johannes Kinzig – [Mail](mailto:johannes@parallelogon-software.com) – [Web](https://parallelogon-software.com)
-* for contribution please refer to official documentation: [Contribution](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/developmentcontribution)
+* Johannes Kinzig – [Mail](mailto:mail@johanneskinzig.com) – [Web](https://johanneskinzig.com)
+* for contribution please refer to official documentation: [Contribution](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/developmentcontribution)
 
 ## About
 I am a software engineer mainly foccussing on application development in Python (and now Swift, as well), for my IoT projects I am using ThingsBoard CE. I recently had the chance (and was given the time) to dive into Swift & iOS / macOS development. Soon, I recognized that Swift (including its tools and language concepts) had potential to optimise my current development workflow, so I continued learning. Due to my affinity (and knwoledge) towards ThingsBoard I started to implement parts of the client API using Swift – which can be seen as my first real-world Swift project.
