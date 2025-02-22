@@ -1,5 +1,5 @@
 //
-//  tb-data-models.swift
+//  TbDataModels.swift
 //
 //
 //  Created by Johannes Kinzig on 01.08.24.

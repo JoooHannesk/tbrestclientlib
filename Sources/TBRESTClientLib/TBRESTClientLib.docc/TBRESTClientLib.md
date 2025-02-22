@@ -12,7 +12,7 @@ This library is an independent implementation developed by its author(s) - see b
 
 ## Repository
 * This library is hostet on Bitbucket: [https://bitbucket.org/swift-projects/tbrestclientlib.git](https://bitbucket.org/swift-projects/tbrestclientlib/src/main/)
-* This documentation is served from: [http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib)
+* This documentation is served from: [https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib)
 
 ## Compatibility to ThingsBoard Server
 For details regarding ThingsBoard server compatibility, please refer to the <doc:ReleaseNotes>.
@@ -30,10 +30,10 @@ This library works with and was tested on:
 Linux is currently unsupported bceause of an incompatibility in a way this library uses `URLSession`. A workaround seems to exist but was not further investigated, implemented or tested. (But it was added as a ToDo 😉)
 
 ## Contact the author(s)
-Johannes Kinzig – [Mail](mailto:johannes@parallelogon-software.com) – [Web](https://parallelogon-software.com)
+Johannes Kinzig – [Mail](mailto:mail@johanneskinzig.com) – [Web](https://johanneskinzig.com)
 
 ## Contribution
-Contribution is always welcome, please refer to documentation: [Contribution](http://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib/developmentcontribution)
+Contribution is always welcome, please refer to documentation: <doc:DevelopmentContribution>
 
 ## Topics
 - <doc:ReleaseNotes>

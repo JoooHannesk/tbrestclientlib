@@ -25,5 +25,5 @@ scp -rp ./.doccbuilds/publish/* $SCPDESTINATION
 rm -r ./.doccbuilds
 
 # refer to published documentation
-echo "Documentation now available at:\nhttp://tbrestclientlib.parallelogon-software.com/documentation/tbrestclientlib"
+echo "Documentation now available at:\nhttps://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib"
 echo "(CMD+2*click on URL to open in your default browser)"

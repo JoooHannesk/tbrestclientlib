@@ -19,8 +19,8 @@ The following preconditions are required for the integration tests to run:
 - `ServerSettings.json` is set in `.gitignore` to prevent accidential leakage of login data.
 
 ## Run Tests
-- Project opened with Xcode:
+- Xcode:
     - Menu: 'Product' > 'Test'
     - Keyboard: ⌘U
-- Project opened in Terminal (SwiftPM):
+- Terminal (SwiftPM):
     - `swift test`

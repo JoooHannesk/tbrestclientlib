@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Client – Version 0.0.9
+* Types with an integer-timestamp `ts` property as **milliseconds since the epoche** now contain a property `tsDt` reflecting the timestamp as swift-native `Date()` type. (refer ``TimeseriesResponse/tsDt``)
 * Implementation against the official ThingsBoard API – [ThingsBoard CE Docs](https://thingsboard.io/docs/)
 * Integration tests executed using
     * ThingsBoard CE 3.9.0 with an private cloud installation
