@@ -1,5 +1,5 @@
 # Installation
-This library can be added to your Xcode or SPM project.
+This library can be added to your Xcode or SwiftPM project.
 
 ## Adding to Xcode Project
 When adding this library to your Xcode project use the build-in dependency management as shown below. As URL to the git repo use `https://bitbucket.org/swift-projects/tbrestclientlib.git`.
@@ -7,8 +7,8 @@ When adding this library to your Xcode project use the build-in dependency manag
 
 ![Add package to Xcode project using native dependency management](addToXcode)
 
-## Adding to SPM Project
-When adding this library to your SPM project, make sure your `Package.swift` looks something like this:
+## Adding to SwiftPM Project
+When adding this library to your SwiftPM project, make sure your `Package.swift` looks something like this:
 
 ```swift
 import PackageDescription
