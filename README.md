@@ -20,7 +20,8 @@ This library was initiated as a sub-project of a larger project which required A
 Please note: This library is continuously growing but **has not implemented all API endpoints** yet. The same applies to the endpoint's responses: This library does not process every fetched element inside the JSON response string (as described by the official API scheme). It neglects the ones which were out of the parent-project's scope. Refer to ´TbDataModels.swift´ for further details about the properties contained in each schema response model.
 
 ## Documentation
-[Library Documentation](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib)
++ [Library Documentation](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib)
++ [Library Website](https://johanneskinzig.com/tbrestclientlib.html)
 
 ## Requirements
 This library works with and was tested on:
@@ -39,7 +40,7 @@ Linux is currently unsupported bceause of an incompatibility in a way this libra
 * Please refer to library documentation: [Usage](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/usage)
 
 ## Unit & Integration Tests
-* Please refer to library documentation: [Testing](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/tests)
+* Please refer to library documentation: [Testing](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/testing)
 
 ## License
 * MIT License
