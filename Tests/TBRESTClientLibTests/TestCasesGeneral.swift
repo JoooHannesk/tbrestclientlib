@@ -18,6 +18,23 @@ class FunctionalTestCases: XCTestCase {
     var tbDevices: Array<Device>?
     
     // MARK: - General Test Cases
+    
+    func loginFailsBecauseOfUnknownHost(apiClient: TBUserApiClient?) {
+        let expectation = XCTestExpectation(description: "Expected login to fail!")
+        apiClient?.registerErrorHandler(
+        apiErrorHandler: { apiError in
+            print("API Error: \(apiError)")
+            XCTFail("This error should not have occurred")
+        },
+        systemErrorHandler: { systemError in
+            print("System Error: \(systemError)")
+            XCTAssertTrue(true)
+            expectation.fulfill()
+        })
+        try! apiClient?.login()
+        wait(for: [expectation], timeout: 10.0)
+    }
+    
     /**
      Fails with "bad credentials" tb app error
      */
@@ -33,7 +50,7 @@ class FunctionalTestCases: XCTestCase {
             expectation.fulfill()
         }
         
-        apiClient?.registerAppErrorHandler(errorHandler: showLoginFailed)
+        apiClient?.registerErrorHandler(apiErrorHandler: showLoginFailed)
         try! apiClient?.login()
         wait(for: [expectation], timeout: 3.0)
     }
@@ -45,9 +62,9 @@ class FunctionalTestCases: XCTestCase {
         let expectLogin = XCTestExpectation(description: "Expected login!")
         XCTAssertNotNil(apiClient)
         
-        apiClient?.registerAppErrorHandler { tbAppError in
+        apiClient?.registerErrorHandler(apiErrorHandler: { tbAppError in
             XCTFail("\(tbAppError)")
-        }
+        })
         
         try! apiClient?.login() { authObject in
             XCTAssertTrue(!authObject.token.isEmpty && !authObject.refreshToken.isEmpty)
@@ -63,9 +80,9 @@ class FunctionalTestCases: XCTestCase {
         let expectLogin = XCTestExpectation(description: "Expected login!")
         XCTAssertNotNil(apiClient)
         
-        apiClient?.registerAppErrorHandler { tbAppError in
+        apiClient?.registerErrorHandler(apiErrorHandler: { tbAppError in
             XCTFail("\(tbAppError)")
-        }
+        })
         
         try! apiClient?.login(withUsername: username, andPassword: password) { authObject in
             XCTAssertTrue(!authObject.token.isEmpty && !authObject.refreshToken.isEmpty)
@@ -165,13 +182,13 @@ class FunctionalTestCases: XCTestCase {
      */
     func getDeviceProfiles(apiClient: TBUserApiClient?) {
         let expectedResponseWithCustomerDeviceProfiles = XCTestExpectation(description: "Expected response containing tenant's Device Profile objects!")
-        apiClient?.registerAppErrorHandler { tbAppError in
+        apiClient?.registerErrorHandler(apiErrorHandler: { tbAppError in
             // fulfill with permission denied - not so good practice but do not let the test fail just in case we do not use a 'TENANT\_ADMIN' authority
             XCTAssertNotNil(tbAppError)
             XCTAssertEqual(tbAppError.status, 403)
             XCTAssertEqual(tbAppError.errorCode, 20)
             expectedResponseWithCustomerDeviceProfiles.fulfill()
-        }
+        })
         apiClient?.getDeviceProfiles() { deviceProfiles in
             if deviceProfiles.totalElements > 0 {
                 // fulfill for received device profiles
@@ -257,11 +274,11 @@ class FunctionalTestCases: XCTestCase {
      */
     func saveEntityAttributesFailureUnmatchedDeviceID(apiClient: TBUserApiClient?) {
         let expectedResponseDeviceUnknown = XCTestExpectation(description: "Expected unknown device response...")
-        apiClient?.registerAppErrorHandler { tbAppError in
+        apiClient?.registerErrorHandler(apiErrorHandler: { tbAppError in
             print("Operation failed with error: \(tbAppError)")
             XCTAssertEqual(tbAppError.status, 999)
             expectedResponseDeviceUnknown.fulfill()
-        }
+        })
         let sampleAttributes = ["sampleAtt1String":"Hello Server", "sampleAtt2String": "Hello Client"]
         apiClient?.saveEntityAttributes(for: .device, entityId: "784f394c-42b6-435a-983c-b7beff2784f9", attributesData: sampleAttributes, scope: .shared) {
             XCTFail("Expected server to respond with an error data model.")
@@ -276,11 +293,11 @@ class FunctionalTestCases: XCTestCase {
      */
     func saveEntityAttributesFailureNonConformingUUID(apiClient: TBUserApiClient?) {
         let expectedResponseDeviceUnknown = XCTestExpectation(description: "Expected unknown device response...")
-        apiClient?.registerAppErrorHandler { tbAppError in
+        apiClient?.registerErrorHandler(apiErrorHandler: { tbAppError in
             print("Test failed with error: \(tbAppError)")
             XCTAssertEqual(tbAppError.status, 400)
             expectedResponseDeviceUnknown.fulfill()
-        }
+        })
         let sampleAttributes = ["sampleAtt1String":"Hello Server", "sampleAtt2Bool": true, "sampleAtt3Int": 4, "sampleAtt4Double": 3.1415926] as [String : Any]
         apiClient?.saveEntityAttributes(for: .device, entityId: "7null3928", attributesData: sampleAttributes, scope: .shared) {
             XCTFail("Expected server to respond with an error data model.")
@@ -294,10 +311,10 @@ class FunctionalTestCases: XCTestCase {
      */
     func getAttributesSuccess(apiClient: TBUserApiClient?) {
         let expectedResponse = XCTestExpectation(description: "Expected response with attributes...")
-        apiClient?.registerAppErrorHandler { tbAppError in
+        apiClient?.registerErrorHandler(apiErrorHandler: { tbAppError in
             print("Test failed with error: \(tbAppError)")
             XCTFail(tbAppError.message)
-        }
+        })
         if let tbDevice = self.tbDevice?.id.id {
             apiClient?.getAttributes(for: .device, entityId: tbDevice, keys: ["sampleAtt1String", "sampleAtt2Bool", "sampleAtt3Int", "sampleAtt4Double"]) { responseObject in
                 var att1 = false, att2 = false, att3 = false, att4 = false
@@ -342,10 +359,10 @@ class FunctionalTestCases: XCTestCase {
      */
     func getAttributesByScopeSuccess(apiClient: TBUserApiClient?) {
         let expectedResponse = XCTestExpectation(description: "Expected response with attributes...")
-        apiClient?.registerAppErrorHandler { tbAppError in
+        apiClient?.registerErrorHandler(apiErrorHandler: { tbAppError in
             print("Test failed with error: \(tbAppError)")
             XCTFail(tbAppError.message)
-        }
+        })
         if let tbDevice = self.tbDevice?.id.id {
             apiClient?.getAttributesByScope(for: .device, entityId: tbDevice, keys: ["sampleAtt1String", "sampleAtt2Bool", "sampleAtt3Int", "sampleAtt4Double"], scope: .shared) { responseObject in
                 var att1 = false, att2 = false, att3 = false, att4 = false
@@ -452,10 +469,10 @@ class FunctionalTestCases: XCTestCase {
         let expectedResponseLatestTimeseries = XCTestExpectation(description: "Expected response with timeseries data...")
         var requested_keys = ["SampleIMEI", "SampleBattery"]
         if let keys = keys { requested_keys = keys }
-        apiClient?.registerAppErrorHandler { tbAppError in
+        apiClient?.registerErrorHandler(apiErrorHandler: { tbAppError in
             print("Test failed with error: \(tbAppError)")
             XCTFail(tbAppError.message)
-        }
+        })
         if let tbDevice = self.tbDevice?.id.id {
             apiClient?.getLatestTimeseries(for: .device, entityId: tbDevice, keys: requested_keys, getValuesAsStrings: getValuesAsStrings) { responseObject in
                 if let sampleimei = responseObject["SampleIMEI"], let samplebattery = responseObject["SampleBattery"] {
@@ -499,10 +516,10 @@ class FunctionalTestCases: XCTestCase {
         let expectedResponseTimeseries = XCTestExpectation(description: "Expected response with timeseries data...")
         var requested_keys = ["SampleIMEI", "SampleBattery"]
         if let keys = keys { requested_keys = keys }
-        apiClient?.registerAppErrorHandler { tbAppError in
+        apiClient?.registerErrorHandler(apiErrorHandler: { tbAppError in
             print("Test failed with error: \(tbAppError)")
             XCTFail(tbAppError.message)
-        }
+        })
         if let tbDevice = self.tbDevice?.id.id {
             let endTs = Int64(Date().timeIntervalSince1970) * 1000
             let sevenDaysPast = Calendar.current.date(byAdding: .day, value: -7, to: Date())

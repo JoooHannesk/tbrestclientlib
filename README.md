@@ -23,9 +23,14 @@ Please note: This library is continuously growing but **has not implemented all 
 + [Library Documentation](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib)
 + [Library Website](https://johanneskinzig.com/tbrestclientlib.html)
 
+## Release history
+[See what's new](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/releasenotes)
+* Version 0.0.9 - 18.12.2024
+* Version 0.0.8 - 23.11.2024
+* Version 0.0.7 - 20.11.2024
+
 ## Requirements
 This library works with and was tested on:
-
 * iOS >= 17.5
 * macOS >= 14.0
 
