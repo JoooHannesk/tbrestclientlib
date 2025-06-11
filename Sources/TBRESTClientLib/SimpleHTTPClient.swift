@@ -10,7 +10,7 @@ import Foundation
 
 // MARK: - HTTP request (generalized)
 
-enum TBHTTPClientRequestError: Error {
+public enum TBHTTPClientRequestError: Error {
     case badURL
     case improperPayloadDataFormat
     case httpRequestFailure

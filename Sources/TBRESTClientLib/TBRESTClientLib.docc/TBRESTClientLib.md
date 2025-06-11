@@ -14,6 +14,12 @@ This library is an independent implementation developed by its author(s) - see b
 * This library is hostet on Bitbucket: [https://bitbucket.org/swift-projects/tbrestclientlib.git](https://bitbucket.org/swift-projects/tbrestclientlib/src/main/)
 * This documentation is served from: [https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib)
 
+## Release History
+See what's new: <doc:ReleaseNotes>
+* Version 0.0.9 - 18.12.2024
+* Version 0.0.8 - 23.11.2024
+* Version 0.0.7 - 20.11.2024
+
 ## Compatibility to ThingsBoard Server
 For details regarding ThingsBoard server compatibility, please refer to the <doc:ReleaseNotes>.
 

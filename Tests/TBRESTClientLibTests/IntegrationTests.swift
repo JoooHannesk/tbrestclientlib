@@ -16,6 +16,17 @@ final class IntegrationTests: FunctionalTestCases {
         let tbTestClient = try? TBUserApiClient(baseUrlStr: serversettings!.baseUrl, username: serversettings!.username, password: serversettings!.password)
         return (tbTestClient, serversettings)
     }
+    
+    
+    /**
+     Test login() - expect failure because of unknown host
+     */
+    func testloginFailsBecauseOfUnknownHost() {
+        let tbTestClient = try? TBUserApiClient(baseUrlStr: "https://localhorst", username: "user@example.com", password: "mysupersecretpassword")
+        loginFailsBecauseOfUnknownHost(apiClient: tbTestClient)
+    }
+    
+    
     /**
      Test login() - expect failure with "Bad Credentials"
      */
@@ -52,9 +63,9 @@ final class IntegrationTests: FunctionalTestCases {
         loginSucceeds(apiClient: tbTestClient)
         let authData = tbTestClient!.authData
         let newTbTestClient = try! TBUserApiClient(baseUrlStr: serversettings!.baseUrl, accessToken: authData!)
-        newTbTestClient!.registerAppErrorHandler() { errorMsg in
-            XCTFail("Unexpected error: \(errorMsg)")
-        }
+        newTbTestClient!.registerErrorHandler(apiErrorHandler: { errorMsg in
+            XCTFail("API error: \(errorMsg)")
+        })
         getUser(apiClient: newTbTestClient, expectedUsername: serversettings!.username)
         renewLogin(apiClient: newTbTestClient, username: serversettings!.username, password: serversettings!.password)
         compareDifferentAuthLogins(apiClientToken1: tbTestClient!.authData!, apiClientToken2: newTbTestClient!.authData!)
