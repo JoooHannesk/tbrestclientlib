@@ -1,6 +1,6 @@
 # Release Notes
 
-## Client – Verision 0.0.10
+## Client – Verison 0.0.10
 * Released: 11.06.2025
 * Improved the error handling mechanism
 * ``TBHTTPRequest/registerErrorHandler(apiErrorHandler:systemErrorHandler:)`` now distinguishes between API generated errors and system thrown errors

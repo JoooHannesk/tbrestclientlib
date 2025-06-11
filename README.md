@@ -26,6 +26,7 @@ Please note: This library is continuously growing but **has not implemented all 
 ## Release history
 [See what's new](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/releasenotes)
 
+* Version 0.0.10 - 11.06.2025
 * Version 0.0.9 - 18.12.2024
 * Version 0.0.8 - 23.11.2024
 * Version 0.0.7 - 20.11.2024
