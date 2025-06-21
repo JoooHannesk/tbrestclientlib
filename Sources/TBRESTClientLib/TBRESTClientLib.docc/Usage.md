@@ -1,12 +1,24 @@
 # Usage
-Detailed description of currently supported methods and data models which are used to communicate with your server.
+Detailed overview of the currently supported methods and data models used to communicate with your ThingsBoard server.
 
 ## Initialization and Login (Authentication)
 A client object can be initialized in two different ways - and requires to provide login data. Either by username/password or access tokens retrieved by a previous session. The following initializers are implemented as failable and will do so, if their parameters are provided with an empty string.
-* ``TBUserApiClient/init(baseUrlStr:username:password:)``: server url, authentication by username and password 
-* ``TBUserApiClient/init(baseUrlStr:accessToken:)``: server url, authentication by access token retrieved from a previous session
+* ``TBUserApiClient/init(baseUrlStr:username:password:logger:)``: server url, authentication by username and password 
+* ``TBUserApiClient/init(baseUrlStr:accessToken:logger:)``: server url, authentication by access token retrieved from a previous session
 
-A thrid option with a custom http session handler exists `init(baseUrlStr:username:password:httpSessionHandler:)` but is intentionally not marked as public because its main purpose is to be used with a mock http client for unit testing.
+Since Version 0.0.11 both initializers support an (optional) `logger` parameter which takes an `Logger?` instance (from *OSLog*) as argument.
+```swift
+import OSLog
+import TBRESTClientLib
+
+let logger = Logger(subsystem: "myApp.TBRESTClientLib", category: "Library")
+let myClient = try? TBUserApiClient(baseUrlStr: "https://my-thingsboard-iot-server.com",
+                                    username: "MyUsername",
+                                    password: "MySuperSecretPassword",
+                                    logger: logger)
+```
+
+A third option with a custom http session handler exists `init(baseUrlStr:username:password:httpSessionHandler:)` but is intentionally not marked as public because its main purpose is to be used with a mock http client for unit testing.
 
 ### Initialization with username/password
 

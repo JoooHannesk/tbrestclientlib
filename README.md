@@ -6,7 +6,7 @@ Simple client library for [ThingsBoard](https://thingsboard.io) servers - implem
 
 * Implementation against the official ThingsBoard API – [ThingsBoard CE Docs](https://thingsboard.io/docs/)
 * Integration tests executed using
-    * ThingsBoard CE 3.9.0 with an on-premise installation
+    * ThingsBoard CE 3.9.0 with an on-premise installation – [v.3.9.0 API Reference](https://app.swaggerhub.com/apis/johannes_kinzig/thingsboard-rest-api/3.9.0)
     * ThingsBoard CE 3.8.0 with an on-premise installation
     * ThingsBoard CE 3.7.0 with an on-premise installation – [v.3.7.0 API Reference](https://app.swaggerhub.com/apis-docs/johannes_kinzig/thingsboard-rest-api/3.7.0)
     
@@ -26,6 +26,7 @@ Please note: This library is continuously growing but **has not implemented all 
 ## Release history
 [See what's new](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/releasenotes)
 
+* Version 0.0.11 - 2025-06-21
 * Version 0.0.10 - 11.06.2025
 * Version 0.0.9 - 18.12.2024
 * Version 0.0.8 - 23.11.2024
@@ -36,9 +37,9 @@ This library works with and was tested on:
 * iOS >= 17.5
 * macOS >= 14.0
 
-Linux is currently unsupported bceause of an incompatibility in a way this library uses `URLSession`. A workaround seems to exist but was not further investigated or tested.
+Linux is currently unsupported due to an incompatibility in how this library uses `URLSession`. While a potential workaround exists, it has not been fully investigated or tested. Additionally, since version 0.0.11, *OSLog* is used for logging, which is also currently unsupported by Swift on Linux. (Both were added as a ToDo 😉)
 
-* Please refer to library documentation: [Requirements](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/#Requirements)
+* Please refer to library DocC documentation: [Requirements](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/#Requirements)
 
 ## Installation
 * Please refer to library documentation: [Installation](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/installation)
@@ -59,4 +60,4 @@ Linux is currently unsupported bceause of an incompatibility in a way this libra
 * for contribution please refer to official documentation: [Contribution](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/developmentcontribution)
 
 ## About
-I am a software engineer mainly foccussing on application development in Python (and now Swift, as well), for my IoT projects I am using ThingsBoard CE. I recently had the chance (and was given the time) to dive into Swift & iOS / macOS development. Soon, I recognized that Swift (including its tools and language concepts) had potential to optimise my current development workflow, so I continued learning. Due to my affinity (and knwoledge) towards ThingsBoard I started to implement parts of the client API using Swift – which can be seen as my first real-world Swift project.
+I am a software engineer mainly focusing on application development in Python (and now Swift, as well), for my IoT projects I am using ThingsBoard CE. I recently had the chance (and was given the time) to dive into Swift & iOS / macOS development. Soon, I recognized that Swift (including its tools and language concepts) had potential to optimise my current development workflow, so I continued learning. Due to my affinity (and knowledge) towards ThingsBoard I started to implement parts of the client API using Swift – which can be seen as my first real-world Swift project.

@@ -18,10 +18,11 @@ This library is an independent implementation developed by its author(s) - see b
 
 ## Release History
 See what's new: <doc:ReleaseNotes>
-* Version 0.0.10 - 11.06.2025
-* Version 0.0.9 - 18.12.2024
-* Version 0.0.8 - 23.11.2024
-* Version 0.0.7 - 20.11.2024
+* Version 0.0.11 - 2025-06-21
+* Version 0.0.10 - 2025-06-11
+* Version 0.0.9 - 2024-12-18
+* Version 0.0.8 - 2024-11-23
+* Version 0.0.7 - 2024-11-20
 
 ## Compatibility to ThingsBoard Server
 For details regarding ThingsBoard server compatibility, please refer to the <doc:ReleaseNotes>.
@@ -36,7 +37,7 @@ This library works with and was tested on:
 * iOS >= 17.5
 * macOS >= 14.0
 
-Linux is currently unsupported bceause of an incompatibility in a way this library uses `URLSession`. A workaround seems to exist but was not further investigated, implemented or tested. (But it was added as a ToDo 😉)
+Linux is currently unsupported due to an incompatibility in how this library uses `URLSession`. While a potential workaround exists, it has not been fully investigated or tested. Additionally, since version 0.0.11, *OSLog* is used for logging, which is also currently unsupported by Swift on Linux. (Both were added as a ToDo 😉)
 
 ## Contact the author(s)
 Johannes Kinzig – [Mail](mailto:mail@johanneskinzig.com) – [Web](https://johanneskinzig.com)

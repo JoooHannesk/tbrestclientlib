@@ -47,6 +47,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter baseUrlStr: server url as utf8 string without trailing slash (no API endpoint, just base server URL)
      - Parameter username: user's username as utf8 string
      - Parameter password: user's password as utf8 string
+     - Parameter logger: Logger (from OSLog) instance (optional)
      */
     public convenience init?(baseUrlStr: String, username: String, password: String, logger: Logger? = nil) throws {
         try self.init(baseUrlStr: baseUrlStr, username: username, password: password, httpSessionHandler: URLSession.shared, logger: logger)
@@ -57,16 +58,17 @@ public class TBUserApiClient: TBHTTPRequest {
      
      - Parameter baseUrlStr: server url as utf8 string without trailing slash (no API endpoint, just base server URL)
      - Parameter accessToken: AuthLogin object containing `token` and `refreshToken`
+     - Parameter logger: Logger (from OSLog) instance (optional)
      - Note: Re-use tokens from an existing/previous session instead of optaining new ones from the server.
      */
-    public init?(baseUrlStr: String, accessToken: AuthLogin) throws {
+    public init?(baseUrlStr: String, accessToken: AuthLogin, logger: Logger? = nil) throws {
         serverSettings = ServerSettings(baseUrl: baseUrlStr, username: "", password: "")
         guard accessToken.allPartsGiven() && serverSettings.urlGiven() else {
             throw TBHTTPClientRequestError.emptyLogin
         }
         authData = accessToken
         AEM.setTbServerBaseURL(self.serverSettings)
-        super.init(httpSessionHandler: URLSession.shared)
+        super.init(httpSessionHandler: URLSession.shared, logger: logger)
     }
     
     // MARK: – Authentication
