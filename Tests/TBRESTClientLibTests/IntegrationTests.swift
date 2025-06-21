@@ -68,7 +68,7 @@ final class IntegrationTests: FunctionalTestCases {
         let (tbTestClient, serversettings) = prepare()
         loginSucceeds(apiClient: tbTestClient)
         let authData = tbTestClient!.authData
-        let newTbTestClient = try! TBUserApiClient(baseUrlStr: serversettings!.baseUrl, accessToken: authData!)
+        let newTbTestClient = try! TBUserApiClient(baseUrlStr: serversettings!.baseUrl, accessToken: authData!, logger: Self.logger)
         newTbTestClient!.registerErrorHandler(apiErrorHandler: { errorMsg in
             XCTFail("API error: \(errorMsg)")
         })
