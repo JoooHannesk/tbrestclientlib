@@ -7,9 +7,12 @@
 // Adopted API for Version: CE 3.7.0
 
 import XCTest
+import OSLog
 @testable import TBRESTClientLib
 
 final class UnitTests: FunctionalTestCases {
+    
+    static let logger = Logger(subsystem: "TestBundle.TBRESTClientLibTests", category: "UnitTests")
     
     // prepare mock api client
     let testableApiClient = MockAPIClientFactory(baseUrlStr: "url.server.com", username: "user@example.com", password: "supersecretpassword")
@@ -18,14 +21,14 @@ final class UnitTests: FunctionalTestCases {
      Check that initializer runs without throwing when all login fields are given
      */
     func testLoginDataNotEmpty() {
-        XCTAssertNoThrow(try TBUserApiClient(baseUrlStr: "url.server.com", username: "user@example.com", password: "supersecretpassword"))
+        XCTAssertNoThrow(try TBUserApiClient(baseUrlStr: "url.server.com", username: "user@example.com", password: "supersecretpassword", logger: Self.logger))
     }
     
     /**
      Check that initializer is throwing in case a single login field is missing
      */
     func testLoginDataEmpty() {
-        XCTAssertThrowsError(try TBUserApiClient(baseUrlStr: "url.server.com", username: "", password: "")) { error in
+        XCTAssertThrowsError(try TBUserApiClient(baseUrlStr: "url.server.com", username: "", password: "", logger: Self.logger)) { error in
             if case TBHTTPClientRequestError.emptyLogin = error {
                 // expected error case returned
                 XCTAssertTrue(true, "Correct error type thrown!")

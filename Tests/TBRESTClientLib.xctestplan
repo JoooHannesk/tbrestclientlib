@@ -1,0 +1,25 @@
+{
+  "configurations" : [
+    {
+      "id" : "F3C21D31-6951-4D1D-A3B9-218D8C14AD0C",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : false,
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "TBRESTClientLibTests",
+        "name" : "TBRESTClientLibTests"
+      }
+    }
+  ],
+  "version" : 1
+}

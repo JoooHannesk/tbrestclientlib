@@ -10,7 +10,7 @@ import Foundation
 
 // MARK: - Protocols & Extensions
 
-/// Represent all TB data models and make them printable for debug purposes
+/// Represent all TB data models and make them string representable for debug purposes
 public protocol TBDataModel: Codable, CustomStringConvertible {
     var description: String { get }
 }
