@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OSLog
 
 public class TBHTTPRequest {
     
@@ -13,10 +14,12 @@ public class TBHTTPRequest {
     var httpClient: SimpleHTTPClient
     private(set) var apiErrorHandler: ((TBAppError) -> Void)? = nil
     private(set) var systemErrorHandler: ((TBHTTPClientRequestError) -> Void)? = nil
+    private let logger: Logger?
     
     // MARK: - Initialization
-    init(httpSessionHandler: URLSessionProtocol) {
-        httpClient = SimpleHTTPClient(sessionHandler: httpSessionHandler)
+    init(httpSessionHandler: URLSessionProtocol, logger: Logger? = nil) {
+        httpClient = SimpleHTTPClient(sessionHandler: httpSessionHandler,  logger: logger)
+        self.logger = logger
     }
     
     // MARK: - Implementation
@@ -61,17 +64,14 @@ public class TBHTTPRequest {
                 if case TBHTTPClientRequestError.tbAppError(let apperror) = error {
                     // run registered app error handler
                     self.apiErrorHandler?(apperror)
-                    // TODO: add logger
-                    print("App Error Message: \(error)")
+                    self.logger?.error("TBRESTClientLib (serverside) Error Message: \(error) - \(error.localizedDescription)")
                 } else if case TBHTTPClientRequestError.tbGenericError(let apperror) = error {
                     // run registered app error handler
                     self.apiErrorHandler?(apperror)
-                    // TODO: add logger
-                    print("App Error Message: \(error)")
+                    self.logger?.error("TBRESTClientLib (serverside) Error Message: \(error) - \(error.localizedDescription)")
                 } else {
-                    // TODO: add logger
                     self.systemErrorHandler?(error)
-                    print("HTTP Request Error: \(error)")
+                    self.logger?.error("TBRESTClientLib (system) Error Message: \(error) - \(error.localizedDescription)")
                 }
             }
         }

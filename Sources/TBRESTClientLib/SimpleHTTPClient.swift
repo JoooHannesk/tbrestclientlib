@@ -7,6 +7,7 @@
 // Rest client for Thingsboard Client API (Library)
 
 import Foundation
+import OSLog
 
 // MARK: - HTTP request (generalized)
 
@@ -29,9 +30,11 @@ enum SupportedHTTPMethods: String {
 class SimpleHTTPClient {
     
     private var sessionHandler: URLSessionProtocol
+    private let logger: Logger?
     
-    init(sessionHandler: URLSessionProtocol = URLSession.shared) {
+    init(sessionHandler: URLSessionProtocol = URLSession.shared,  logger: Logger? = nil) {
         self.sessionHandler = sessionHandler
+        self.logger = logger
     }
     
     /**
@@ -75,12 +78,10 @@ class SimpleHTTPClient {
         
         let requestTask = sessionHandler.dataTask(with: request) { (responseData, response, error) in
             if let httpResponse = response as? HTTPURLResponse {
-                // TODO: add logger
-                print("HTTP status response: \(httpResponse.statusCode)")
+                self.logger?.info("TBRESTClientLib (system) HTTP status response: \(httpResponse.statusCode)")
             }
             if let error = error {
-                // TODO: add logger
-                print("HTTP request failed: \(error)")
+                self.logger?.error("TBRESTClientLib (system) HTTP request failed: \(error) - \(error.localizedDescription)")
                 completionHandler(.failure(.httpRequestFailure))
             } else if let responseData = responseData {
                 let responseDataResultDict = self.convertResponseToTbDataModelObject(responseData, expectedResponseType: responseType)
@@ -129,8 +130,7 @@ class SimpleHTTPClient {
         } catch {
             localError += "\(error.localizedDescription): \(error)\nAPI Response: \(responseDataStr)\n"
         }
-        // TODO: – add logger here
-        print(localError)
+        self.logger?.error("TBRESTClientLib (serverside) Error Message: \(localError)")
         // create error object to keep in convention with other errors – even delivered in other format from server
         let genErr = TBAppError(status: 999, message: responseDataStr, errorCode: 999, timestamp: 0)
         return .failure(.tbGenericError(genericError: genErr))

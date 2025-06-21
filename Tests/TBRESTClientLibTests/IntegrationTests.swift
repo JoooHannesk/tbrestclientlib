@@ -7,13 +7,19 @@
 // Adopted API for Version: CE 3.7.0
 
 import XCTest
+import OSLog
 @testable import TBRESTClientLib
 
 final class IntegrationTests: FunctionalTestCases {
     
+    static let logger = Logger(subsystem: "TestBundle.TBRESTClientLibTests", category: "IntegrationTests")
+    
     func prepare() -> (TBUserApiClient?, ServerSettings?) {
         let serversettings = FileResourceLoader(searchPath: "Resources").loadServerSettingsFromFile(fileName: "ServerSettings")
-        let tbTestClient = try? TBUserApiClient(baseUrlStr: serversettings!.baseUrl, username: serversettings!.username, password: serversettings!.password)
+        let tbTestClient = try? TBUserApiClient(baseUrlStr: serversettings!.baseUrl,
+                                                username: serversettings!.username,
+                                                password: serversettings!.password,
+                                                logger: Self.logger)
         return (tbTestClient, serversettings)
     }
     
@@ -22,7 +28,7 @@ final class IntegrationTests: FunctionalTestCases {
      Test login() - expect failure because of unknown host
      */
     func testloginFailsBecauseOfUnknownHost() {
-        let tbTestClient = try? TBUserApiClient(baseUrlStr: "https://localhorst", username: "user@example.com", password: "mysupersecretpassword")
+        let tbTestClient = try? TBUserApiClient(baseUrlStr: "https://localhorst", username: "user@example.com", password: "mysupersecretpassword", logger: Self.logger)
         loginFailsBecauseOfUnknownHost(apiClient: tbTestClient)
     }
     
@@ -32,7 +38,7 @@ final class IntegrationTests: FunctionalTestCases {
      */
     func testLoginFails() {
         let serversettings = prepare().1
-        let tbTestClient = try? TBUserApiClient(baseUrlStr: serversettings!.baseUrl, username: "user@example.com", password: "mysupersecretpassword")
+        let tbTestClient = try? TBUserApiClient(baseUrlStr: serversettings!.baseUrl, username: "user@example.com", password: "mysupersecretpassword", logger: Self.logger)
         loginFails(apiClient: tbTestClient)
     }
     

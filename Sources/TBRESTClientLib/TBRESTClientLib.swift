@@ -8,6 +8,7 @@
 //
 
 import Foundation
+import OSLog
 
 public class TBUserApiClient: TBHTTPRequest {
     
@@ -30,14 +31,14 @@ public class TBUserApiClient: TBHTTPRequest {
      This initializer's intention is mainly to be used when performing unit testing. When using the library it is recommended to use the
      convenience initializer.
      */
-    init?(baseUrlStr: String, username: String, password: String, httpSessionHandler: URLSessionProtocol) throws {
+    init?(baseUrlStr: String, username: String, password: String, httpSessionHandler: URLSessionProtocol, logger: Logger? = nil) throws {
         serverSettings = ServerSettings(baseUrl: baseUrlStr, username: username, password: password)
         guard serverSettings.allPartsGiven() else {
             throw TBHTTPClientRequestError.emptyLogin
         }
         
         AEM.setTbServerBaseURL(serverSettings)
-        super.init(httpSessionHandler: httpSessionHandler)
+        super.init(httpSessionHandler: httpSessionHandler, logger: logger)
     }
     
     /**
@@ -47,8 +48,8 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter username: user's username as utf8 string
      - Parameter password: user's password as utf8 string
      */
-    public convenience init?(baseUrlStr: String, username: String, password: String) throws {
-        try self.init(baseUrlStr: baseUrlStr, username: username, password: password, httpSessionHandler: URLSession.shared)
+    public convenience init?(baseUrlStr: String, username: String, password: String, logger: Logger? = nil) throws {
+        try self.init(baseUrlStr: baseUrlStr, username: username, password: password, httpSessionHandler: URLSession.shared, logger: logger)
     }
     
     /**
