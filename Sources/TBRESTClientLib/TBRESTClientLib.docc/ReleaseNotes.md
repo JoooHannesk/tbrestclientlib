@@ -3,6 +3,8 @@
 ## Client – Version 0.0.11
 * Released: 2025-06-21
 * Added an optional parameter `logger` to initializers to support logging functionality (requires an *OSLog* instance)
+* See <doc:Usage/Initialization-and-Login-Authentication> for what's new
+* Integration tests executed using ThingsBoard CE 3.9.0 with a private cloud installation [v.3.9.0 API Reference](https://app.swaggerhub.com/apis/johannes_kinzig/thingsboard-rest-api/3.9.0)
 
 ## Client – Version 0.0.10
 * Released: 2025-06-11
