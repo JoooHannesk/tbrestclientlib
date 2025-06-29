@@ -11,15 +11,15 @@ import Foundation
 // MARK: - Protocols & Extensions
 
 /// Represent all TB data models and make them string representable for debug purposes
-public protocol TBDataModel: Codable, CustomStringConvertible {
+public protocol TBDataModel: Codable & CustomStringConvertible & Hashable {
     var description: String { get }
 }
 extension TBDataModel {
     public var description: String { return getStringRepresentation(for: self) }
 }
 
-extension Array: TBDataModel where Element: Codable { }
-extension Dictionary: TBDataModel where Key: Codable, Value: Codable { }
+extension Array: TBDataModel where Element: Codable & Hashable { }
+extension Dictionary: TBDataModel where Key: Codable, Value: Codable & Hashable { }
 
 /// Support subscript access for conforming types
 public protocol PaginationDataResponse {
@@ -64,17 +64,6 @@ public extension PaginationDataResponse {
     }
 }
 
-/// Support equality check for conforming types
-protocol EntityEquatable: Equatable {
-    var id: ID { get }
-    var name: String { get }
-}
-extension EntityEquatable {
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.id == rhs.id && lhs.name == rhs.name
-    }
-}
-
 
 // MARK: - Helper Functions
 /**
@@ -82,7 +71,7 @@ extension EntityEquatable {
  - Parameter for: type (or instance) conforming to 'TBDataModels' protocol
  - Returns: string representation of dataModelObject
  */
-fileprivate func getStringRepresentation(for dataModelObject: TBDataModel) -> String {
+fileprivate func getStringRepresentation(for dataModelObject: any TBDataModel) -> String {
     var propertiesString: String = String(describing: type(of: dataModelObject)) + " – "
     let dataModelObjectMirror: Mirror = Mirror(reflecting: dataModelObject)
     for dataModelObjectProperty in dataModelObjectMirror.children {
@@ -111,7 +100,7 @@ struct ServerSettings: TBDataModel {
 }
 
 /// hold authentication tokens received by server upon successful login
-public struct AuthLogin: TBDataModel, Equatable {
+public struct AuthLogin: TBDataModel {
     public let token: String
     public let refreshToken: String
     
@@ -121,7 +110,7 @@ public struct AuthLogin: TBDataModel, Equatable {
     
 }
 
-public struct User: TBDataModel, EntityEquatable {
+public struct User: TBDataModel {
     public let id: ID
     public let createdTime: Int
     public let tenantId: ID
@@ -141,7 +130,7 @@ public struct User: TBDataModel, EntityEquatable {
 /**
  Represent **Device** and **DeviceInfo** objects
  */
-public struct Device: TBDataModel, EntityEquatable {
+public struct Device: TBDataModel {
     public let id: ID
     public let createdTime: Int
     public let tenantId: ID
@@ -163,7 +152,7 @@ public struct Device: TBDataModel, EntityEquatable {
     // TODO: Think about adding `public let additionalInfo: AdditionalInfo?`
 }
 
-public struct DeviceProfile: TBDataModel, EntityEquatable {
+public struct DeviceProfile: TBDataModel {
     public let id: ID
     public let createdTime: Int?
     public let tenantId: ID
@@ -192,14 +181,9 @@ public struct DeviceProfile: TBDataModel, EntityEquatable {
     }
 }
 
-public struct ID: TBDataModel, Equatable {
+public struct ID: TBDataModel, Hashable {
     public let id: String
     public let entityType: String
-    
-    // Support equality check
-    public static func == (lhs: ID, rhs: ID) -> Bool {
-        return lhs.id == rhs.id && lhs.entityType == rhs.entityType
-    }
 }
 
 public struct AdditionalInfo: TBDataModel {
