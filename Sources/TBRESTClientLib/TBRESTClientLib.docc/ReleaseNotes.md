@@ -1,5 +1,10 @@
 # Release Notes
 
+## Client – Version 0.0.12
+* Released: 2025-07-17
+* Removed `intVal` from ``MplValueType`` to prevent floating point numbers having a zero as only decimal digit (e.g. 20.0) to be treated as integers.
+* Values (``AttributesResponse`` or ``TimeseriesResponse``) now support: Bool, Double, String
+
 ## Client – Version 0.0.11
 * Released: 2025-06-21
 * Added an optional parameter `logger` to initializers to support logging functionality (requires an *OSLog* instance)

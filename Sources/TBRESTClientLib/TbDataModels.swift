@@ -212,9 +212,9 @@ public struct AttributesResponse: TBDataModel {
     /// attribute key as string
     public let key: String
     /**
-    ThingsBoard data points have **values** of **different types**. This library supports: Bool, Int, Double, String (JSON is currenlty unsupported).
+    ThingsBoard data points have **values** of **different types**. This library supports: Bool, Double, String (JSON is currenlty unsupported).
      
-    Depending on the value's expected type, use the following members to get the value from the `value` property: `value.intVal`, `value.doubleVal`, `value.stringVal`, `value.boolVal`
+    Depending on the value's expected type, use the following members to get the value from the `value` property: `value.doubleVal`, `value.stringVal`, `value.boolVal`
     For further information, see  ``MplValueType``
     */
     public let value: MplValueType
@@ -227,9 +227,9 @@ public struct AttributesResponse: TBDataModel {
 /// Represent a swift-native type for: ThingsBoard time-series data value
 public struct TimeseriesResponse: TBDataModel {
     /**
-    ThingsBoard data points have **values** of **different types**. This library supports: Bool, Int, Double, String (JSON is currenlty unsupported).
+    ThingsBoard data points have **values** of **different types**. This library supports: Bool, Double, String (JSON is currenlty unsupported).
      
-    Depending on the value's expected type, use the following members to get the value from the `value` property: `value.intVal`, `value.doubleVal`, `value.stringVal`, `value.boolVal`
+    Depending on the value's expected type, use the following members to get the value from the `value` property: `value.doubleVal`, `value.stringVal`, `value.boolVal`
     For further information, see  ``MplValueType``
     */
     public let value: MplValueType
@@ -242,23 +242,16 @@ public struct TimeseriesResponse: TBDataModel {
 /**
  ThingsBoard data (e.g. attributes or time-series data) retrieved from the server have values of different types, wrapped inside a JSON response.
  
- `MplValueType` is designed to automatically detect the value's type and cast it into swift-native datatypes. Currently **Bool**, **Int**, **Double**, **String**
+ `MplValueType` is designed to automatically detect the value's type and cast it into swift-native datatypes. Currently **Bool**, **Double**, **String**
  is supported, a **JSON-String as a value is currenlty unsupported**.
  */
 public enum MplValueType: TBDataModel {
     case bool(Bool)
-    case int(Int)
     case double(Double)
     case string(String)
     
     public var boolVal: Bool? {
         if case .bool(let val) = self {
-            return val
-        }
-        return nil
-    }
-    public var intVal: Int? {
-        if case .int(let val) = self {
             return val
         }
         return nil
@@ -280,8 +273,6 @@ public enum MplValueType: TBDataModel {
         let container = try decoder.singleValueContainer()
         if let x = try? container.decode(Bool.self) {
             self = .bool(x)
-        } else if let x = try? container.decode(Int.self) {
-            self = .int(x)
         } else if let x = try? container.decode(Double.self) {
             self = .double(x)
         } else if let x = try? container.decode(String.self) {

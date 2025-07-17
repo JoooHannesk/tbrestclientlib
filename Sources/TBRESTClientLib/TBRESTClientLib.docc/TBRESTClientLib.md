@@ -18,6 +18,7 @@ This library is an independent implementation developed by its author(s) - see b
 
 ## Release History
 See what's new: <doc:ReleaseNotes>
+* Version 0.0.12 – 2025-07-17
 * Version 0.0.11 - 2025-06-21
 * Version 0.0.10 - 2025-06-11
 * Version 0.0.9 - 2024-12-18

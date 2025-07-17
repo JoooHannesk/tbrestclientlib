@@ -51,8 +51,8 @@ public class TBHTTPRequest {
                               usingMethod httpMethod: SupportedHTTPMethods = .post,
                               withPayload payload: Dictionary<String, Any>? = nil,
                               authToken authData: AuthLogin? = nil,
-                              expectedTBResponseType responseType: TBDataModel.Type,
-                              successHandler: @escaping (TBDataModel) -> Void)
+                               expectedTBResponseType responseType: any TBDataModel.Type,
+                               successHandler: @escaping (any TBDataModel) -> Void)
     -> Void {
         var tbheaders = ["Content-Type": "application/json", "Accept": "application/json"]
         if let token = authData?.token { tbheaders["x-authorization"] = "Bearer \(token)" }

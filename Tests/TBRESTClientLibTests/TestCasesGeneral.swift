@@ -329,7 +329,7 @@ class FunctionalTestCases: XCTestCase {
                     att2 = true
                 }
                 if let index = responseObject.firstIndex(where: {$0.key == "sampleAtt3Int"}) {
-                    XCTAssertEqual(responseObject[index].value.intVal, 4)
+                    XCTAssertEqual(Int(responseObject[index].value.doubleVal!), 4)
                     XCTAssertLessThanOrEqual(responseObject[index].lastUpdateDt, Date())
                     att3 = true
                 }
@@ -375,7 +375,7 @@ class FunctionalTestCases: XCTestCase {
                     att2 = true
                 }
                 if let index = responseObject.firstIndex(where: {$0.key == "sampleAtt3Int"}) {
-                    XCTAssertEqual(responseObject[index].value.intVal, 4)
+                    XCTAssertEqual(Int(responseObject[index].value.doubleVal!), 4)
                     att3 = true
                 }
                 if let index = responseObject.firstIndex(where: {$0.key == "sampleAtt4Double"}) {
@@ -487,7 +487,7 @@ class FunctionalTestCases: XCTestCase {
                         }
                     } else {
                         // reflect values-as-native-types case
-                        if sampleimei?.value.intVal == 999999999999999, samplebattery?.value.intVal == 100 {
+                        if Int(sampleimei!.value.doubleVal!) == 999999999999999, Int(samplebattery!.value.doubleVal!) == 100 {
                             expectedResponseLatestTimeseries.fulfill()
                         } else {
                             XCTFail("Expected different value/type!")
@@ -538,7 +538,7 @@ class FunctionalTestCases: XCTestCase {
                         }
                     } else {
                         // reflect values-as-native-types case
-                        if sampleimei[0].value.intVal == 999999999999999, samplebattery[0].value.intVal == 100 {
+                        if Int(sampleimei[0].value.doubleVal!) == 999999999999999, Int(samplebattery[0].value.doubleVal!) == 100 {
                             expectedResponseTimeseries.fulfill()
                         } else {
                             XCTFail("Expected different value/type!")
