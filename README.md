@@ -26,6 +26,7 @@ Please note: This library is continuously growing but **has not implemented all 
 ## Release history
 [See what's new](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/releasenotes)
 
+* Version 0.0.13 – 2025-07-17
 * Version 0.0.11 - 2025-06-21
 * Version 0.0.10 - 11.06.2025
 * Version 0.0.9 - 18.12.2024
@@ -58,6 +59,3 @@ Linux is currently unsupported due to an incompatibility in how this library use
 ## Contact and Contribution
 * Johannes Kinzig – [Mail](mailto:mail@johanneskinzig.com) – [Web](https://johanneskinzig.com)
 * for contribution please refer to official documentation: [Contribution](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/developmentcontribution)
-
-## About
-I am a software engineer mainly focusing on application development in Python (and now Swift, as well), for my IoT projects I am using ThingsBoard CE. I recently had the chance (and was given the time) to dive into Swift & iOS / macOS development. Soon, I recognized that Swift (including its tools and language concepts) had potential to optimize my current development workflow, so I continued learning. Due to my affinity (and knowledge) towards ThingsBoard I started to implement parts of the client API using Swift – which can be seen as my first real-world Swift project.
