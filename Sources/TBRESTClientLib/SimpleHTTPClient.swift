@@ -51,8 +51,8 @@ class SimpleHTTPClient {
                        usingMethod httpMethod: SupportedHTTPMethods,
                        withhttpHeaders httpHeaders: Dictionary<String, String>?,
                        withPayload payload: Dictionary<String, Any>?,
-                       expectedTBResponseType responseType: TBDataModel.Type,
-                       completionHandler: @escaping (Result<TBDataModel, TBHTTPClientRequestError>) -> Void)
+                       expectedTBResponseType responseType: any TBDataModel.Type,
+                       completionHandler: @escaping (Result<any TBDataModel, TBHTTPClientRequestError>) -> Void)
     -> Void {
         guard let url = URL(string: urlString) else {
             completionHandler(.failure(.badURL))
@@ -99,8 +99,8 @@ class SimpleHTTPClient {
      - Parameter expectedResponseType: expected TB Data Model instance Type
      - Returns: Result object containing dictionary
      */
-    fileprivate func convertResponseToTbDataModelObject(_ responseData: Data, expectedResponseType: TBDataModel.Type)
-    -> Result<TBDataModel, TBHTTPClientRequestError> {
+    fileprivate func convertResponseToTbDataModelObject(_ responseData: Data, expectedResponseType: any TBDataModel.Type)
+    -> Result<any TBDataModel, TBHTTPClientRequestError> {
         guard let responseDataStr = String(data: responseData, encoding: .utf8) else {
             return .failure(.improperPayloadDataFormat)
         }
