@@ -1,4 +1,15 @@
+# macOS (Finder) and Windows (Explorer) files
 .DS_Store
+Thumbs.db
+
+
+# Applications
+*.app
+*.exe
+*.war
+
+# Xcode and Swift PM files
+*.lock
 /.build
 /.doccbuilds
 /Packages
@@ -7,4 +18,9 @@ DerivedData/
 .swiftpm/configuration/registries.json
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .netrc
+
+# Logs
+*.log
+
+# Project specific exclusions
 Tests/TBRESTClientLibTests/Resources/ServerSettings.json
