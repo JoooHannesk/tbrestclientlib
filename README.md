@@ -4,19 +4,21 @@
 
 Simple client library for [ThingsBoard](https://thingsboard.io) servers - implementing the administration / user-space API (not device API) – written in Swift.
 
-* Implementation against the official ThingsBoard API – [ThingsBoard CE Docs](https://thingsboard.io/docs/)
-* Integration tests executed using
-    * ThingsBoard CE 3.9.0 with an on-premise installation – [v.3.9.0 API Reference](https://app.swaggerhub.com/apis/johannes_kinzig/thingsboard-rest-api/3.9.0)
-    * ThingsBoard CE 3.8.0 with an on-premise installation
-    * ThingsBoard CE 3.7.0 with an on-premise installation – [v.3.7.0 API Reference](https://app.swaggerhub.com/apis-docs/johannes_kinzig/thingsboard-rest-api/3.7.0)
-    
+## 🛠 Development Status – Available Functions (v0.0.14)
+This library is continuously growing but has **not yet implemented all API endpoints**. Currently supported functionality:
 
-## Disclaimer
-This library is an independent implementation developed by [its author(s)](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/#Contact-the-authors) and is **not affiliated with, endorsed by, or officially associated with ThingsBoard Inc. in any way**. For further details [mail the author](mailto:johannes@parallelogon-software.com) and/or refer to this library's [license](https://bitbucket.org/swift-projects/tbrestclientlib/src/main/LICENSE.txt).
++ [Login](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/usage#Initialization-and-Login-Authentication)
++ [Read own user profile](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/usage#User-Profile)
++ [Read customer info](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/usage/#Customer-Info)
++ [Read devices and device profiles](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/usage#Devices-and-device-profiles)
++ [Read attributes](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/usage#Entity-attributes)
++ [Set / delete attributes](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/usage#saveEntityAttributes)
++ [Read time-series data](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/usage#Entitiy-timeseries-data)
++ [Manipulate / delete time-series data](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/usage#deleteEntityTimeseries)
 
-## Project Status
+Please refer to the documentation for further details regarding the [development status](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/#Development-Status).
+
 This library was initiated as a sub-project of a larger project which required API access to ThingsBoard server instances. Because library development can be seen as a full project by itself, this part then was open-sourced and released to the public.
-
 Please note: This library is continuously growing but **has not implemented all API endpoints** yet. The same applies to the endpoint's responses: This library does not process every fetched element inside the JSON response string (as described by the official API scheme). It neglects the ones which were out of the parent-project's scope. Refer to ´TbDataModels.swift´ for further details about the properties contained in each schema response model.
 
 ## Documentation
@@ -25,6 +27,7 @@ Please note: This library is continuously growing but **has not implemented all 
 
 ## Release history
 [See what's new](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/releasenotes)
+
 * Version 0.0.14 - 2025-08-18
 * Version 0.0.13 – 2025-07-17
 * Version 0.0.11 - 2025-06-21
@@ -32,6 +35,12 @@ Please note: This library is continuously growing but **has not implemented all 
 * Version 0.0.9 - 18.12.2024
 * Version 0.0.8 - 23.11.2024
 * Version 0.0.7 - 20.11.2024
+
+Implementation against the official ThingsBoard API – [ThingsBoard CE Docs](https://thingsboard.io/docs/). All integration tests ran against real ThingsBoard installations:
+
+* ThingsBoard CE 3.9.0 with an on-premise installation – [v.3.9.0 API Reference](https://app.swaggerhub.com/apis/johannes_kinzig/thingsboard-rest-api/3.9.0)
+* ThingsBoard CE 3.8.0 with an on-premise installation
+* ThingsBoard CE 3.7.0 with an on-premise installation – [v.3.7.0 API Reference](https://app.swaggerhub.com/apis-docs/johannes_kinzig/thingsboard-rest-api/3.7.0)
 
 ## Requirements
 This library works with and was tested on:
@@ -59,3 +68,7 @@ Linux is currently unsupported due to an incompatibility in how this library use
 ## Contact and Contribution
 * Johannes Kinzig – [Mail](mailto:mail@johanneskinzig.com) – [Web](https://johanneskinzig.com)
 * for contribution please refer to official documentation: [Contribution](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/developmentcontribution)
+    
+## Disclaimer
+This library is an independent implementation developed by [its author(s)](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/#Contact-the-authors) and is **not affiliated with, endorsed by, or officially associated with ThingsBoard Inc. in any way**. For further details [mail the author](mailto:johannes@parallelogon-software.com) and/or refer to this library's [license](https://bitbucket.org/swift-projects/tbrestclientlib/src/main/LICENSE.txt).
+
