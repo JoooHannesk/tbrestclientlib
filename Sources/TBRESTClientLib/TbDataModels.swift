@@ -127,6 +127,24 @@ public struct User: TBDataModel {
     
 }
 
+public struct Customer: TBDataModel {
+    public let id: ID
+    public let createdTime: Int
+    public let country: String?
+    public let state: String?
+    public let city: String?
+    public let address: String?
+    public let address2: String?
+    public let zip: String?
+    public let phone: String?
+    public let email: String?
+    public let title: String
+    public let tenantId: ID
+    public let version: Int64
+    public let name: String
+    public let additionalInfo: AdditionalInfo?
+}
+
 /**
  Represent **Device** and **DeviceInfo** objects
  */
@@ -154,7 +172,7 @@ public struct Device: TBDataModel {
 
 public struct DeviceProfile: TBDataModel {
     public let id: ID
-    public let createdTime: Int?
+    public let createdTime: Int
     public let tenantId: ID
     public let name: String
     public let description: String?
@@ -171,14 +189,17 @@ public struct DeviceProfile: TBDataModel {
     public let defaultEdgeRuleChainId: ID?
     
     /// createdTime as Date type
-    public var createdTimeDt: Date? {
-        if let createdTime = createdTime {
-            return Date(timeIntervalSince1970: TimeInterval(createdTime/1000))
-        }
-        else {
-            return nil
-        }
-    }
+    public var createdTimeDt: Date { Date(timeIntervalSince1970: TimeInterval(createdTime/1000)) }
+}
+
+public struct DeviceProfileInfo: TBDataModel {
+    public let id: ID
+    public let tenantId: ID
+    public let name: String?
+    public let description: String?
+    public let image: String?
+    public let type: String
+    public let transportType: String
 }
 
 public struct ID: TBDataModel, Hashable {

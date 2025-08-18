@@ -1,5 +1,11 @@
 # Release Notes
 
+## Client – Version 0.0.14
+* Released: 2025-08-18
+* Added a method ``TBUserApiClient/getCustomerById(customerId:responseHandler:)`` to retrieve the customer the requesting user belongs to
+* Refer to <doc:Usage/Customer-Info>
+* Integration tests executed using *ThingsBoard CE 3.9.0* with a private cloud installation
+
 ## Client – Version 0.0.13
 * Released: 2025-07-17
 * Removed `intVal` from ``MplValueType`` to prevent floating point numbers having a zero as only decimal digit (e.g. 20.0) to be treated as integers.

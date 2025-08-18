@@ -64,6 +64,15 @@ final class UnitTests: FunctionalTestCases {
     }
     
     /**
+     Test getCustomerById()
+     */
+    func testGetCustomerById() {
+        testGetUser()
+        let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "GetCustomerById", expectedHTTPStatusCode: 200)
+        getCustomerById(apiClient: tbTestClient, expectedCustomerName: "IoT Playground")
+    }
+    
+    /**
      Test 'User' data model equality check
      Equality check (==) was moved from 'User' struct to a protocol extension to support all conforming entity data models
      */
