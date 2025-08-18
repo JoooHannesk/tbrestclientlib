@@ -107,6 +107,18 @@ self.myClient?.getUser() { userInfo in
 ```
 Types involved: ``User``
 
+## Customer Info
+To get information about the customer a user belongs to, use ``TBUserApiClient/getCustomerById(customerId:responseHandler:)``
+```swift
+let customerId: String = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+var customerInfo: Customer?
+apiClient?.getCustomerById(customerId: customerId) { customer in
+    customerInfo = customer
+    print("\(self.customerInfo)")
+```
+Types involved: ``Customer``
+
+
 ## Devices and device profiles
 Working with devices and device profiles.
 

@@ -11,6 +11,7 @@ protocol TbAPIEndpointsEnum: RawRepresentable where RawValue == String { }
 enum TbAPIEndpointsV1: String, TbAPIEndpointsEnum {
     case login = "/api/auth/login"
     case getUser = "/api/auth/user"
+    case getCustomerById = "/api/customer/{?customerId?}"
     case getCustomerDevices = "/api/customer/{?customerId?}/devices"
     case getCustomerDeviceInfos = "/api/customer/{?customerId?}/deviceInfos"
     case getDeviceProfileInfos =  "/api/deviceProfileInfos"

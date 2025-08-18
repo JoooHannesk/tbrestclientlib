@@ -61,6 +61,16 @@ final class IntegrationTests: FunctionalTestCases {
     }
     
     /**
+     Test getCustomerById() - expect a valid `Customer` as response
+     */
+    func testGetCustomerById() {
+        let (tbTestClient, serversettings) = prepare()
+        loginSucceeds(apiClient: tbTestClient)
+        getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        getCustomerById(apiClient: tbTestClient, expectedCustomerName: "IoT Playground")
+    }
+    
+    /**
      Test loginWithAccessToken()
      Test login with existing token from previous session
      */

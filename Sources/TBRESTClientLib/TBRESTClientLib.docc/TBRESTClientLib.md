@@ -9,29 +9,25 @@ This library implements (in parts) the ThingsBoard administration / user-space A
 
 This documentation tries to refere to the official ThingsBoard nomenclature as well as official API documentation as close as possible. It may did not work out all the time.
 
-## Disclaimer
-This library is an independent implementation developed by its author(s) - see below - and is **not affiliated with, endorsed by, or officially associated with ThingsBoard Inc. in any way**. For further details [mail the author](mailto:johannes@parallelogon-software.com) and/or refer to this library's <doc:License>.
+## Development Status – Available Functions (v0.0.14)
+* <doc:Usage/Initialization-and-Login-Authentication>
+* <doc:Usage/User-Profile>
+* <doc:Usage/Customer-Info>
+* <doc:Usage/Devices-and-device-profiles>
+* <doc:Usage/Entity-attributes>
+* <doc:Usage/Entitiy-timeseries-data>
 
-## Repository
-* This library is hostet on Bitbucket: [https://bitbucket.org/swift-projects/tbrestclientlib.git](https://bitbucket.org/swift-projects/tbrestclientlib/src/main/)
-* This documentation is served from: [https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib)
-
-## Release History
-See what's new: <doc:ReleaseNotes>
-* Version 0.0.13 – 2025-07-17
-* Version 0.0.11 - 2025-06-21
-* Version 0.0.10 - 2025-06-11
-* Version 0.0.9 - 2024-12-18
-* Version 0.0.8 - 2024-11-23
-* Version 0.0.7 - 2024-11-20
-
-## Compatibility to ThingsBoard Server
-For details regarding ThingsBoard server compatibility, please refer to the <doc:ReleaseNotes>.
-
-## Development Status
 This library was initiated as a sub-project of a larger project which required API access to ThingsBoard server instances. Because library development can be seen as a full project by itself, this part then was open-sourced and released to the public.
 
 Please note: This library is continuously growing but **has not implemented all API endpoints** yet. The same applies to the endpoint's responses: This library does not process every fetched element inside the JSON response string (as described by the official API scheme). It neglects the ones which were out of the parent-project's scope. Refer to <doc:Usage> for further details about the properties contained in each schema response model.
+
+## Repository
+* 📦 This library is hostet on Bitbucket: [https://bitbucket.org/swift-projects/tbrestclientlib.git](https://bitbucket.org/swift-projects/tbrestclientlib/src/main/)
+* 📚 This documentation is served from: [https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib)
+* 🏠 Library Home: [https://johanneskinzig.com/tbrestclientlib.html](https://johanneskinzig.com/tbrestclientlib.html)
+
+## Compatibility to ThingsBoard Server
+For details regarding ThingsBoard server compatibility, please refer to the <doc:ReleaseNotes>.
 
 ## Requirements
 This library works with and was tested on:
@@ -46,10 +42,13 @@ Johannes Kinzig – [Mail](mailto:mail@johanneskinzig.com) – [Web](https://joh
 ## Contribution
 Contribution is always welcome, please refer to documentation: <doc:DevelopmentContribution>
 
+## Disclaimer
+This library is an independent implementation developed by its author(s) - see below - and is **not affiliated with, endorsed by, or officially associated with ThingsBoard Inc. in any way**. For further details [mail the author](mailto:johannes@parallelogon-software.com) and/or refer to this library's <doc:License>.
+
 ## Topics
-- <doc:ReleaseNotes>
-- <doc:Installation>
-- <doc:Usage>
-- <doc:Testing>
-- <doc:DevelopmentContribution>
-- <doc:License>
+* <doc:Installation>
+* <doc:Usage>
+* <doc:Testing>
+* <doc:DevelopmentContribution>
+* <doc:ReleaseNotes>
+* <doc:License>

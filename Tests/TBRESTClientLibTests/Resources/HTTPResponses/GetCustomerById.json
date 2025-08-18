@@ -1,0 +1,23 @@
+{
+  "id": {
+    "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+    "entityType": "CUSTOMER"
+  },
+  "createdTime": 1609459200000,
+  "country": "US",
+  "state": "NY",
+  "city": "New York",
+  "address": "42",
+  "address2": "string",
+  "zip": "10004",
+  "phone": "+1(415)777-7777",
+  "email": "example@company.com",
+  "title": "IoT Playground",
+  "tenantId": {
+    "id": "784f394c-42b6-435a-983c-b7beff2784f9",
+    "entityType": "TENANT"
+  },
+  "version": 9007199254740991,
+  "name": "IoT Playground",
+  "additionalInfo": {}
+}

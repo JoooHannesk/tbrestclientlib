@@ -126,6 +126,23 @@ public class TBUserApiClient: TBHTTPRequest {
         }
     }
     
+    /**
+     Get customer info
+     
+     A user can only request information for the customer account they belong to.
+     - Parameter customerId: A string value representing the customer id
+     - Parameter responseHandler: takes a ``Customer`` as parameter and is called upon successful retrieval of the customer information
+     */
+    public func getCustomerById(customerId: String, responseHandler: ((Customer) -> Void)? = nil) -> Void {
+        let endpointURL = AEM.getEndpointURL(TBApiEndpoints.getCustomerById, replacePaths: [URLModifier(searchString: "{?customerId?}", replaceString: customerId)])
+        tbApiRequest(fromEndpoint: endpointURL,
+                     usingMethod: .get,
+                     authToken: self.authData,
+                     expectedTBResponseType: Customer.self) { responseObject -> Void in
+            responseHandler?(responseObject as! Customer)
+        }
+    }
+    
     // MARK: - Device related requests
     /**
      Get Customer Devices – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
@@ -225,15 +242,15 @@ public class TBUserApiClient: TBHTTPRequest {
         sortProperty: TbQuerySortProperty = .name,
         sortOrder: TbQuerySortOrder = .ascending,
         transportType: TbQueryTransportType? = nil,
-        responseHandler: ((PaginationDataContainer<DeviceProfile>) -> Void)?)
+        responseHandler: ((PaginationDataContainer<DeviceProfileInfo>) -> Void)?)
     -> Void {
         let endpointURL = AEM.getEndpointURLWithQueryParameters(apiPath: TBApiEndpoints.getDeviceProfileInfos,
                                                                 pageSize: pageSize, page: page,
                                                                 textSearch: textSearch, transportType: transportType,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: PaginationDataContainer<DeviceProfile>.self) { responseObject -> Void in
-            responseHandler?(responseObject as! PaginationDataContainer<DeviceProfile>)
+                     authToken: self.authData, expectedTBResponseType: PaginationDataContainer<DeviceProfileInfo>.self) { responseObject -> Void in
+            responseHandler?(responseObject as! PaginationDataContainer<DeviceProfileInfo>)
         }
     }
     

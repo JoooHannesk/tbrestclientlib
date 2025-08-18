@@ -20,12 +20,12 @@ This library was initiated as a sub-project of a larger project which required A
 Please note: This library is continuously growing but **has not implemented all API endpoints** yet. The same applies to the endpoint's responses: This library does not process every fetched element inside the JSON response string (as described by the official API scheme). It neglects the ones which were out of the parent-project's scope. Refer to ´TbDataModels.swift´ for further details about the properties contained in each schema response model.
 
 ## Documentation
-+ [Library Documentation](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib)
-+ [Library Website](https://johanneskinzig.com/tbrestclientlib.html)
++ 📚 [Library Documentation](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib)
++ 🏠 [Library Home](https://johanneskinzig.com/tbrestclientlib.html)
 
 ## Release history
 [See what's new](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/releasenotes)
-
+* Version 0.0.14 - 2025-08-18
 * Version 0.0.13 – 2025-07-17
 * Version 0.0.11 - 2025-06-21
 * Version 0.0.10 - 11.06.2025

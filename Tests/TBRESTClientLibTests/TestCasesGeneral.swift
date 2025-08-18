@@ -121,6 +121,24 @@ class FunctionalTestCases: XCTestCase {
     }
     
     /**
+     Test getCustomerById() - get customer info the user belongs to
+     */
+    @discardableResult
+    func getCustomerById(apiClient: TBUserApiClient?, expectedCustomerName: String) -> Customer? {
+        let expectedResponseWithCustomer = XCTestExpectation(description: "Expected response containing own customer info!")
+        var userCustomer: Customer? = nil
+        if let customerId = self.tbUser?.customerId.id {
+            apiClient?.getCustomerById(customerId: customerId) { customer in
+                userCustomer = customer
+                XCTAssertEqual(customer.name, expectedCustomerName)
+                expectedResponseWithCustomer.fulfill()
+            }
+        }
+        wait(for: [expectedResponseWithCustomer], timeout: 3.0)
+        return userCustomer
+    }
+    
+    /**
      Test getCustomerDevices() - for a given customer ID
      - Note: This test requires to have **at least two different devices** in the GetCustomerDevices.json resource file (for unit tests)
      or in your TB tenant (for integration tests)
