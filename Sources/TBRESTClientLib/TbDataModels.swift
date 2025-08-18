@@ -143,6 +143,8 @@ public struct Customer: TBDataModel {
     public let version: Int64
     public let name: String
     public let additionalInfo: AdditionalInfo?
+    /// createdTime as Date type
+    public var createdTimeDt: Date { Date(timeIntervalSince1970: TimeInterval(createdTime/1000)) }
 }
 
 /**
