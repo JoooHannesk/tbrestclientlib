@@ -43,6 +43,7 @@ Implementation against the official ThingsBoard API – [ThingsBoard CE Docs](ht
 
 ## Requirements
 This library works with and was tested on:
+
 * iOS >= 17.5
 * macOS >= 14.0
 
