@@ -1,5 +1,10 @@
 # Release Notes
 
+## Client - Version 0.0.15
+* Released: 2025-08-19
+* Added ``TBUserApiClient/getAccessToken()`` for retrieving the currently active access token, enabling easier session recovery without re-authentication.
+* Introduced ``TBUserApiClient/getLoginData()`` to access the server URL and username used during initialization (password is intentionally not exposed for security reasons).
+
 ## Client – Version 0.0.14
 * Released: 2025-08-18
 * Added a method ``TBUserApiClient/getCustomerById(customerId:responseHandler:)`` to retrieve the customer the requesting user belongs to

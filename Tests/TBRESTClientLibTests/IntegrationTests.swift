@@ -32,7 +32,6 @@ final class IntegrationTests: FunctionalTestCases {
         loginFailsBecauseOfUnknownHost(apiClient: tbTestClient)
     }
     
-    
     /**
      Test login() - expect failure with "Bad Credentials"
      */
@@ -49,6 +48,16 @@ final class IntegrationTests: FunctionalTestCases {
         //let (tbTestClient, _) = prepare()
         let tbTestClient = prepare().0
         loginSucceeds(apiClient: tbTestClient)
+    }
+    
+    /**
+     Test getAccessToken()
+     */
+    func testGetAccessToken() {
+        let (tbTestClient, _) = prepare()
+        loginSucceeds(apiClient: tbTestClient)
+        let accessToken = tbTestClient!.getAccessToken()
+        XCTAssertNotNil(accessToken)
     }
     
     /**
