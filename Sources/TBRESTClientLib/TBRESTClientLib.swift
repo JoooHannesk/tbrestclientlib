@@ -108,6 +108,28 @@ public class TBUserApiClient: TBHTTPRequest {
         serverSettings.password = password
         try login(responseHandler: responseHandler)
     }
+    
+    /**
+     Return the login data
+     
+     Return the login data which were given during initialisation. Ideal when having to manage multiple instances and need to distinguish between them.
+     - Returns: a tuple with (serverUrl, username) - both as String
+     - Note: For security reasons, the password is not returned!
+     */
+    public func getLoginData() -> (String, String) {
+        return (serverSettings.baseUrl, serverSettings.username)
+    }
+    
+    /**
+     Return access token
+     
+     Returns the access token currently in use. Useful for session recovery to continue an existing authentication context.
+     - Returns: authData (of type ``AuthLogin``)
+     - Note: Returns `nil` if authentication has not been attempted, or if the provided credentials were invalid. Call ``login(responseHandler:)`` before accessing this value.
+     */
+    public func getAccessToken() -> AuthLogin? {
+        return self.authData
+    }
 
 
     // MARK: - User related requests

@@ -56,6 +56,17 @@ final class UnitTests: FunctionalTestCases {
     }
     
     /**
+     Test getLoginData() - expect to receive nonempty values
+     */
+    func testGetLoginData() {
+        let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "Login", expectedHTTPStatusCode: 200)
+        loginSucceeds(apiClient: tbTestClient)
+        let loginData = tbTestClient!.getLoginData()
+        XCTAssertFalse(loginData.0.isEmpty)
+        XCTAssertFalse(loginData.1.isEmpty)
+    }
+    
+    /**
      Test getUser()
      */
     func testGetUser() {

@@ -95,6 +95,19 @@ try? myClient2?.login(withUsername: "MyUsername", andPassword: "MySuperSecretPas
 ```
 Types involved: ``AuthLogin``
 
+### Access Login Data
+Use ``TBUserApiClient/getLoginData()`` when working with multiple ``TBUserApiClient`` instances to retrieve the login data provided during initialization. The returned data includes the server URL and username. For security reasons, the password is not returned.
+```swift
+let loginData = myClient?.getLoginData()
+let serverUrl = loginData.0
+let username = loginData.1
+```
+
+``TBUserApiClient/getAccessToken()`` retrieves the access token that is currently in use. The token can be reused to restore an existing authentication session, for example when recovering a client state without performing a new login. (Refer to <doc:Usage/Initialization-with-existing-access-token> for initializing the client with an access token.)
+```swift
+let accessToken = myClient?.getAccessToken()
+```
+
 ## User Profile
 To perform user-specific requests (e.g. user-accessible devices or profiles) it is mandatorry to include a user-id reference to these requests. Therefore it is required to obtain its own user-id first. More details about ``TBUserApiClient/getUser(responseHandler:)``
 ```swift
