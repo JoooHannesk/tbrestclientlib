@@ -313,4 +313,14 @@ final class IntegrationTests: FunctionalTestCases {
         deleteEntityTimeseries(apiClient: tbTestClient)
     }
     
+    /**
+     Test `logout()`
+     */
+    func testLogout() {
+        let (tbTestClient, serversettings) = prepare()
+        loginSucceeds(apiClient: tbTestClient)
+        getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        logout(apiClient: tbTestClient)
+    }
+    
 }

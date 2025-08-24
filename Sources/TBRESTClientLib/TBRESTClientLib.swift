@@ -130,6 +130,22 @@ public class TBUserApiClient: TBHTTPRequest {
     public func getAccessToken() -> AuthLogin? {
         return self.authData
     }
+    
+    /**
+     Logout
+     
+     Request user logout on ThingsBoard server and destroy access token locally.
+     - Note: Calling `logout()` on the server side serves the purpose of audit logging, as the logout request is written to the audit log. The main logout procedure, however, takes place on the client side by clearing the access token.
+     */
+    public func logout() -> Void {
+        tbApiRequest(fromEndpoint: AEM.getEndpointURL(TBApiEndpoints.logout),
+                     usingMethod: .post,
+                     authToken: self.authData,
+                     expectedTBResponseType: TBAppError.self) { responseObject in
+            self.logger?.warning("Logout failed: \(String(describing: responseObject))")
+        }
+        self.authData = nil
+    }
 
 
     // MARK: - User related requests

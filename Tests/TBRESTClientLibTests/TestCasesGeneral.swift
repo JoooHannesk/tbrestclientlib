@@ -595,4 +595,12 @@ class FunctionalTestCases: XCTestCase {
         }
         wait(for: [expectedResponse], timeout: 3.0)
     }
+    
+    /**
+     Test logout
+     */
+    func logout(apiClient: TBUserApiClient?) {
+        apiClient?.logout()
+        XCTAssertNil(apiClient?.getAccessToken())
+    }
 }
