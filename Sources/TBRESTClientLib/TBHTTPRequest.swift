@@ -14,7 +14,7 @@ public class TBHTTPRequest {
     var httpClient: SimpleHTTPClient
     private(set) var apiErrorHandler: ((TBAppError) -> Void)? = nil
     private(set) var systemErrorHandler: ((TBHTTPClientRequestError) -> Void)? = nil
-    private let logger: Logger?
+    let logger: Logger?
     
     // MARK: - Initialization
     init(httpSessionHandler: URLSessionProtocol, logger: Logger? = nil) {

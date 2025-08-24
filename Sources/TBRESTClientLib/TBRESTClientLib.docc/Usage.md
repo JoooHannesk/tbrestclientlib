@@ -108,6 +108,13 @@ let username = loginData.1
 let accessToken = myClient?.getAccessToken()
 ```
 
+### Logout
+Request user logout on ThingsBoard server and destroy access token locally.
+```swift
+myClient?.logout()
+```
+Calling ``TBUserApiClient/logout()`` on the server side serves the purpose of audit logging, as the logout request is written to the audit log. The main logout procedure, however, takes place on the client side by clearing the access token.
+
 ## User Profile
 To perform user-specific requests (e.g. user-accessible devices or profiles) it is mandatorry to include a user-id reference to these requests. Therefore it is required to obtain its own user-id first. More details about ``TBUserApiClient/getUser(responseHandler:)``
 ```swift

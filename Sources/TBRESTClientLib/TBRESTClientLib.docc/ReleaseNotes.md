@@ -1,5 +1,9 @@
 # Release Notes
 
+## Client - Version 0.0.16
+* Released: 2025-08-24
+* Added ``TBUserApiClient/logout()`` method to request user logout on ThingsBoard server.
+
 ## Client - Version 0.0.15
 * Released: 2025-08-19
 * Added ``TBUserApiClient/getAccessToken()`` for retrieving the currently active access token, enabling easier session recovery without re-authentication.
