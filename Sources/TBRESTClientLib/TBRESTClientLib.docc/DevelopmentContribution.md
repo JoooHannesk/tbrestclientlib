@@ -6,4 +6,4 @@ The project can be opened in Xcode or via Terminal – it was created using Swif
 ## Contribution
 For enhancements, improvements, questions or contribution, feel free to create a pull request or reach out [via mail](mailto:mail@johanneskinzig.com).
 
-Code is managed through Bitbucket, issue tracking through Jira: [TBRESTClientLib on Bitbucket](https://bitbucket.org/swift-projects/tbrestclientlib/src/main/)
+Code and issue tracking is managed through GitHub: [TBRESTClientLib on GitHub](https://github.com/JoooHannesk/tbrestclientlib.git)
