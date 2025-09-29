@@ -2,7 +2,7 @@
 This library can be added to your Xcode or SwiftPM project.
 
 ## Adding to Xcode Project
-When adding this library to your Xcode project use the build-in dependency management as shown below. As URL to the git repo use `https://bitbucket.org/swift-projects/tbrestclientlib.git`.
+When adding this library to your Xcode project use the build-in dependency management as shown below. As URL to the git repo use `https://github.com/JoooHannesk/tbrestclientlib.git`.
 
 
 ![Add package to Xcode project using native dependency management](addToXcode)
@@ -19,7 +19,7 @@ let package = Package(
                 .macOS(.v14),
     ],
     dependencies: [
-        .package(url: "https://bitbucket.org/swift-projects/tbrestclientlib.git", from: "0.0.9"),
+        .package(url: "https://github.com/JoooHannesk/tbrestclientlib.git", from: "0.0.9"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.

@@ -1,4 +1,4 @@
-![project_avatar_icon](https://bitbucket.org/swift-projects/tbrestclientlib/raw/main/Meta/tbrestclientlib-project-avatar.png)
+![project_avatar_icon](https://raw.githubusercontent.com/JoooHannesk/tbrestclientlib/refs/heads/main/Meta/tbrestclientlib-project-avatar.png)
 
 # TBRESTClientLib
 
@@ -71,5 +71,5 @@ Linux is currently unsupported due to an incompatibility in how this library use
 * for contribution please refer to official documentation: [Contribution](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/developmentcontribution)
     
 ## Disclaimer
-This library is an independent implementation developed by [its author(s)](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/#Contact-the-authors) and is **not affiliated with, endorsed by, or officially associated with ThingsBoard Inc. in any way**. For further details [mail the author](mailto:johannes@parallelogon-software.com) and/or refer to this library's [license](https://bitbucket.org/swift-projects/tbrestclientlib/src/main/LICENSE.txt).
+This library is an independent implementation developed by [its author(s)](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/#Contact-the-authors) and is **not affiliated with, endorsed by, or officially associated with ThingsBoard Inc. in any way**. For further details [mail the author](mailto:mail@johanneskinzig.com) and/or refer to this library's [license](https://github.com/JoooHannesk/tbrestclientlib/blob/main/LICENSE.txt).
 
