@@ -11,7 +11,7 @@ import Foundation
 // MARK: - Protocols & Extensions
 
 /// Represent all TB data models and make them string representable for debug purposes
-public protocol TBDataModel: Codable & CustomStringConvertible & Hashable {
+public protocol TBDataModel: Codable & CustomStringConvertible & Hashable & Sendable {
     var description: String { get }
 }
 extension TBDataModel {
