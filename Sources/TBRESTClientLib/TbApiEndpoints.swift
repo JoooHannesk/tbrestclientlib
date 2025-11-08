@@ -5,28 +5,77 @@
 //  Created by Johannes Kinzig on 12.08.24.
 //
 
-protocol TbAPIEndpointsEnum: RawRepresentable where RawValue == String { }
+public protocol SupportedTbAPIEndpoints {
+    var login: String { get }
+    var logout: String { get }
+    var getUser: String { get }
+    var getCustomerById: String { get }
+    var getCustomerDevices: String { get }
+    var getCustomerDeviceInfos: String { get }
+    var getDeviceProfileInfos: String { get }
+    var getDeviceProfiles: String { get }
+    var getAttributeKeys: String { get }
+    var getAttributeKeysByScope: String { get }
+    var saveEntityAttributes: String { get }
+    var getAttributes: String { get }
+    var getAttributesByScope: String { get }
+    var deleteEntityAttributes: String { get }
+    var getTimeseriesKeys: String { get }
+    var saveEntityTelemetry: String { get }
+    var getTimeseries: String { get }
+    var deleteEntityTimeseries: String { get }
+}
 
 // MARK: - API Endpoints
-enum TbAPIEndpointsV1: String, TbAPIEndpointsEnum {
-    case login = "/api/auth/login"
-    case logout = "/api/auth/logout"
-    case getUser = "/api/auth/user"
-    case getCustomerById = "/api/customer/{?customerId?}"
-    case getCustomerDevices = "/api/customer/{?customerId?}/devices"
-    case getCustomerDeviceInfos = "/api/customer/{?customerId?}/deviceInfos"
-    case getDeviceProfileInfos =  "/api/deviceProfileInfos"
-    case getDeviceProfiles = "/api/deviceProfiles"
-    case getAttributeKeys = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/keys/attributes"
-    case getAttributeKeysByScope = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/keys/attributes/{?scope?}"
-    case saveEntityAttributes = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/attributes/{?scope?}"
-    case getAttributes = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/values/attributes"
-    case getAttributesByScope = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/values/attributes/{?scope?}"
-    case deleteEntityAttributes = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/{?scope?}"
-    case getTimeseriesKeys = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/keys/timeseries"
-    case saveEntityTelemetry = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/timeseries/{?scope?}"
-    case getTimeseries = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/values/timeseries"
-    case deleteEntityTimeseries = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/timeseries/delete"
+
+/// Endpoints V1 – currently in use
+public struct TbAPIEndpointsV1: SupportedTbAPIEndpoints {
+
+    public init() { }
+
+    public let login = "/api/auth/login"
+    public let logout = "/api/auth/logout"
+    public let getUser = "/api/auth/user"
+    public let getCustomerById = "/api/customer/{?customerId?}"
+    public let getCustomerDevices = "/api/customer/{?customerId?}/devices"
+    public let getCustomerDeviceInfos = "/api/customer/{?customerId?}/deviceInfos"
+    public let getDeviceProfileInfos =  "/api/deviceProfileInfos"
+    public let getDeviceProfiles = "/api/deviceProfiles"
+    public let getAttributeKeys = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/keys/attributes"
+    public let getAttributeKeysByScope = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/keys/attributes/{?scope?}"
+    public let saveEntityAttributes = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/attributes/{?scope?}"
+    public let getAttributes = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/values/attributes"
+    public let getAttributesByScope = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/values/attributes/{?scope?}"
+    public let deleteEntityAttributes = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/{?scope?}"
+    public let getTimeseriesKeys = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/keys/timeseries"
+    public let saveEntityTelemetry = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/timeseries/{?scope?}"
+    public let getTimeseries = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/values/timeseries"
+    public let deleteEntityTimeseries = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/timeseries/delete"
+}
+
+/// Endpoints V2 – future use
+public struct TbAPIEndpointsV2: SupportedTbAPIEndpoints {
+
+    public init() { }
+    
+    public let login = ""
+    public let logout = ""
+    public let getUser = ""
+    public let getCustomerById = ""
+    public let getCustomerDevices = ""
+    public let getCustomerDeviceInfos = ""
+    public let getDeviceProfileInfos =  ""
+    public let getDeviceProfiles = ""
+    public let getAttributeKeys = ""
+    public let getAttributeKeysByScope = ""
+    public let saveEntityAttributes = ""
+    public let getAttributes = ""
+    public let getAttributesByScope = ""
+    public let deleteEntityAttributes = ""
+    public let getTimeseriesKeys = ""
+    public let saveEntityTelemetry = ""
+    public let getTimeseries = ""
+    public let deleteEntityTimeseries = ""
 }
 
 // MARK: - Query Parameters
@@ -97,14 +146,16 @@ struct URLModifier {
 }
 
 struct APIEndpointManager {
-    private static var tbServerBaseURL: String = ""
-    
+    private let tbServerBaseURL: String
+    private let apiEndpoints: SupportedTbAPIEndpoints
+
     /**
-     Set TB Server base url (without trailing slash)
+     Init by setting TB Server base url (without trailing slash)
      - Parameter baseURL: server base URL as String
      */
-    internal static func setTbServerBaseURL(_ serverSettings: ServerSettings) {
-        tbServerBaseURL = serverSettings.baseUrl
+    init(serverSettings: ServerSettings, apiEndpoints: SupportedTbAPIEndpoints) {
+        self.tbServerBaseURL = serverSettings.baseUrl
+        self.apiEndpoints = apiEndpoints
     }
     
     /**
@@ -114,12 +165,12 @@ struct APIEndpointManager {
      - Parameter appendQuery: append query parameters to URL
      - Returns: API endpoint URL as string
      */
-    internal static func getEndpointURL(
-        _ apiPath: some TbAPIEndpointsEnum,
+    internal func getEndpointURL(
+        _ apiPath: KeyPath<SupportedTbAPIEndpoints, String>,
         replacePaths: [URLModifier]? = nil,
         appendQuery: String? = nil
     ) -> String {
-        var urlAsString = tbServerBaseURL + apiPath.rawValue
+        var urlAsString = "\(self.tbServerBaseURL)\(self.apiEndpoints[keyPath: apiPath])"
         if let replacePaths = replacePaths {
             for replacePath in replacePaths {
                 urlAsString = urlAsString.replacingOccurrences(of: replacePath.searchString, with: replacePath.replaceString)
@@ -159,8 +210,8 @@ struct APIEndpointManager {
      - Parameter sortOrder: sort results in ascending or descending order, state according to 'TbQuerysortOrder'; default: .ascending
      - Returns: API endpoint URL as string
      */
-    internal static func getEndpointURLWithQueryParameters(
-        apiPath: some TbAPIEndpointsEnum,
+    internal func getEndpointURLWithQueryParameters(
+        apiPath: KeyPath<SupportedTbAPIEndpoints, String>,
         replacePaths: [URLModifier]? = nil,
         pageSize: Int32? = nil,
         page: Int32? = nil,
