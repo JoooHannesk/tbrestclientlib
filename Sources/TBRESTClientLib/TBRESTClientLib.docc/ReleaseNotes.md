@@ -1,5 +1,10 @@
 # Release Notes
 
+## Client - Version 0.0.19
+* Released: 2025-11-08
+* Removed a convenience initializer but extended the main initializer to keep the overal signature: no public-facing API changes
+* Introduced an API url versioning-scheme and added the coresponding arguments to the initializer signature with a default parameter to prevent public-facing API changes (therefore this remains undocumented for now) 
+
 ## Client - Version 0.0.16
 * Released: 2025-08-24
 * Added ``TBUserApiClient/logout()`` method to request user logout on ThingsBoard server.

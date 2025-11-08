@@ -4,7 +4,7 @@
 
 Simple client library for [ThingsBoard](https://thingsboard.io) servers - implementing the administration / user-space API (not device API) – written in Swift.
 
-## 🛠 Development Status – Available Functions (v0.0.16)
+## 🛠 Development Status – Available Functions (v0.0.19)
 This library is continuously growing but has **not yet implemented all API endpoints**. Currently supported functionality:
 
 + [Login](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/usage#Initialization-and-Login-Authentication)
@@ -29,6 +29,7 @@ Please note: This library is continuously growing but **has not implemented all 
 ## Release history
 [See what's new](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/releasenotes)
 
+* Version 0.0.19 – 2025-11-08
 * Version 0.0.15 - 2025-08-19
 * Version 0.0.14 - 2025-08-18
 * Version 0.0.13 – 2025-07-17

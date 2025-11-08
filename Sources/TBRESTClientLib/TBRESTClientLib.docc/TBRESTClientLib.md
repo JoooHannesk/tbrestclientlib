@@ -9,7 +9,7 @@ This library implements (in parts) the ThingsBoard administration / user-space A
 
 This documentation tries to refere to the official ThingsBoard nomenclature as well as official API documentation as close as possible. It may did not work out all the time.
 
-## Development Status – Available Functions (v0.0.16)
+## Development Status – Available Functions (v0.0.19)
 * <doc:Usage/Initialization-and-Login-Authentication>
 * <doc:Usage/Logout>
 * <doc:Usage/User-Profile>

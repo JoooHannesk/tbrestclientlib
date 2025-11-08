@@ -56,7 +56,7 @@ myClient?.registerAppErrorHandler { errorMsg in
 Types involved: ``TBAppError``
 
 ### Login when initialized with username/password
-When client is initialized with username/password ``TBUserApiClient/login(responseHandler:)`` method can be called afterwards. This generates a login token which remains with the client until it is deinitalized or cleand up.
+When a client is initialized with username/password the ``TBUserApiClient/login(responseHandler:)`` method can be called afterwards. This generates a login token which remains with the client until it is deinitalized or cleand up.
 ```swift
 try? myClient?.login() { authToken in
     print("\(authToken)")
