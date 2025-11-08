@@ -40,7 +40,7 @@ struct MockAPIClientFactory {
      */
     func getMockApiClient(expectedHTTPResponse: String, expectedHTTPStatusCode: Int, expectedError: Error? = nil) -> TBUserApiClient? {
         let mockLoginHTTPSession = mhs.createMockHttpSession(jsonFileName: expectedHTTPResponse, httpStatusCode: expectedHTTPStatusCode, error: expectedError)
-        let tbTestClient = try? TBUserApiClient(baseUrlStr: baseUrlStr, username: username, password: password, apiEndpointVersion: TbAPIEndpointsV1(), httpSessionHandler: mockLoginHTTPSession!)
+        let tbTestClient = try? TBUserApiClient(baseUrlStr: baseUrlStr, username: username, password: password, httpSessionHandler: mockLoginHTTPSession!)
         return tbTestClient
     }
 }

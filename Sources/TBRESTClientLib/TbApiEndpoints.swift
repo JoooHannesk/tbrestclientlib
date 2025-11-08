@@ -5,7 +5,7 @@
 //  Created by Johannes Kinzig on 12.08.24.
 //
 
-public protocol SupportedTbAPIEndpoints {
+protocol SupportedTbAPIEndpoints {
     var login: String { get }
     var logout: String { get }
     var getUser: String { get }
@@ -29,7 +29,7 @@ public protocol SupportedTbAPIEndpoints {
 // MARK: - API Endpoints
 
 /// Endpoints V1 – currently in use
-public struct TbAPIEndpointsV1: SupportedTbAPIEndpoints {
+struct TbAPIEndpointsV1: SupportedTbAPIEndpoints {
 
     public init() { }
 
@@ -54,10 +54,10 @@ public struct TbAPIEndpointsV1: SupportedTbAPIEndpoints {
 }
 
 /// Endpoints V2 – future use
-public struct TbAPIEndpointsV2: SupportedTbAPIEndpoints {
-
+struct TbAPIEndpointsV2: SupportedTbAPIEndpoints {
+    // TODO: implement in case of a version 2 requirement
     public init() { }
-    
+
     public let login = ""
     public let logout = ""
     public let getUser = ""
@@ -76,6 +76,19 @@ public struct TbAPIEndpointsV2: SupportedTbAPIEndpoints {
     public let saveEntityTelemetry = ""
     public let getTimeseries = ""
     public let deleteEntityTimeseries = ""
+}
+
+/// ThingsBoard API Version selector
+public enum TbApiEndpointsVersion {
+    case v1
+    case v2
+
+    var version: SupportedTbAPIEndpoints {
+        switch self {
+        case .v1: return TbAPIEndpointsV1()
+        case .v2: return TbAPIEndpointsV2()
+        }
+    }
 }
 
 // MARK: - Query Parameters

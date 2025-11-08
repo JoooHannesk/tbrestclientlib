@@ -31,26 +31,13 @@ public class TBUserApiClient: TBHTTPRequest {
      This initializer's intention is mainly to be used when performing unit testing. When using the library it is recommended to use the
      convenience initializer.
      */
-    init?(baseUrlStr: String, username: String, password: String, apiEndpointVersion: SupportedTbAPIEndpoints, httpSessionHandler: URLSessionProtocol, logger: Logger? = nil) throws {
+    init?(baseUrlStr: String, username: String, password: String, apiEndpointVersion: TbApiEndpointsVersion = .v1, httpSessionHandler: URLSessionProtocol = URLSession.shared, logger: Logger? = nil) throws {
         serverSettings = ServerSettings(baseUrl: baseUrlStr, username: username, password: password)
         guard serverSettings.allPartsGiven() else {
             throw TBHTTPClientRequestError.emptyLogin
         }
-        aem = APIEndpointManager(serverSettings: self.serverSettings, apiEndpoints: apiEndpointVersion)
+        aem = APIEndpointManager(serverSettings: self.serverSettings, apiEndpoints: apiEndpointVersion.version)
         super.init(httpSessionHandler: httpSessionHandler, logger: logger)
-    }
-    
-    /**
-     Initialize TB client
-     
-     - Parameter baseUrlStr: server url as utf8 string without trailing slash (no API endpoint, just base server URL)
-     - Parameter username: user's username as utf8 string
-     - Parameter password: user's password as utf8 string
-     - Parameter apiEndpointVersion: API version, currently only .v1 supported because no other version is currently implemented.
-     - Parameter logger: Logger (from OSLog) instance (optional)
-     */
-    public convenience init?(baseUrlStr: String, username: String, password: String, apiEndpointVersion: SupportedTbAPIEndpoints = TbAPIEndpointsV1(), logger: Logger? = nil) throws {
-        try self.init(baseUrlStr: baseUrlStr, username: username, password: password, apiEndpointVersion: apiEndpointVersion, httpSessionHandler: URLSession.shared, logger: logger)
     }
     
     /**
@@ -62,13 +49,13 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter logger: Logger (from OSLog) instance (optional)
      - Note: Re-use tokens from an existing/previous session instead of optaining new ones from the server.
      */
-    public init?(baseUrlStr: String, accessToken: AuthLogin, apiEndpointVersion: SupportedTbAPIEndpoints = TbAPIEndpointsV1(), logger: Logger? = nil) throws {
+    public init?(baseUrlStr: String, accessToken: AuthLogin, apiEndpointVersion: TbApiEndpointsVersion = .v1, logger: Logger? = nil) throws {
         serverSettings = ServerSettings(baseUrl: baseUrlStr, username: "", password: "")
         guard accessToken.allPartsGiven() && serverSettings.urlGiven() else {
             throw TBHTTPClientRequestError.emptyLogin
         }
         authData = accessToken
-        aem = APIEndpointManager(serverSettings: self.serverSettings, apiEndpoints: apiEndpointVersion)
+        aem = APIEndpointManager(serverSettings: self.serverSettings, apiEndpoints: apiEndpointVersion.version)
         super.init(httpSessionHandler: URLSession.shared, logger: logger)
     }
     
