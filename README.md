@@ -1,4 +1,4 @@
-![project_avatar_icon](https://media.githubusercontent.com/media/JoooHannesk/tbrestclientlib/refs/heads/main/Meta/tbrestclientlib-project-avatar.png)
+![project_avatar_icon](https://github.com/JoooHannesk/tbrestclientlib/blob/main/Meta/tbrestclientlib-project-avatar.png)
 
 # TBRESTClientLib
 
