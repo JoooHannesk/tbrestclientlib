@@ -244,8 +244,24 @@ public class TBUserApiClient: TBHTTPRequest {
             responseHandler?(responseObject as! PaginationDataContainer<Device>)
         }
     }
-    
-    
+
+    /**
+     Create a new device or update an existing one – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+
+     To create a new device, don't provide the device id. When creating a device, ThingsBoard takes care fro creating the device id by itself. An access token is generated in case it was not provided in the 'accessToken' parameter. ThingsBoard responds with the newly created device.
+     To update an existing device provide the device id in addition to the other required members.
+     The device name has to be unique (tenant's scope). Use unique identifiers (e.g. MAC address, IMEI or serial number) for the device *name*. The *label* field is designed for user-friendly presentation and is not required to be unique.
+
+     - Parameters accessToken: the access token to use for the (new) device
+     - Returns: the created or updated device
+
+     - Note: If you don't provide a `deviceProfileId` or `customerId` the device will be created with their corresponding default values.
+     */
+    public func saveDevice(deviceId: UUID? = nil, accessToken: String? = nil) {
+        
+    }
+
+
     // MARK: - Device Profile related requests
     /**
      Get Device Profile Infos – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
