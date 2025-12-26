@@ -245,7 +245,22 @@ public class TBUserApiClient: TBHTTPRequest {
         }
     }
 
-    // TODO: add getDeviceById
+    /**
+     Get device by ID – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+
+     Before returning the device object, the server checks if the device belongs to the tenant or customer (depending
+     whether the request comes from a TENANT\_ADMIN' or 'CUSTOMER\_USER').
+
+     - Parameters deviceId: device id as UUID
+     - Parameters responseHandler: optional callable taking the new device object as a parameter, will only be called in case the API call succeeds
+     */
+    public func getDeviceById(deviceId: UUID, responseHandler: ((Device) -> Void)?) {
+        let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getDeviceById,
+                                                                replacePaths: [URLModifier(searchString: "{?deviceId?}", replaceString: deviceId.uuidString)])
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, authToken: self.authData, expectedTBResponseType: Device.self) { device -> Void in
+            responseHandler?(device as! Device)
+        }
+    }
 
     /**
      Create a new device or update an existing one – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
@@ -255,10 +270,16 @@ public class TBUserApiClient: TBHTTPRequest {
      To update an existing device provide the device id in addition to the other required members.
      Use unique identifiers (e.g. MAC address, IMEI or serial number) for the device *name*. The *label* field is designed for user-friendly presentation and is not required to be unique.
 
+     - Parameters name: device name
+     - Parameters label: device label
+     - Parameters deviceId: device id as UUID
+     - Parameters deviceProfileName: device profile name
+     - Parameters deviceProfileId: device profile id as UUID
+     - Parameters tenantId: tenant id as UUID
+     - Parameters customerId: customer id as UUID
      - Parameters accessToken: the access token to use for the (new) device
-     - Returns: the created or updated device
-
-     - Note: If you don't provide a `deviceProfileId` or `customerId` for a new device, it will be created with their corresponding
+     - Parameters responseHandler: optional callable taking the new device object as a parameter, will only be called in case the API call succeeds
+     - Note: If you don't provide a `deviceProfileName` and `deviceProfileId` or `customerId` for a new device, it will be created with their corresponding
      default values. **Catuion: If you don't provide these fields for an existing device during update, these fields will be set to their default values!**
      */
     public func saveDevice(name: String,

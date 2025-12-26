@@ -108,7 +108,17 @@ final class UnitTests: FunctionalTestCases {
         let customer_devices = getCustomerDevices(apiClient: tbTestClient)
         return customer_devices
     }
-    
+
+    /**
+     Test `getDeviceById()`
+     */
+    func testGetDeviceById() {
+        testGetUser()
+        let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "GetDeviceById", expectedHTTPStatusCode: 200)
+        let device = getDeviceById(apiClient: tbTestClient, deviceId: UUID(uuidString: "00000000-0000-0000-0000-000000000000")!)
+        XCTAssertNotNil(device)
+    }
+
     /**
      Test 'Device' data model equality check
      Equality check (==) was moved to a protocol extension to support all conforming entity data models in commit

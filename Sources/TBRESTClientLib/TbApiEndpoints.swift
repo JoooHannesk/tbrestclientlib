@@ -12,6 +12,7 @@ protocol SupportedTbAPIEndpoints {
     var getCustomerById: String { get }
     var getCustomerDevices: String { get }
     var getCustomerDeviceInfos: String { get }
+    var getDeviceById: String { get }
     var saveDevice: String { get }
     var getDeviceProfileInfos: String { get }
     var getDeviceProfiles: String { get }
@@ -40,6 +41,7 @@ struct TbAPIEndpointsV1: SupportedTbAPIEndpoints {
     public let getCustomerById = "/api/customer/{?customerId?}"
     public let getCustomerDevices = "/api/customer/{?customerId?}/devices"
     public let getCustomerDeviceInfos = "/api/customer/{?customerId?}/deviceInfos"
+    public let getDeviceById = "/api/device/{?deviceId?}"
     public let saveDevice = "/api/device{?accessToken?}"
     public let getDeviceProfileInfos =  "/api/deviceProfileInfos"
     public let getDeviceProfiles = "/api/deviceProfiles"
@@ -66,6 +68,7 @@ struct TbAPIEndpointsV2: SupportedTbAPIEndpoints {
     public let getCustomerById = ""
     public let getCustomerDevices = ""
     public let getCustomerDeviceInfos = ""
+    public let getDeviceById = ""
     public let saveDevice = ""
     public let getDeviceProfileInfos =  ""
     public let getDeviceProfiles = ""

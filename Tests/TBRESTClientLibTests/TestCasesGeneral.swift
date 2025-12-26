@@ -178,6 +178,23 @@ class FunctionalTestCases: XCTestCase {
     }
 
     /**
+     Test getDeviceById() - for a given device ID
+     */
+    @discardableResult
+    func getDeviceById(apiClient: TBUserApiClient?, deviceId: UUID) -> Device? {
+        let expectDeviceResponse: XCTestExpectation = XCTestExpectation(description: "Expected response containing a Device object!")
+        var device: Device? = nil
+        apiClient?.getDeviceById(deviceId: deviceId, responseHandler: { deviceResponse in
+            XCTAssertNotNil(deviceResponse)
+            device = deviceResponse
+            expectDeviceResponse.fulfill()
+        })
+        wait(for: [expectDeviceResponse], timeout: 3.0)
+        return device
+    }
+    // TODO: add testcase for integration test
+
+    /**
      Test update device
 
      - Note: This updates the device label and changes it back to its original label
@@ -211,6 +228,7 @@ class FunctionalTestCases: XCTestCase {
         }
         wait(for: [expectResponseWithUpdatedDevice], timeout: 3.0)
     }
+    // TODO: improve testcase by comparing sensor with sensor from getcustomerdeviceinfos
 
     /**
      Test getDeviceProfileInfos()
