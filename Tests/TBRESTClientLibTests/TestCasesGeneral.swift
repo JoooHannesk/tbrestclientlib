@@ -184,7 +184,7 @@ class FunctionalTestCases: XCTestCase {
         let expectResponseWithCustomerDeviceProfileInfos = XCTestExpectation(description: "Expected response containing tenants's Device Profile Info objects!")
         apiClient?.getDeviceProfileInfos() { deviceProfileInfos in
             if deviceProfileInfos.totalElements > 0 {
-                XCTAssertEqual(deviceProfileInfos[0]?.id.entityType, "DEVICE_PROFILE")
+                XCTAssertEqual(deviceProfileInfos[0]?.id.entityType, TbQueryEntityTypes.deviceProfile)
                 expectResponseWithCustomerDeviceProfileInfos.fulfill()
             }
             else {
@@ -210,7 +210,7 @@ class FunctionalTestCases: XCTestCase {
         apiClient?.getDeviceProfiles() { deviceProfiles in
             if deviceProfiles.totalElements > 0 {
                 // fulfill for received device profiles
-                XCTAssertEqual(deviceProfiles[0]?.id.entityType, "DEVICE_PROFILE")
+                XCTAssertEqual(deviceProfiles[0]?.id.entityType, TbQueryEntityTypes.device)
                 expectedResponseWithCustomerDeviceProfiles.fulfill()
             }
             else {

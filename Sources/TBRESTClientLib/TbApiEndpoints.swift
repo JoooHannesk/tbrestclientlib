@@ -144,13 +144,14 @@ public enum TbQueryEntityScopes: String {
     case any = "ANY"
 }
 
-public enum TbQueryEntityTypes: String {
+public enum TbQueryEntityTypes: String, Codable, Sendable {
     case tenant = "TENANT"
     case customer = "CUSTOMER"
     case user = "USER"
     case dahsboard = "DASHBOARD"
     case asset = "ASSET"
     case device = "DEVICE"
+    case deviceProfile = "DEVICE_PROFILE"
     case alarm = "ALARM"
     case entitiyView = "ENTITY_VIEW"
 }

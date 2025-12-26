@@ -206,7 +206,22 @@ public struct DeviceProfileInfo: TBDataModel {
 
 public struct ID: TBDataModel, Hashable {
     public let id: String
-    public let entityType: String
+    public let entityType: TbQueryEntityTypes
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(String.self, forKey: .id)
+        self.entityType = try container.decode(TbQueryEntityTypes.self, forKey: .entityType)
+    }
+
+    public init(id: String, entityType: TbQueryEntityTypes) {
+        self.id = id
+        self.entityType = entityType
+    }
+
+    public func getAsDict() -> [String: String] {
+        ["id": id, "entityType": entityType.rawValue]
+    }
 }
 
 public struct AdditionalInfo: TBDataModel {
