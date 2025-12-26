@@ -105,7 +105,7 @@ final class IntegrationTests: FunctionalTestCases {
         getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
         getCustomerDevices(apiClient: tbTestClient)
     }
-    
+
     /**
      Test getCustomerDeviceInfos()
      */
@@ -116,7 +116,17 @@ final class IntegrationTests: FunctionalTestCases {
         getCustomerDevices(apiClient: tbTestClient)
         getCustomerDeviceInfos(apiClient: tbTestClient)
     }
-    
+
+    /**
+     Test updateDeviceLabel()
+     */
+    func testUpdateDeviceLabel() {
+        let (tbTestClient, serversettings) = prepare()
+        loginSucceeds(apiClient: tbTestClient)
+        getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        updateDeviceLabel(apiClient: tbTestClient)
+    }
+
     /**
      Test getDeviceProfileInfos()
      */

@@ -40,7 +40,7 @@ struct TbAPIEndpointsV1: SupportedTbAPIEndpoints {
     public let getCustomerById = "/api/customer/{?customerId?}"
     public let getCustomerDevices = "/api/customer/{?customerId?}/devices"
     public let getCustomerDeviceInfos = "/api/customer/{?customerId?}/deviceInfos"
-    public let saveDevice = "/api/device{?accessToken}"
+    public let saveDevice = "/api/device{?accessToken?}"
     public let getDeviceProfileInfos =  "/api/deviceProfileInfos"
     public let getDeviceProfiles = "/api/deviceProfiles"
     public let getAttributeKeys = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/keys/attributes"

@@ -159,8 +159,8 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter customerId: A string value representing the customer id
      - Parameter responseHandler: takes a ``Customer`` as parameter and is called upon successful retrieval of the customer information
      */
-    public func getCustomerById(customerId: String, responseHandler: ((Customer) -> Void)? = nil) -> Void {
-        let endpointURL = aem.getEndpointURL(\.getCustomerById, replacePaths: [URLModifier(searchString: "{?customerId?}", replaceString: customerId)])
+    public func getCustomerById(customerId: UUID, responseHandler: ((Customer) -> Void)? = nil) -> Void {
+        let endpointURL = aem.getEndpointURL(\.getCustomerById, replacePaths: [URLModifier(searchString: "{?customerId?}", replaceString: customerId.uuidString)])
         tbApiRequest(fromEndpoint: endpointURL,
                      usingMethod: .get,
                      authToken: self.authData,
@@ -175,7 +175,7 @@ public class TBUserApiClient: TBHTTPRequest {
      
      Receives a page of devices assigned to the customer (by ID). Specify parameters to filter the results, which are wrapped inside a PageData object that
      allows to iterate over the result set using pagination.
-     - Parameter customerId: A string value representing the customer id
+     - Parameter customerId: A UUID value representing the customer id
      - Parameter pageSize: Maximum amount of entities in a one page
      - Parameter page: Sequence number of page starting from 0
      - Parameter type: Device type as the name of the device profile
@@ -185,7 +185,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter responseHandler: takes a 'PageDataContainer<Device>' as parameter and is called upon successful server response
      - Note: for supported data models as parameters see: TbDataModels.swift
      */
-    public func getCustomerDevices(customerId: String,
+    public func getCustomerDevices(customerId: UUID,
                             pageSize: Int32 = Int32.max,
                             page: Int32 = 0,
                             type: String? = nil,
@@ -195,7 +195,7 @@ public class TBUserApiClient: TBHTTPRequest {
                             responseHandler: ((PaginationDataContainer<Device>) -> Void)?)
     -> Void {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getCustomerDevices,
-                                                                replacePaths: [URLModifier(searchString: "{?customerId?}", replaceString: customerId)],
+                                                                replacePaths: [URLModifier(searchString: "{?customerId?}", replaceString: customerId.uuidString)],
                                                                 pageSize: pageSize, page: page, type: type,
                                                                 textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
@@ -222,7 +222,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter responseHandler: takes a 'PageDataContainer<Device>' as parameter and is called upon successful server response
      - Note: for supported data models as parameters see: `TbDataModels.swift`
      */
-    public func getCustomerDeviceInfos(customerId: String,
+    public func getCustomerDeviceInfos(customerId: UUID,
                                 pageSize: Int32 = Int32.max,
                                 page: Int32 = 0,
                                 type: String? = nil,
@@ -234,7 +234,7 @@ public class TBUserApiClient: TBHTTPRequest {
                                 responseHandler: ((PaginationDataContainer<Device>) -> Void)?)
     -> Void {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getCustomerDeviceInfos,
-                                                                replacePaths: [URLModifier(searchString: "{?customerId?}", replaceString: customerId)],
+                                                                replacePaths: [URLModifier(searchString: "{?customerId?}", replaceString: customerId.uuidString)],
                                                                 pageSize: pageSize, page: page, type: type,
                                                                 deviceProfileId: deviceProfileId,
                                                                 active: active, textSearch: textSearch,
@@ -244,6 +244,8 @@ public class TBUserApiClient: TBHTTPRequest {
             responseHandler?(responseObject as! PaginationDataContainer<Device>)
         }
     }
+
+    // TODO: add getDeviceById
 
     /**
      Create a new device or update an existing one – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
@@ -266,7 +268,8 @@ public class TBUserApiClient: TBHTTPRequest {
                            deviceProfileId: UUID? = nil,
                            tenantId: UUID? = nil,
                            customerId: UUID? = nil,
-                           accessToken: String? = nil) {
+                           accessToken: String = "",
+                           responseHandler: ((Device) -> Void)?) {
         var deviceData = Dictionary<String, Any>()
 
         deviceData["name"] = name
@@ -274,11 +277,25 @@ public class TBUserApiClient: TBHTTPRequest {
         if let deviceProfileName = deviceProfileName { deviceData["deviceProfileName"] = deviceProfileName }
 
         if let deviceId = deviceId {
-            deviceData["id"] = ID(id: deviceId.uuidString, entityType: .device).getAsDict()
+            deviceData["id"] = ID(id: deviceId, entityType: .device).getAsDict()
         }
 
         if let deviceProfileId = deviceProfileId {
-            deviceData["deviceProfileId"] = deviceProfileId
+            deviceData["deviceProfileId"] = ID(id: deviceProfileId, entityType: .deviceProfile).getAsDict()
+        }
+
+        if let tenantId = tenantId {
+            deviceData["tenantId"] = ID(id: tenantId, entityType: .tenant).getAsDict()
+        }
+        
+        if let customerId = customerId {
+            deviceData["customerId"] = ID(id: customerId, entityType: .customer).getAsDict()
+        }
+
+        let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.saveDevice,
+                                                                replacePaths: [URLModifier(searchString: "{?accessToken?}", replaceString: accessToken)])
+        tbApiRequest(fromEndpoint: endpointURL, withPayload: deviceData, authToken: self.authData, expectedTBResponseType: Device.self) { device -> Void in
+            responseHandler?(device as! Device)
         }
     }
 
@@ -357,11 +374,11 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter responseHandler: takes an 'Array<String>' as parameter and is called upon successful server response
      - Note: The response includes merged key names for all scopes (supported scopes: ``TbQueryEntityScopes``).
      */
-    public func getAttributeKeys(for entityType: TbQueryEntityTypes, entityId: String, responseHandler: ((Array<String>) -> Void)?)
+    public func getAttributeKeys(for entityType: TbQueryEntityTypes, entityId: UUID, responseHandler: ((Array<String>) -> Void)?)
     -> Void {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getAttributeKeys, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
-            URLModifier(searchString: "{?entityId?}", replaceString: entityId)
+            URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString)
         ])
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
                      authToken: self.authData, expectedTBResponseType: Array<String>.self) { responseObject -> Void in
@@ -379,12 +396,12 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter responseHandler: takes an 'Array<String>' as parameter and is called upon successful server response
      - Note: The response includes key names for requested scope.
      */
-    public func getAttributeKeysByScope(for entityType: TbQueryEntityTypes, entityId: String,
+    public func getAttributeKeysByScope(for entityType: TbQueryEntityTypes, entityId: UUID,
                                         scope: TbQueryEntityScopes, responseHandler: ((Array<String>) -> Void)?)
     -> Void {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getAttributeKeysByScope, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
-            URLModifier(searchString: "{?entityId?}", replaceString: entityId),
+            URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString),
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ])
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
@@ -404,12 +421,12 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter responseHandler: takes no parameters and is called upon successful server response
      - Note: Attribute scopes depend on the entity type: .server - supported for all entity; .shared - supported for devices
      */
-    public func saveEntityAttributes(for entityType: TbQueryEntityTypes, entityId: String, attributesData:  Dictionary<String, Any>,
+    public func saveEntityAttributes(for entityType: TbQueryEntityTypes, entityId: UUID, attributesData:  Dictionary<String, Any>,
                                      scope: TbQueryEntityScopes, responseHandler: (() -> Void)? = nil)
     -> Void {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.saveEntityAttributes, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
-            URLModifier(searchString: "{?entityId?}", replaceString: entityId),
+            URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString),
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ])
         tbApiRequest(fromEndpoint: endpointURL, withPayload: attributesData,
@@ -426,10 +443,10 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter keys: array of strings containing the keys
      - Parameter responseHandler: takes an array containing items of type ``AttributesResponse``
      */
-    public func getAttributes(for entityType: TbQueryEntityTypes, entityId: String, keys: [String] = [], responseHandler: (([AttributesResponse]) -> Void)?) {
+    public func getAttributes(for entityType: TbQueryEntityTypes, entityId: UUID, keys: [String] = [], responseHandler: (([AttributesResponse]) -> Void)?) {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getAttributes, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
-            URLModifier(searchString: "{?entityId?}", replaceString: entityId)
+            URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString)
         ], keys: keys)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, authToken: self.authData, expectedTBResponseType: [AttributesResponse].self) { responseObject in
             responseHandler?(responseObject as! [AttributesResponse])
@@ -445,10 +462,10 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter scope: scope in which the attribute is managed as defined in ``TbQueryEntityScopes``
      - Parameter responseHandler: takes an array containing items of type ``AttributesResponse``
      */
-    public func getAttributesByScope(for entityType: TbQueryEntityTypes, entityId: String, keys: [String] = [], scope: TbQueryEntityScopes, responseHandler: (([AttributesResponse]) -> Void)?) {
+    public func getAttributesByScope(for entityType: TbQueryEntityTypes, entityId: UUID, keys: [String] = [], scope: TbQueryEntityScopes, responseHandler: (([AttributesResponse]) -> Void)?) {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getAttributesByScope, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
-            URLModifier(searchString: "{?entityId?}", replaceString: entityId),
+            URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString),
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ], keys: keys)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, authToken: self.authData, expectedTBResponseType: [AttributesResponse].self) { responseObject in
@@ -465,10 +482,10 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter scope: scope in which the attribute is managed as defined in ``TbQueryEntityScopes``
      - Parameter responseHandler: takes no parameters, is called on success
      */
-    public func deleteEntityAttributes(for entityType: TbQueryEntityTypes, entityId: String, keys: [String], scope: TbQueryEntityScopes, responseHandler: (() -> Void)? = nil) {
+    public func deleteEntityAttributes(for entityType: TbQueryEntityTypes, entityId: UUID, keys: [String], scope: TbQueryEntityScopes, responseHandler: (() -> Void)? = nil) {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.deleteEntityAttributes, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
-            URLModifier(searchString: "{?entityId?}", replaceString: entityId),
+            URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString),
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ], keys: keys)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete, authToken: self.authData, expectedTBResponseType: [String].self) { _ in
@@ -487,10 +504,10 @@ public class TBUserApiClient: TBHTTPRequest {
      This limitation is accepted, as the main scope of this library is not to mimic client device functionality. In principle, this function
      may be used to push mass-data to the server – which results in repetitive function-calls leading to repetitive http requests.
      */
-    public func saveEntityTelemetry(for entityType: TbQueryEntityTypes, entityId: String, timeseriesData: Dictionary<String, Any>, responseHandler: (() -> Void)? = nil) {
+    public func saveEntityTelemetry(for entityType: TbQueryEntityTypes, entityId: UUID, timeseriesData: Dictionary<String, Any>, responseHandler: (() -> Void)? = nil) {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.saveEntityTelemetry, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
-            URLModifier(searchString: "{?entityId?}", replaceString: entityId),
+            URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString),
             URLModifier(searchString: "{?scope?}", replaceString: TbQueryEntityScopes.any.rawValue)
         ])
         tbApiRequest(fromEndpoint: endpointURL, withPayload: timeseriesData,
@@ -506,11 +523,11 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter entityId: entitiy id
      - Parameter responseHandler: takes an 'Array<String>' as parameter and is called upon successful server response
      */
-    public func getTimeseriesKeys(for entityType: TbQueryEntityTypes, entityId: String, responseHandler: ((Array<String>) -> Void)?)
+    public func getTimeseriesKeys(for entityType: TbQueryEntityTypes, entityId: UUID, responseHandler: ((Array<String>) -> Void)?)
     -> Void {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getTimeseriesKeys, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
-            URLModifier(searchString: "{?entityId?}", replaceString: entityId)
+            URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString)
         ])
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
                      authToken: self.authData, expectedTBResponseType: Array<String>.self) { responseObject -> Void in
@@ -532,11 +549,11 @@ public class TBUserApiClient: TBHTTPRequest {
      JSON-String values cannot be treated by this library as native datatypes currently and should therefore be retrieved as strings. To get the value from a ``TimeseriesResponse`` object, refer to
      ``TimeseriesResponse/value`` and ``MplValueType``.
      */
-    public func getLatestTimeseries(for entityType: TbQueryEntityTypes, entityId: String, keys: Array<String>? = nil,
+    public func getLatestTimeseries(for entityType: TbQueryEntityTypes, entityId: UUID, keys: Array<String>? = nil,
                                     getValuesAsStrings: Bool = true, responseHandler: ((Dictionary<String, TimeseriesResponse?>) -> Void)?) {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getTimeseries, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
-            URLModifier(searchString: "{?entityId?}", replaceString: entityId)],
+            URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString)],
                                                                 keys: keys, useStrictDataTypes: !getValuesAsStrings)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
                      authToken: self.authData, expectedTBResponseType: Dictionary<String, [TimeseriesResponse]>.self) { responseObject -> Void in
@@ -567,14 +584,14 @@ public class TBUserApiClient: TBHTTPRequest {
      JSON-String values cannot be treated by this library as native datatype currently and should therefore be retrieved as strings. To get the value from a ``TimeseriesResponse`` object, refer to
      ``TimeseriesResponse/value`` and ``MplValueType``.
      */
-    public func getTimeseries(for entityType: TbQueryEntityTypes, entityId: String, keys: Array<String>, startTs: Int64, endTs: Int64,
+    public func getTimeseries(for entityType: TbQueryEntityTypes, entityId: UUID, keys: Array<String>, startTs: Int64, endTs: Int64,
                               intervalType: TbQueryIntervalTypes? = nil, interval: Int64? = nil, timeZone: String? = nil,
                               limit: Int? = nil, aggregation: TbQueryAggregationOptions = .none, sortOrder: TbQuerySortOrder = .ascending,
                               getValuesAsStrings: Bool = true, responseHandler: ((Dictionary<String, [TimeseriesResponse]>) -> Void)?) {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getTimeseries,
                                                                 replacePaths: [
                                                                     URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
-                                                                    URLModifier(searchString: "{?entityId?}", replaceString: entityId)
+                                                                    URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString)
                                                                 ],
                                                                 keys: keys, startTs: startTs, endTs: endTs,
                                                                 intervalType: intervalType, interval: interval,
@@ -602,7 +619,7 @@ public class TBUserApiClient: TBHTTPRequest {
      the replacement value will be fetched from the 'time-series' table, and its timestamp will be the most recent one before the defined time-range
      - Parameter responseHandler: takes no parameters and is called upon successful server response
      */
-    public func deleteEntityTimeseries(for entityType: TbQueryEntityTypes, entityId: String, keys: [String],
+    public func deleteEntityTimeseries(for entityType: TbQueryEntityTypes, entityId: UUID, keys: [String],
                                        deleteAllDataForKeys: Bool? = nil,
                                        startTs: Int64? = nil, endTs: Int64? = nil,
                                        deleteLatest: Bool? = nil, rewriteLatestIfDeleted: Bool? = nil,
@@ -610,7 +627,7 @@ public class TBUserApiClient: TBHTTPRequest {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.deleteEntityTimeseries,
                                                                 replacePaths: [
                                                                     URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
-                                                                    URLModifier(searchString: "{?entityId?}", replaceString: entityId)
+                                                                    URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString)
                                                                 ],
                                                                 keys: keys, deleteAllDataForKeys: deleteAllDataForKeys, startTs: startTs, endTs: endTs,
                                                                 deleteLatest: deleteLatest, rewriteLatestIfDeleted: rewriteLatestIfDeleted)

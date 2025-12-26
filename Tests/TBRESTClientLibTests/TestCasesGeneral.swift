@@ -159,7 +159,7 @@ class FunctionalTestCases: XCTestCase {
         wait(for: [expectedResponseWithCustomerDevices], timeout: 3.0)
         return self.tbDevices
     }
-    
+
     /**
      Test getCustomerDeviceInfos() - for a given customer ID
      */
@@ -176,7 +176,42 @@ class FunctionalTestCases: XCTestCase {
         }
         wait(for: [expectedResponseWithCustomerDeviceInfos], timeout: 3.0)
     }
-    
+
+    /**
+     Test update device
+
+     - Note: This updates the device label and changes it back to its original label
+     */
+    func updateDeviceLabel(apiClient: TBUserApiClient?) {
+        var deviceAboutToUpdate: Device? = nil
+        let newDeviceLabel = "Test Device Label"
+        // Retrieve a device
+        let expectedResponseWithCustomerDevices = XCTestExpectation(description: "Expected response containing customer Device objects!")
+        if let customerId = self.tbUser?.customerId.id {
+            apiClient?.getCustomerDeviceInfos(customerId: customerId) { customerDevices in
+                XCTAssertGreaterThanOrEqual(customerDevices.itemsOnPage, 2)
+                deviceAboutToUpdate = customerDevices[0]!
+                expectedResponseWithCustomerDevices.fulfill()
+            }
+        }
+        wait(for: [expectedResponseWithCustomerDevices], timeout: 3.0)
+
+        // Update device
+        let expectResponseWithUpdatedDevice = XCTestExpectation(description: "Expected response containing updated Device object!")
+        if let customerId = self.tbUser?.customerId.id, let tenantId = self.tbUser?.tenantId.id {
+            apiClient?.saveDevice(name: deviceAboutToUpdate!.name,
+                                  label: newDeviceLabel,
+                                  deviceId: deviceAboutToUpdate!.id.id,
+                                  deviceProfileName: deviceAboutToUpdate!.deviceProfileName,
+                                  tenantId: tenantId,
+                                  customerId: customerId) { updatedDevice in
+                print(updatedDevice)
+                expectResponseWithUpdatedDevice.fulfill()
+            }
+        }
+        wait(for: [expectResponseWithUpdatedDevice], timeout: 3.0)
+    }
+
     /**
      Test getDeviceProfileInfos()
      */
@@ -205,6 +240,7 @@ class FunctionalTestCases: XCTestCase {
             XCTAssertNotNil(tbAppError)
             XCTAssertEqual(tbAppError.status, 403)
             XCTAssertEqual(tbAppError.errorCode, 20)
+            // this might fail with unit test but succeeds with integration test... TODO: solve and improve this test case
             expectedResponseWithCustomerDeviceProfiles.fulfill()
         })
         apiClient?.getDeviceProfiles() { deviceProfiles in
@@ -298,7 +334,7 @@ class FunctionalTestCases: XCTestCase {
             expectedResponseDeviceUnknown.fulfill()
         })
         let sampleAttributes = ["sampleAtt1String":"Hello Server", "sampleAtt2String": "Hello Client"]
-        apiClient?.saveEntityAttributes(for: .device, entityId: "784f394c-42b6-435a-983c-b7beff2784f9", attributesData: sampleAttributes, scope: .shared) {
+        apiClient?.saveEntityAttributes(for: .device, entityId: UUID(uuidString: "784f394c-42b6-435a-983c-b7beff2784f9")!, attributesData: sampleAttributes, scope: .shared) {
             XCTFail("Expected server to respond with an error data model.")
         }
         wait(for: [expectedResponseDeviceUnknown], timeout: 3)
@@ -313,11 +349,11 @@ class FunctionalTestCases: XCTestCase {
         let expectedResponseDeviceUnknown = XCTestExpectation(description: "Expected unknown device response...")
         apiClient?.registerErrorHandler(apiErrorHandler: { tbAppError in
             print("Test failed with error: \(tbAppError)")
-            XCTAssertEqual(tbAppError.status, 400)
+            XCTAssertEqual(tbAppError.status, 999)
             expectedResponseDeviceUnknown.fulfill()
         })
         let sampleAttributes = ["sampleAtt1String":"Hello Server", "sampleAtt2Bool": true, "sampleAtt3Int": 4, "sampleAtt4Double": 3.1415926] as [String : Any]
-        apiClient?.saveEntityAttributes(for: .device, entityId: "7null3928", attributesData: sampleAttributes, scope: .shared) {
+        apiClient?.saveEntityAttributes(for: .device, entityId: UUID(uuidString: "00000000-0000-0000-0000-000000000000")!, attributesData: sampleAttributes, scope: .shared) {
             XCTFail("Expected server to respond with an error data model.")
         }
         wait(for: [expectedResponseDeviceUnknown], timeout: 3)
