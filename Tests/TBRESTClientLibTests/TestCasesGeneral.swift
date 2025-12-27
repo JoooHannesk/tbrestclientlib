@@ -163,18 +163,22 @@ class FunctionalTestCases: XCTestCase {
     /**
      Test getCustomerDeviceInfos() - for a given customer ID
      */
-    func getCustomerDeviceInfos(apiClient: TBUserApiClient?) {
+    @discardableResult
+    func getCustomerDeviceInfos(apiClient: TBUserApiClient?) -> Array<Device>? {
         let expectedResponseWithCustomerDeviceInfos = XCTestExpectation(description: "Expected response containing customer's DeviceInfo objects!")
+        var deviceInfos: [Device] = []
         if let customerId = self.tbUser?.customerId.id, let tenantId = self.tbUser?.tenantId.id {
             apiClient?.getCustomerDeviceInfos(customerId: customerId) { customerDevices in
                 XCTAssertGreaterThanOrEqual(customerDevices.totalElements, 1)
                 XCTAssertEqual(customerDevices[0]?.customerId.id , customerId)
                 XCTAssertEqual(customerDevices[0]?.tenantId.id , tenantId)
                 XCTAssertEqual(customerDevices[0]?.type , self.tbDevice?.type)
+                deviceInfos = customerDevices.getItemsInsideArray()!
                 expectedResponseWithCustomerDeviceInfos.fulfill()
             }
         }
         wait(for: [expectedResponseWithCustomerDeviceInfos], timeout: 3.0)
+        return deviceInfos
     }
 
     /**
@@ -192,7 +196,6 @@ class FunctionalTestCases: XCTestCase {
         wait(for: [expectDeviceResponse], timeout: 3.0)
         return device
     }
-    // TODO: add testcase for integration test
 
     /**
      Test update device

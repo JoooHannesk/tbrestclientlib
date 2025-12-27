@@ -247,5 +247,3 @@ final class UnitTests: FunctionalTestCases {
     }
     
 }
-
-// TODO: improve client implementation for different http status codes

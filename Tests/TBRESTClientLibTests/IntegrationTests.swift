@@ -118,6 +118,27 @@ final class IntegrationTests: FunctionalTestCases {
     }
 
     /**
+     Test testGetDeviceById()
+     */
+    func testGetDeviceById() {
+        var deviceOfInterest: Device? = nil
+        let (tbTestClient, serversettings) = prepare()
+        loginSucceeds(apiClient: tbTestClient)
+        getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        // 1. Get all devices for customer, select the first
+        let firstDevice = getCustomerDevices(apiClient: tbTestClient)?.first
+        XCTAssertNotNil(firstDevice)
+        if let firstDevice = firstDevice {
+        // 2. Request specific device (test the function which is of interest for this specific test case)
+            deviceOfInterest = getDeviceById(apiClient: tbTestClient, deviceId: firstDevice.id.id)
+        }
+        else {
+            XCTFail("No device available! Aborting!")
+        }
+        XCTAssertEqual(firstDevice, deviceOfInterest)
+    }
+
+    /**
      Test updateDeviceLabel()
      */
     func testUpdateDeviceLabel() {
