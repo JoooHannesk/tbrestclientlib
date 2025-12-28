@@ -46,6 +46,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter baseUrlStr: server url as utf8 string without trailing slash (no API endpoint, just base server URL)
      - Parameter accessToken: AuthLogin object containing `token` and `refreshToken`
      - Parameter apiEndpointVersion: API version, currently only .v1 supported because no other version is currently implemented.
+     - Parameter httpSessionHandler: HTTP session handler, defaults `URLSession.shared`
      - Parameter logger: Logger (from OSLog) instance (optional)
      - Note: Re-use tokens from an existing/previous session instead of optaining new ones from the server.
      */
@@ -256,6 +257,26 @@ public class TBUserApiClient: TBHTTPRequest {
      */
     public func getDeviceById(deviceId: UUID, responseHandler: ((Device) -> Void)?) {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getDeviceById,
+                                                                replacePaths: [URLModifier(searchString: "{?deviceId?}", replaceString: deviceId.uuidString)])
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, authToken: self.authData, expectedTBResponseType: Device.self) { device -> Void in
+            responseHandler?(device as! Device)
+        }
+    }
+
+    /**
+     Get device info by ID – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+
+     Before returning the device info object, the server checks if the device belongs to the tenant or customer (depending
+     whether the request comes from a TENANT\_ADMIN' or 'CUSTOMER\_USER').
+
+     - Parameters deviceId: device id as UUID
+     - Parameters responseHandler: optional callable taking the new device object as a parameter, will only be called in case the API call succeeds
+     - Note: To maintain a consistent interface, this library uses the ``Device`` type for both standard device data and extended *Device Info* results. Rather
+     than using two separate models, extended fields (such as `customerTitle` and `deviceProfileName`) are integrated directly into the `Device` object.
+     Please note that these extended fields will be *nil* when using standard API endpoints; they are only populated when performing specific *DeviceInfo* requests.
+     */
+    public func getDeviceInfoById(deviceId: UUID, responseHandler: ((Device) -> Void)?) {
+        let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getDeviceInfoById,
                                                                 replacePaths: [URLModifier(searchString: "{?deviceId?}", replaceString: deviceId.uuidString)])
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, authToken: self.authData, expectedTBResponseType: Device.self) { device -> Void in
             responseHandler?(device as! Device)

@@ -165,11 +165,13 @@ class FunctionalTestCases: XCTestCase {
      */
     @discardableResult
     func getCustomerDeviceInfos(apiClient: TBUserApiClient?) -> Array<Device>? {
+        self.getCustomerDevices(apiClient: apiClient)
         let expectedResponseWithCustomerDeviceInfos = XCTestExpectation(description: "Expected response containing customer's DeviceInfo objects!")
         var deviceInfos: [Device] = []
         if let customerId = self.tbUser?.customerId.id, let tenantId = self.tbUser?.tenantId.id {
             apiClient?.getCustomerDeviceInfos(customerId: customerId) { customerDevices in
                 XCTAssertGreaterThanOrEqual(customerDevices.totalElements, 1)
+                XCTAssertEqual(customerDevices[0]?.id , self.tbDevice?.id)
                 XCTAssertEqual(customerDevices[0]?.customerId.id , customerId)
                 XCTAssertEqual(customerDevices[0]?.tenantId.id , tenantId)
                 XCTAssertEqual(customerDevices[0]?.type , self.tbDevice?.type)
@@ -189,6 +191,22 @@ class FunctionalTestCases: XCTestCase {
         let expectDeviceResponse: XCTestExpectation = XCTestExpectation(description: "Expected response containing a Device object!")
         var device: Device? = nil
         apiClient?.getDeviceById(deviceId: deviceId, responseHandler: { deviceResponse in
+            XCTAssertNotNil(deviceResponse)
+            device = deviceResponse
+            expectDeviceResponse.fulfill()
+        })
+        wait(for: [expectDeviceResponse], timeout: 3.0)
+        return device
+    }
+
+    /**
+     Test getDeviceById() - for a given device ID
+     */
+    @discardableResult
+    func getDeviceInfoById(apiClient: TBUserApiClient?, deviceId: UUID) -> Device? {
+        let expectDeviceResponse: XCTestExpectation = XCTestExpectation(description: "Expected response containing a Device object!")
+        var device: Device? = nil
+        apiClient?.getDeviceInfoById(deviceId: deviceId, responseHandler: { deviceResponse in
             XCTAssertNotNil(deviceResponse)
             device = deviceResponse
             expectDeviceResponse.fulfill()
