@@ -24,3 +24,4 @@ DerivedData/
 
 # Project specific exclusions
 Tests/TBRESTClientLibTests/Resources/ServerSettings.json
+Tests/TBRESTClientLibTests/Resources/ServerSettingsAdmin.json
