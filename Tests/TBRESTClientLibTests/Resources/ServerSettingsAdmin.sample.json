@@ -1,0 +1,5 @@
+{
+    "baseUrl": "https://my-tb-instance.com",
+    "username": "user@example.com",
+    "password": "mysupersecretpassword"
+}

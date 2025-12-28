@@ -237,6 +237,37 @@ class FunctionalTestCases: XCTestCase {
     }
 
     /**
+     Test create device
+
+     Create a new device
+     */
+    func createNewDeviceForCustomer(apiClient: TBUserApiClient?, name: String, label: String) -> Device? {
+        let expectedResponseWithNewCustomerDevice = XCTestExpectation(description: "Expected response containing customer's new device object!")
+        var device: Device? = nil
+        if let tenantId = self.tbUser?.tenantId.id {
+            apiClient?.saveDevice(name: name, label: label, tenantId: tenantId) { newCustomerDevice in
+                device = newCustomerDevice
+                expectedResponseWithNewCustomerDevice.fulfill()
+            }
+        }
+        wait(for: [expectedResponseWithNewCustomerDevice], timeout: 3.0)
+        return device
+    }
+
+    /**
+     Delete device
+
+     Delete existing device for given device id
+     */
+    func deleteDevice(apiClient: TBUserApiClient?, deviceId: UUID) {
+        let expectedEmptyResponse = XCTestExpectation(description: "Expected empty response, no error message")
+        apiClient?.deleteDevice(deviceId: deviceId, ) {
+            expectedEmptyResponse.fulfill()
+        }
+        wait(for: [expectedEmptyResponse], timeout: 3.0)
+    }
+
+    /**
      Test getDeviceProfileInfos()
      */
     func getDeviceProfileInfos(apiClient: TBUserApiClient?) {
@@ -270,7 +301,7 @@ class FunctionalTestCases: XCTestCase {
         apiClient?.getDeviceProfiles() { deviceProfiles in
             if deviceProfiles.totalElements > 0 {
                 // fulfill for received device profiles
-                XCTAssertEqual(deviceProfiles[0]?.id.entityType, TbQueryEntityTypes.device)
+                XCTAssertEqual(deviceProfiles[0]?.id.entityType, TbQueryEntityTypes.deviceProfile)
                 expectedResponseWithCustomerDeviceProfiles.fulfill()
             }
             else {

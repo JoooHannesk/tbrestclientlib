@@ -10,10 +10,15 @@ import XCTest
 import OSLog
 @testable import TBRESTClientLib
 
+/**
+ Integration tests
+
+ All test cases can be run with `CUSTOMER\_USER` authority.
+ */
 final class IntegrationTests: FunctionalTestCases {
-    
+
     static let logger = Logger(subsystem: "TestBundle.TBRESTClientLibTests", category: "IntegrationTests")
-    
+
     func prepare() -> (TBUserApiClient?, ServerSettings?) {
         let serversettings = FileResourceLoader(searchPath: "Resources").loadServerSettingsFromFile(fileName: "ServerSettings")
         let tbTestClient = try? TBUserApiClient(baseUrlStr: serversettings!.baseUrl,
@@ -22,8 +27,8 @@ final class IntegrationTests: FunctionalTestCases {
                                                 logger: Self.logger)
         return (tbTestClient, serversettings)
     }
-    
-    
+
+
     /**
      Test login() - expect failure because of unknown host
      */
@@ -31,7 +36,7 @@ final class IntegrationTests: FunctionalTestCases {
         let tbTestClient = try? TBUserApiClient(baseUrlStr: "https://localhorst", username: "user@example.com", password: "mysupersecretpassword", logger: Self.logger)
         loginFailsBecauseOfUnknownHost(apiClient: tbTestClient)
     }
-    
+
     /**
      Test login() - expect failure with "Bad Credentials"
      */
@@ -40,7 +45,7 @@ final class IntegrationTests: FunctionalTestCases {
         let tbTestClient = try? TBUserApiClient(baseUrlStr: serversettings!.baseUrl, username: "user@example.com", password: "mysupersecretpassword", logger: Self.logger)
         loginFails(apiClient: tbTestClient)
     }
-    
+
     /**
      Test login() - expect success
      */
@@ -49,7 +54,7 @@ final class IntegrationTests: FunctionalTestCases {
         let tbTestClient = prepare().0
         loginSucceeds(apiClient: tbTestClient)
     }
-    
+
     /**
      Test getAccessToken()
      */
@@ -59,7 +64,7 @@ final class IntegrationTests: FunctionalTestCases {
         let accessToken = tbTestClient!.getAccessToken()
         XCTAssertNotNil(accessToken)
     }
-    
+
     /**
      Test getUser() - expect correct response with own user info
      */
@@ -68,7 +73,7 @@ final class IntegrationTests: FunctionalTestCases {
         loginSucceeds(apiClient: tbTestClient)
         getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
     }
-    
+
     /**
      Test getCustomerById() - expect a valid `Customer` as response
      */
@@ -78,7 +83,7 @@ final class IntegrationTests: FunctionalTestCases {
         getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
         getCustomerById(apiClient: tbTestClient, expectedCustomerName: "IoT Playground")
     }
-    
+
     /**
      Test loginWithAccessToken()
      Test login with existing token from previous session
@@ -95,7 +100,7 @@ final class IntegrationTests: FunctionalTestCases {
         renewLogin(apiClient: newTbTestClient, username: serversettings!.username, password: serversettings!.password)
         compareDifferentAuthLogins(apiClientToken1: tbTestClient!.authData!, apiClientToken2: newTbTestClient!.authData!)
     }
-    
+
     /**
      Test getCustomerDevices()
      */
@@ -129,7 +134,7 @@ final class IntegrationTests: FunctionalTestCases {
         let firstDevice = getCustomerDevices(apiClient: tbTestClient)?.first
         XCTAssertNotNil(firstDevice)
         if let firstDevice = firstDevice {
-        // 2. Request specific device (test the function which is of interest for this specific test case)
+            // 2. Request specific device (test the function which is of interest for this specific test case)
             deviceOfInterest = getDeviceById(apiClient: tbTestClient, deviceId: firstDevice.id.id)
         }
         else {
@@ -151,7 +156,7 @@ final class IntegrationTests: FunctionalTestCases {
         let firstDevice = getCustomerDeviceInfos(apiClient: tbTestClient)?.first
         XCTAssertNotNil(firstDevice)
         if let firstDevice = firstDevice {
-        // 2. Request specific device (test the function which is of interest for this specific test case)
+            // 2. Request specific device (test the function which is of interest for this specific test case)
             deviceOfInterest = getDeviceInfoById(apiClient: tbTestClient, deviceId: firstDevice.id.id)
         }
         else {
@@ -198,16 +203,6 @@ final class IntegrationTests: FunctionalTestCases {
         let tbTestClient = prepare().0
         loginSucceeds(apiClient: tbTestClient)
         getDeviceProfileInfos(apiClient: tbTestClient)
-    }
-    
-    /**
-     Test getDeviceProfiles()
-     - Note: works with 'TENANT\_ADMIN' authority only!
-     */
-    func testGetDeviceProfiles() {
-        let tbTestClient = prepare().0
-        loginSucceeds(apiClient: tbTestClient)
-        getDeviceProfiles(apiClient: tbTestClient)
     }
     
     /**

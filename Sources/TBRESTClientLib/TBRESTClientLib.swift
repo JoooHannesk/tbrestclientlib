@@ -306,7 +306,7 @@ public class TBUserApiClient: TBHTTPRequest {
     public func saveDevice(name: String,
                            label: String? = nil,
                            deviceId: UUID? = nil,
-                           type: String?,
+                           type: String? = nil,
                            deviceProfileId: UUID? = nil,
                            tenantId: UUID? = nil,
                            customerId: UUID? = nil,
@@ -338,6 +338,22 @@ public class TBUserApiClient: TBHTTPRequest {
                                                                 replacePaths: [URLModifier(searchString: "{?accessToken?}", replaceString: accessToken)])
         tbApiRequest(fromEndpoint: endpointURL, withPayload: deviceData, authToken: self.authData, expectedTBResponseType: Device.self) { device -> Void in
             responseHandler?(device as! Device)
+        }
+    }
+
+    /**
+     Delete device – requires 'TENANT\_ADMIN' authority
+
+     Delete device for given device id. Delete device and all its relations.
+
+     - Parameters deviceId: device id as UUID
+     - Parameters responseHandler: optional callable called on success
+     */
+    public func deleteDevice(deviceId: UUID, responseHandler: (() -> Void)? = nil) {
+        let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.deleteDevice,
+                                                                replacePaths: [URLModifier(searchString: "{?deviceId?}", replaceString: deviceId.uuidString)])
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete, authToken: self.authData, expectedTBResponseType: [String].self) {_ in
+            responseHandler?()
         }
     }
 

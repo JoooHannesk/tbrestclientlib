@@ -15,6 +15,7 @@ protocol SupportedTbAPIEndpoints {
     var getDeviceById: String { get }
     var getDeviceInfoById: String { get }
     var saveDevice: String { get }
+    var deleteDevice: String { get }
     var getDeviceProfileInfos: String { get }
     var getDeviceProfiles: String { get }
     var getAttributeKeys: String { get }
@@ -45,6 +46,7 @@ struct TbAPIEndpointsV1: SupportedTbAPIEndpoints {
     public let getDeviceById = "/api/device/{?deviceId?}"
     public let getDeviceInfoById = "/api/device/info/{?deviceId?}"
     public let saveDevice = "/api/device{?accessToken?}"
+    public let deleteDevice = "/api/device/{?deviceId?}"
     public let getDeviceProfileInfos =  "/api/deviceProfileInfos"
     public let getDeviceProfiles = "/api/deviceProfiles"
     public let getAttributeKeys = "/api/plugins/telemetry/{?entityType?}/{?entityId?}/keys/attributes"
@@ -73,6 +75,7 @@ struct TbAPIEndpointsV2: SupportedTbAPIEndpoints {
     public let getDeviceById = ""
     public let getDeviceInfoById = ""
     public let saveDevice = ""
+    public let deleteDevice = ""
     public let getDeviceProfileInfos =  ""
     public let getDeviceProfiles = ""
     public let getAttributeKeys = ""
@@ -160,6 +163,7 @@ public enum TbQueryEntityTypes: String, Codable, Sendable {
     case deviceProfile = "DEVICE_PROFILE"
     case alarm = "ALARM"
     case entitiyView = "ENTITY_VIEW"
+    case ruleChain = "RULE_CHAIN"
 }
 
 // MARK: - URL Paths Modification

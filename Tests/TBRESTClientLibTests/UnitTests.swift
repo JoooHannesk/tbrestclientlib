@@ -163,15 +163,6 @@ final class UnitTests: FunctionalTestCases {
     }
     
     /**
-     Test `getDeviceProfiles()`
-     - Note: works with 'TENANT\_ADMIN' authority only!
-     */
-    func testGetDeviceProfiles() {
-        let tbTestClient = testableApiClient.getMockApiClient(expectedHTTPResponse: "GetDeviceProfiles", expectedHTTPStatusCode: 200)
-        getDeviceProfiles(apiClient: tbTestClient)
-    }
-    
-    /**
      Test `getAttributeKeys()`
      */
     func testGetAttributeKeys() {
