@@ -165,7 +165,6 @@ class FunctionalTestCases: XCTestCase {
      */
     @discardableResult
     func getCustomerDeviceInfos(apiClient: TBUserApiClient?) -> Array<Device>? {
-        self.getCustomerDevices(apiClient: apiClient)
         let expectedResponseWithCustomerDeviceInfos = XCTestExpectation(description: "Expected response containing customer's DeviceInfo objects!")
         var deviceInfos: [Device] = []
         if let customerId = self.tbUser?.customerId.id, let tenantId = self.tbUser?.tenantId.id {
@@ -220,36 +219,22 @@ class FunctionalTestCases: XCTestCase {
 
      - Note: This updates the device label and changes it back to its original label
      */
-    func updateDeviceLabel(apiClient: TBUserApiClient?) {
-        var deviceAboutToUpdate: Device? = nil
-        let newDeviceLabel = "Test Device Label"
-        // Retrieve a device
-        let expectedResponseWithCustomerDevices = XCTestExpectation(description: "Expected response containing customer Device objects!")
-        if let customerId = self.tbUser?.customerId.id {
-            apiClient?.getCustomerDeviceInfos(customerId: customerId) { customerDevices in
-                XCTAssertGreaterThanOrEqual(customerDevices.itemsOnPage, 2)
-                deviceAboutToUpdate = customerDevices[0]!
-                expectedResponseWithCustomerDevices.fulfill()
-            }
-        }
-        wait(for: [expectedResponseWithCustomerDevices], timeout: 3.0)
-
-        // Update device
+    func updateDeviceLabel(apiClient: TBUserApiClient?, device: Device, newLabelName: String) -> Device? {
         let expectResponseWithUpdatedDevice = XCTestExpectation(description: "Expected response containing updated Device object!")
-        if let customerId = self.tbUser?.customerId.id, let tenantId = self.tbUser?.tenantId.id {
-            apiClient?.saveDevice(name: deviceAboutToUpdate!.name,
-                                  label: newDeviceLabel,
-                                  deviceId: deviceAboutToUpdate!.id.id,
-                                  deviceProfileName: deviceAboutToUpdate!.deviceProfileName,
-                                  tenantId: tenantId,
-                                  customerId: customerId) { updatedDevice in
-                print(updatedDevice)
-                expectResponseWithUpdatedDevice.fulfill()
-            }
+        var updatedDevice: Device? = nil
+        apiClient?.saveDevice(name: device.name,
+                              label: newLabelName,
+                              deviceId: device.id.id,
+                              type: device.type,
+                              deviceProfileId: device.deviceProfileId.id,
+                              tenantId: device.tenantId.id,
+                              customerId: device.customerId.id) { newDevice in
+            updatedDevice = newDevice
+            expectResponseWithUpdatedDevice.fulfill()
         }
         wait(for: [expectResponseWithUpdatedDevice], timeout: 3.0)
+        return updatedDevice
     }
-    // TODO: improve testcase by comparing sensor with sensor from getcustomerdeviceinfos
 
     /**
      Test getDeviceProfileInfos()

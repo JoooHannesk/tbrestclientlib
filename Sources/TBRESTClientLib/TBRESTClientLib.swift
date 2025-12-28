@@ -306,7 +306,7 @@ public class TBUserApiClient: TBHTTPRequest {
     public func saveDevice(name: String,
                            label: String? = nil,
                            deviceId: UUID? = nil,
-                           deviceProfileName: String?,
+                           type: String?,
                            deviceProfileId: UUID? = nil,
                            tenantId: UUID? = nil,
                            customerId: UUID? = nil,
@@ -316,7 +316,7 @@ public class TBUserApiClient: TBHTTPRequest {
 
         deviceData["name"] = name
         if let label = label { deviceData["label"] = label }
-        if let deviceProfileName = deviceProfileName { deviceData["deviceProfileName"] = deviceProfileName }
+        if let type = type { deviceData["type"] = type }
 
         if let deviceId = deviceId {
             deviceData["id"] = ID(id: deviceId, entityType: .device).getAsDict()

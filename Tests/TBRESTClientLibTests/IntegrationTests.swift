@@ -146,6 +146,7 @@ final class IntegrationTests: FunctionalTestCases {
         let (tbTestClient, serversettings) = prepare()
         loginSucceeds(apiClient: tbTestClient)
         getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        self.getCustomerDevices(apiClient: tbTestClient)
         // 1. Get all devices for customer, select the first
         let firstDevice = getCustomerDeviceInfos(apiClient: tbTestClient)?.first
         XCTAssertNotNil(firstDevice)
@@ -161,12 +162,33 @@ final class IntegrationTests: FunctionalTestCases {
 
     /**
      Test updateDeviceLabel()
+
+     Test requires that devices have their lables not empty
      */
     func testUpdateDeviceLabel() {
+        var originalDeviceLabel = ""
+        var originalDevice: Device? = nil
+        let newDeviceLabel = "Test Device Label"
         let (tbTestClient, serversettings) = prepare()
         loginSucceeds(apiClient: tbTestClient)
         getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
-        updateDeviceLabel(apiClient: tbTestClient)
+        self.getCustomerDevices(apiClient: tbTestClient)
+        // Change label name to new label and compare
+        if let firstDevice = getCustomerDeviceInfos(apiClient: tbTestClient)?.first {
+            originalDeviceLabel = firstDevice.label!
+            originalDevice = updateDeviceLabel(apiClient: tbTestClient, device: firstDevice, newLabelName: newDeviceLabel)
+            XCTAssertEqual(originalDevice!.label, newDeviceLabel)
+        }
+        else {
+            XCTFail("No device found to test")
+        }
+        // Change label back to original value an compare
+        if let updatedDevice = updateDeviceLabel(apiClient: tbTestClient, device: originalDevice!, newLabelName: originalDeviceLabel) {
+            XCTAssertEqual(updatedDevice.label, originalDeviceLabel)
+        } else {
+            XCTFail("Failed to update device label to original value")
+        }
+
     }
 
     /**
