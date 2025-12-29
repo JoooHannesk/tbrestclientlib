@@ -76,5 +76,5 @@ For compatibility to specific ThingsBoard server versions, refer to [ThingsBoard
 * for contribution please refer to official documentation: [Contribution](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/developmentcontribution)
     
 ## 📑 Disclaimer
-This library is an independent implementation developed by [its author(s)](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/#Contact-the-authors) and is **not affiliated with, endorsed by, or officially associated with ThingsBoard Inc. in any way**. For further details [mail the author](mailto:mail@johanneskinzig.com) and/or refer to this library's [license](https://github.com/JoooHannesk/tbrestclientlib/blob/main/LICENSE.txt).
+This library is an independent implementation developed by [its author(s)](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/#📇-Contact-the-authors-and-Contribution) and is **not affiliated with, endorsed by, or officially associated with ThingsBoard Inc. in any way**. For further details [mail the author](mailto:mail@johanneskinzig.com) and/or refer to this library's [license](https://github.com/JoooHannesk/tbrestclientlib/blob/main/LICENSE.txt).
 
