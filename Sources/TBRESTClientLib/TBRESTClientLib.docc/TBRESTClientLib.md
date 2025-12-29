@@ -18,6 +18,7 @@ This library is **under active development** and is steadily expanding its cover
 * <doc:Usage/User-Profile>
 * <doc:Usage/Customer-Info>
 * <doc:Usage/Devices-and-device-profiles>
+* <doc:Usage/Add-Edit-and-Delete-devices>
 * <doc:Usage/Entity-attributes>
 * <doc:Usage/Entitiy-timeseries-data>
 
@@ -36,11 +37,11 @@ For a detailed overview of the properties supported by each response model, plea
 * 🏠 Library Home: [https://johanneskinzig.com/tbrestclientlib.html](https://johanneskinzig.com/tbrestclientlib.html)
 
 ## 💻 Requirements
-This library works with and was tested on:
+This client library works with and was tested on:
 * iOS >= 17.5
 * macOS >= 14.0
 
-Linux is currently unsupported due to an incompatibility in how this library uses `URLSession`. While a potential workaround exists, it has not been fully investigated or tested. Additionally, since version 0.0.11, *OSLog* is used for logging, which is also currently unsupported by Swift on Linux. (Both were added as a ToDo 😉)
+For compatibility to specific ThingsBoard server versions, refer to <doc:ThingsBoardServerCompatibility>
 
 ## 💾 Installation
 * Please refer to section: <doc:Installation>
@@ -65,3 +66,8 @@ Linux is currently unsupported due to an incompatibility in how this library use
 
 ## 📑 Disclaimer
 This library is an independent implementation developed by its author(s) - see below - and is **not affiliated with, endorsed by, or officially associated with ThingsBoard Inc. in any way**. For further details [mail the author](mailto:mail@johanneskinzig.com) and/or refer to this library's <doc:License>.
+
+## 📜 Misc
+Legal information (*Legal Notice* & *Privacy Policy*) applies solely to the operation of this documentation website; the documented software itself is governed by its respective licenses.
+* [Legal Notice](https://johanneskinzig.com/legal-notice.html)
+* [Privacy Policy](https://johanneskinzig.com/data-protection-notice-privacy-policy.html)

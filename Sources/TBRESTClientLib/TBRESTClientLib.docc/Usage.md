@@ -3,10 +3,11 @@ Detailed overview of the currently supported methods and data models used to com
 
 ## Initialization and Login (Authentication)
 A client object can be initialized in two different ways - and requires to provide login data. Either by username/password or access tokens retrieved by a previous session. The following initializers are implemented as failable and will do so, if their parameters are provided with an empty string.
-* ``TBUserApiClient/init(baseUrlStr:username:password:logger:)``: server url, authentication by username and password 
-* ``TBUserApiClient/init(baseUrlStr:accessToken:logger:)``: server url, authentication by access token retrieved from a previous session
+* ``TBUserApiClient/init(baseUrlStr:username:password:apiEndpointVersion:httpSessionHandler:logger:)``: server url, authentication by username and password 
+* ``TBUserApiClient/init(baseUrlStr:accessToken:apiEndpointVersion:httpSessionHandler:logger:)``: server url, authentication by access token retrieved from a previous session
 
-Since Version 0.0.11 both initializers support an (optional) `logger` parameter which takes an `Logger?` instance (from *OSLog*) as argument.
+Since version 0.0.11, both initializers support an optional `logger` parameter that accepts a Logger? instance from *OSLog*. In addition, the `apiEndpointVersion` parameter was introduced in version 0.0.19 to support future API versioning. It currently defaults to `.v1` but has no practical effect yet.
+
 ```swift
 import OSLog
 import TBRESTClientLib
@@ -128,13 +129,11 @@ self.myClient?.getUser() { userInfo in
 Types involved: ``User``
 
 ## Customer Info
-To get information about the customer a user belongs to, use ``TBUserApiClient/getCustomerById(customerId:responseHandler:)``
+Get information about the customer a user belongs to: ``TBUserApiClient/getCustomerById(customerId:responseHandler:)``
 ```swift
-let customerId: String = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-var customerInfo: Customer?
+let customerId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
 apiClient?.getCustomerById(customerId: customerId) { customer in
-    customerInfo = customer
-    print("\(self.customerInfo)")
+    print("\(customer)")
 ```
 Types involved: ``Customer``
 
@@ -143,14 +142,20 @@ Types involved: ``Customer``
 Working with devices and device profiles.
 
 ### Get devices and device infos
-Get devices and device infos for the customer the user belongs to. Response supports pagination. This is automatically neglected when using default arguments for function parameters, assuming a response with decent number of devices. ``TBUserApiClient/getCustomerDeviceInfos(customerId:pageSize:page:type:deviceProfileId:active:textSearch:sortProperty:sortOrder:responseHandler:)`` gives more flexibility compared to ``TBUserApiClient/getCustomerDevices(customerId:pageSize:page:type:textSearch:sortProperty:sortOrder:responseHandler:)``. To minimize complexity, return type is the same for both functions.
+Get devices and device infos for the customer the user belongs to. The response supports pagination which is automatically neglected when using default arguments for function parameters, assuming a response with just a few devices being returned.
+
+``TBUserApiClient/getCustomerDeviceInfos(customerId:pageSize:page:type:deviceProfileId:active:textSearch:sortProperty:sortOrder:responseHandler:)`` gives more flexibility compared to ``TBUserApiClient/getCustomerDevices(customerId:pageSize:page:type:textSearch:sortProperty:sortOrder:responseHandler:)``.
+
+To minimize complexity, the return type is ``Device`` for both functions. Refer to <doc:Usage/Note-on-Equality-Comparisons-Device-vs-DeviceInfo> for further information about extended info objects.
 
 #### getCustomerDeviceInfos()
+Get all devices which belong to a customer: ``TBUserApiClient/getCustomerDeviceInfos(customerId:pageSize:page:type:deviceProfileId:active:textSearch:sortProperty:sortOrder:responseHandler:)``. Please be aware that this library does not make a difference between `DeviceInfo` and ``Device`` objects. Refer to <doc:Usage/Note-on-Equality-Comparisons-Device-vs-DeviceInfo> for further information about extended info objects.
 ```swift
 var devices: [Device]! = []
 
 // picking up all devices assuming there are not hundreds/thousands - therefore omitting the use of proper pagination
-myClient?.getCustomerDeviceInfos(customerId: userInfo?.customerId.id ?? "") { tbDevicesPaginated in
+let customerId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+myClient?.getCustomerDeviceInfos(customerId: customerId) { tbDevicesPaginated in
     self.devices = tbDevicesPaginated.data
     print("\(self.devices)")
 }
@@ -158,12 +163,91 @@ myClient?.getCustomerDeviceInfos(customerId: userInfo?.customerId.id ?? "") { tb
 Types involved: ``PaginationDataContainer``, ``Device``
 
 #### getCustomerDevices()
+Get all devices which belong to a customer: ``TBUserApiClient/getCustomerDevices(customerId:pageSize:page:type:textSearch:sortProperty:sortOrder:responseHandler:)``. Please be aware that this library does not make a difference between `DeviceInfo` and ``Device`` objects. Refer to <doc:Usage/Note-on-Equality-Comparisons-Device-vs-DeviceInfo> for further information about extended info objects.
 ```swift
-myClient?.getCustomerDevices(customerId: userInfo?.customerId.id ?? "") { customerDevices in
+let customerId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+myClient?.getCustomerDevices(customerId: customerId) { customerDevices in
    print("\(customerDevices)")
 }
 ```
 Types involved: ``PaginationDataContainer``, ``Device``
+
+#### getDeviceById()
+Get device by device ID (`UUID`): ``TBUserApiClient/getDeviceById(deviceId:responseHandler:)``. Server responds with the found ``Device``, which is passed as an argument to the `responseHandler`.
+```swift
+let deviceId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+myClient?.getDeviceById(deviceId: deviceId) { device in
+    print("\(device)")
+})
+```
+Types involved ``Device``.
+
+#### getDeviceInfoById()
+Same as ``TBUserApiClient/getDeviceById(deviceId:responseHandler:)`` but returns ``Device`` with `DeviceInfo` members set.
+```swift
+let deviceId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+myClient?.getDeviceInfoById(deviceId: deviceId, responseHandler: { device in
+    print("\(device)")
+})
+```
+Types involved ``Device``.
+
+``TBUserApiClient/getDeviceInfoById(deviceId:responseHandler:)`` responds with extended `Device Info` data. To maintain a consistent interface, this library uses the ``Device`` type for both standard device data and extended *Device Info* results.
+
+Rather than using two separate models, extended fields (such as `customerTitle` and `deviceProfileName`) are integrated directly into the `Device` object.
+
+Please note that these extended fields will be *nil* when using standard API endpoints; they are only populated when performing specific *DeviceInfo* requests.
+
+#### Note on Equality Comparisons - Device vs. DeviceInfo
+The official ThingsBoard API distinguishes between API endpoints returning ``Device`` and `DeviceInfo` objects (e.g. using ``TBUserApiClient/getDeviceById(deviceId:responseHandler:)``). In contrast, this library consolidates ``Device`` and `DeviceInfo` into a single ``Device`` model.
+
+Rather than using two separate models, extended fields (such as `customerTitle` and `deviceProfileName`) are integrated directly into the ``Device`` object. This avoids type-casting overhead and simplifies data handling.
+
+When a standard device request is made, the object returned is a ``Device`` instance with extended properties initialized as nil. These properties are only hydrated when calling endpoints that explicitly provide extended device metadata.
+
+⚠️ Because this library performs a deep comparison of all object members, the equality operator (`==`) will return `false` if you compare a standard ``Device`` object with one containing extended `DeviceInfo` data – even if they share the same `ID`. To verify if two objects represent the same physical device, it is recommended to compare their `id` properties directly rather than comparing the objects themselves. **This may be changed in future versions!**
+
+### Add, Edit and Delete devices
+
+#### saveDevice()
+Create a new device or edit an existing one. Refer to ``TBUserApiClient/saveDevice(name:label:deviceId:type:deviceProfileId:tenantId:customerId:accessToken:responseHandler:)`` for a detailed explanation when a **device is created** and when a **device is edited/updated**.
+
+#### Create a new device
+The following listing creates a new device for a given tenant. The device is not added to a customer and the device profile is empty, resulting in a new device with a default device profile. This call requires 'TENANT\_ADMIN' authority.
+```swift
+let tenantId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+myClient?.saveDevice(name: name, label: label, tenantId: tenantId) { newDevice in
+    print("\(newDevice)")
+}
+```
+
+#### Edit/Update an existing device
+When editing a device it is highly recommended to retrieve the device first via ``TBUserApiClient/getDeviceById(deviceId:responseHandler:)`` or ``TBUserApiClient/getCustomerDevices(customerId:pageSize:page:type:textSearch:sortProperty:sortOrder:responseHandler:)``, modify the required members and send it back. This avoids accidental field loss.
+
+The following listing shows an example which edits the device label to *New Label Name*. You can edit devices with 'CUSTOMER\_USER' authority only if the device belongs to the same customer.
+
+⚠️ **Caution:** You can remove the device from your customer if you don't provide a valid customer id. Once removed, you require a user with 'TENANT\_ADMIN' authority to re-add the device to your customer.
+```swift
+// Assuming ``Device`` was retrieved through ``TBUserApiClient/getDeviceById(deviceId:responseHandler:)``
+myClient?.saveDevice(name: device.name,
+                      label: "New Label Name",
+                      deviceId: device.id.id,
+                      type: device.type,
+                      deviceProfileId: device.deviceProfileId.id,
+                      tenantId: device.tenantId.id,
+                      customerId: device.customerId.id) { updatedDevice in
+                        print("\(updatedDevice)")
+}
+```
+
+#### deleteDevice()
+Deletes a device identified by its device id – requires 'TENANT\_ADMIN' authority: ``TBUserApiClient/deleteDevice(deviceId:responseHandler:)``
+```swift
+let deviceId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+apiClient?.deleteDevice(deviceId: deviceId) {
+    print("Device with ID \(deviceId.uuidString) deleted!")
+}
+```
 
 ### Get device profiles and device profile infos
 Get device profiles and device profile infos. Response supports pagination. This is automatically neglected when using default arguments for function parameters, assuming a response with decent number of profiles. ``TBUserApiClient/getDeviceProfileInfos(pageSize:page:textSearch:sortProperty:sortOrder:transportType:responseHandler:)`` gives more flexibility compared to ``TBUserApiClient/getDeviceProfiles(pageSize:page:textSearch:sortProperty:sortOrder:responseHandler:)``. To minimize complexity, the return type is the same for both functions.
@@ -291,7 +375,7 @@ myClient?.getLatestTimeseries(for: .device, entityId: "entityId-as-UUID-string",
 ```
 Types involved: ``TimeseriesResponse``
 
-To better understand ``TimeseriesResponse``'s value property, refer to ``TimeseriesResponse/value`` and ``MplValueType``. For further details about this endpoints parameters, please refer to the [API documentation](https://app.swaggerhub.com/apis-docs/johannes_kinzig/thingsboard-rest-api/3.7.0#/telemetry-controller/getLatestTimeseries).
+To better understand ``TimeseriesResponse``'s value property, refer to ``TimeseriesResponse/value`` and ``MplValueType``. For further details about this endpoints parameters, please refer to the [API documentation](https://apidocs.kinzig-developer-docs.com/tbrestclientlib/?urls.primaryName=v3.7.0#/telemetry-controller/getLatestTimeseries).
 
 #### getTimeseries()
 Request timeseries data for given entity (``TbQueryEntityTypes``). Response contains timeseries data for given time frame: key-value pairs including timestamp. ``TBUserApiClient/getTimeseries(for:entityId:keys:startTs:endTs:intervalType:interval:timeZone:limit:aggregation:sortOrder:getValuesAsStrings:responseHandler:)`` has a parameter `getValuesAsStrings`. This tells the server to respond with all values as strings and not as native datatypes, such as int, bool, float. When a value contains a JSON string, it is highly recommended to set ` getValuesAsStrings: true` because parsing JSON strings inside response values is currently not supported by this library.
@@ -334,7 +418,7 @@ myClient?.getTimeseries(for: .device,
 ```
 Types involved: ``TimeseriesResponse``
 
-To better understand ``TimeseriesResponse``'s value property, refer to ``TimeseriesResponse/value`` and ``MplValueType``. For further details about this endpoints parameters, please refer to the [API documentation](https://app.swaggerhub.com/apis-docs/johannes_kinzig/thingsboard-rest-api/3.7.0#/telemetry-controller/getTimeseries).
+To better understand ``TimeseriesResponse``'s value property, refer to ``TimeseriesResponse/value`` and ``MplValueType``. For further details about this endpoints parameters, please refer to the [API documentation](https://apidocs.kinzig-developer-docs.com/tbrestclientlib/?urls.primaryName=v3.7.0#/telemetry-controller/getTimeseries).
 
 #### saveEntityTelemetry()
 It is also possible to save telemetry data on behalf of a specified entity (e.g. device, refer to ``TbQueryEntityTypes``). The following listings show two examples for ``TBUserApiClient/saveEntityTelemetry(for:entityId:timeseriesData:responseHandler:)``. The completion handler is called on success.
@@ -364,5 +448,5 @@ myClient?.deleteEntityTimeseries(for: .device, entityId: "entityId-as-UUID-strin
     print("Success!")
 }
 ```
-For further details regarding endpoint parameters and their functionality, refer to official [API documentation](https://app.swaggerhub.com/apis-docs/johannes_kinzig/thingsboard-rest-api/3.7.0#/telemetry-controller/deleteEntityTimeseries).
+For further details regarding endpoint parameters and their functionality, refer to official [API documentation](https://apidocs.kinzig-developer-docs.com/tbrestclientlib/?urls.primaryName=v3.7.0#/telemetry-controller/deleteEntityTimeseries).
 
