@@ -251,9 +251,8 @@ public class TBUserApiClient: TBHTTPRequest {
 
      Before returning the device object, the server checks if the device belongs to the tenant or customer (depending
      whether the request comes from a TENANT\_ADMIN' or 'CUSTOMER\_USER').
-
-     - Parameters deviceId: device id as UUID
-     - Parameters responseHandler: optional callable taking the new device object as a parameter, will only be called in case the API call succeeds
+     - Parameter deviceId: device id as UUID
+     - Parameter responseHandler: optional callable taking the returned ``Device`` object as an argument, will only be called in case the API call succeeds
      */
     public func getDeviceById(deviceId: UUID, responseHandler: ((Device) -> Void)?) {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getDeviceById,
@@ -268,9 +267,8 @@ public class TBUserApiClient: TBHTTPRequest {
 
      Before returning the device info object, the server checks if the device belongs to the tenant or customer (depending
      whether the request comes from a TENANT\_ADMIN' or 'CUSTOMER\_USER').
-
-     - Parameters deviceId: device id as UUID
-     - Parameters responseHandler: optional callable taking the new device object as a parameter, will only be called in case the API call succeeds
+     - Parameter deviceId: device id as UUID
+     - Parameter responseHandler: optional callable taking the returned ``Device`` object as an argument, will only be called in case the API call succeeds
      - Note: To maintain a consistent interface, this library uses the ``Device`` type for both standard device data and extended *Device Info* results. Rather
      than using two separate models, extended fields (such as `customerTitle` and `deviceProfileName`) are integrated directly into the `Device` object.
      Please note that these extended fields will be *nil* when using standard API endpoints; they are only populated when performing specific *DeviceInfo* requests.
@@ -287,19 +285,18 @@ public class TBUserApiClient: TBHTTPRequest {
      Create a new device or update an existing one – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
 
      To create a new device, don't provide the device id. When creating a device, ThingsBoard takes care for creating the device id by itself.
-     An access token is generated in case it was not provided in the 'accessToken' parameter. ThingsBoard responds with the newly created device.
+     An access token is generated in case it was not provided in the `accessToken` parameter. ThingsBoard responds with the newly created device.
      To update an existing device provide the device id in addition to the other required members.
      Use unique identifiers (e.g. MAC address, IMEI or serial number) for the device *name*. The *label* field is designed for user-friendly presentation and is not required to be unique.
-
-     - Parameters name: device name
-     - Parameters label: device label
-     - Parameters deviceId: device id as UUID
-     - Parameters deviceProfileName: device profile name
-     - Parameters deviceProfileId: device profile id as UUID
-     - Parameters tenantId: tenant id as UUID
-     - Parameters customerId: customer id as UUID
-     - Parameters accessToken: the access token to use for the (new) device
-     - Parameters responseHandler: optional callable taking the new device object as a parameter, will only be called in case the API call succeeds
+     - Parameter name: device name
+     - Parameter label: device label
+     - Parameter deviceId: device id as UUID
+     - Parameter type: device profile name
+     - Parameter deviceProfileId: device profile id as UUID
+     - Parameter tenantId: tenant id as UUID
+     - Parameter customerId: customer id as UUID
+     - Parameter accessToken: the access token to use for the (new) device
+     - Parameter responseHandler: optional callable taking the new ``Device`` object as an argument, will only be called in case the API call succeeds
      - Note: If you don't provide a `deviceProfileName` and `deviceProfileId` or `customerId` for a new device, it will be created with their corresponding
      default values. **Catuion: If you don't provide these fields for an existing device during update, these fields will be set to their default values!**
      */
@@ -345,9 +342,8 @@ public class TBUserApiClient: TBHTTPRequest {
      Delete device – requires 'TENANT\_ADMIN' authority
 
      Delete device for given device id. Delete device and all its relations.
-
-     - Parameters deviceId: device id as UUID
-     - Parameters responseHandler: optional callable called on success
+     - Parameter deviceId: device id as UUID
+     - Parameter responseHandler: optional callable called on success, takes no argument
      */
     public func deleteDevice(deviceId: UUID, responseHandler: (() -> Void)? = nil) {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.deleteDevice,
@@ -371,7 +367,6 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter sortOrder: sort results in ascending or descending order, state according to ``TbQuerySortOrder``; default: `.ascending`
      - Parameter transportType: Type of the transport the device profiles support: DEFAULT, MQTT, COAP, LWM2M, SNMP
      - Parameter responseHandler: takes a 'PageDataContainer<DeviceProfile>' as parameter and is called upon successful server response
-     
      */
     public func getDeviceProfileInfos(
         pageSize: Int32 = Int32.max,

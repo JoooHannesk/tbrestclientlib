@@ -189,11 +189,11 @@ class FunctionalTestCases: XCTestCase {
     func getDeviceById(apiClient: TBUserApiClient?, deviceId: UUID) -> Device? {
         let expectDeviceResponse: XCTestExpectation = XCTestExpectation(description: "Expected response containing a Device object!")
         var device: Device? = nil
-        apiClient?.getDeviceById(deviceId: deviceId, responseHandler: { deviceResponse in
+        apiClient?.getDeviceById(deviceId: deviceId) { deviceResponse in
             XCTAssertNotNil(deviceResponse)
             device = deviceResponse
             expectDeviceResponse.fulfill()
-        })
+        }
         wait(for: [expectDeviceResponse], timeout: 3.0)
         return device
     }
@@ -261,7 +261,7 @@ class FunctionalTestCases: XCTestCase {
      */
     func deleteDevice(apiClient: TBUserApiClient?, deviceId: UUID) {
         let expectedEmptyResponse = XCTestExpectation(description: "Expected empty response, no error message")
-        apiClient?.deleteDevice(deviceId: deviceId, ) {
+        apiClient?.deleteDevice(deviceId: deviceId) {
             expectedEmptyResponse.fulfill()
         }
         wait(for: [expectedEmptyResponse], timeout: 3.0)
@@ -295,7 +295,6 @@ class FunctionalTestCases: XCTestCase {
             XCTAssertNotNil(tbAppError)
             XCTAssertEqual(tbAppError.status, 403)
             XCTAssertEqual(tbAppError.errorCode, 20)
-            // this might fail with unit test but succeeds with integration test... TODO: solve and improve this test case
             expectedResponseWithCustomerDeviceProfiles.fulfill()
         })
         apiClient?.getDeviceProfiles() { deviceProfiles in
