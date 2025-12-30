@@ -292,26 +292,33 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter label: device label
      - Parameter deviceId: device id as UUID
      - Parameter type: device profile name
+     - Parameter description: device description (user defined description)
      - Parameter deviceProfileId: device profile id as UUID
      - Parameter tenantId: tenant id as UUID
      - Parameter customerId: customer id as UUID
+     - Parameter gateway: device acts as a gateway; default: false
+     - Parameter overwriteActivityTime: if the device is a gateway, it can overwrite the end-devices activity times
      - Parameter accessToken: the access token to use for the (new) device
      - Parameter responseHandler: optional callable taking the new ``Device`` object as an argument, will only be called in case the API call succeeds
-     - Note: If you don't provide a `deviceProfileName` and `deviceProfileId` or `customerId` for a new device, it will be created with their corresponding
-     default values. **Catuion: If you don't provide these fields for an existing device during update, these fields will be set to their default values!**
+     - Note: If you don't provide a `description`, `deviceProfileName` and `deviceProfileId` or `customerId` for a new device, it will be created with their corresponding
+     default values. **Catuion: If you don't provide these fields for an existing device during edit/update, these fields will be (re)set to their default values and may remain empty or get cleared!**
      */
     public func saveDevice(name: String,
                            label: String? = nil,
                            deviceId: UUID? = nil,
                            type: String? = nil,
+                           description: String = "",
                            deviceProfileId: UUID? = nil,
                            tenantId: UUID? = nil,
                            customerId: UUID? = nil,
+                           gateway: Bool = false,
+                           overwriteActivityTime: Bool = false,
                            accessToken: String = "",
                            responseHandler: ((Device) -> Void)?) {
         var deviceData = Dictionary<String, Any>()
 
         deviceData["name"] = name
+        deviceData["additionalInfo"] = AdditionalInfoDevice(gateway: gateway, overwriteActivityTime: overwriteActivityTime, description: description).asDict
         if let label = label { deviceData["label"] = label }
         if let type = type { deviceData["type"] = type }
 

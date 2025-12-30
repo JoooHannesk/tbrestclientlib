@@ -217,7 +217,7 @@ class FunctionalTestCases: XCTestCase {
     /**
      Test update device
 
-     - Note: This updates the device label and changes it back to its original label
+     - Note: This updates the device label and leaves all other fields unchanged
      */
     func updateDeviceLabel(apiClient: TBUserApiClient?, device: Device, newLabelName: String) -> Device? {
         let expectResponseWithUpdatedDevice = XCTestExpectation(description: "Expected response containing updated Device object!")
@@ -226,6 +226,7 @@ class FunctionalTestCases: XCTestCase {
                               label: newLabelName,
                               deviceId: device.id.id,
                               type: device.type,
+                              description: device.additionalInfo?.description ?? "",
                               deviceProfileId: device.deviceProfileId.id,
                               tenantId: device.tenantId.id,
                               customerId: device.customerId.id) { newDevice in

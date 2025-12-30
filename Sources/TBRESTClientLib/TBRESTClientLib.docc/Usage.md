@@ -210,7 +210,7 @@ When a standard device request is made, the object returned is a ``Device`` inst
 ### Add, Edit and Delete devices
 
 #### saveDevice()
-Create a new device or edit an existing one. Refer to ``TBUserApiClient/saveDevice(name:label:deviceId:type:deviceProfileId:tenantId:customerId:accessToken:responseHandler:)`` for a detailed explanation when a **device is created** and when a **device is edited/updated**.
+Create a new device or edit an existing one. Refer to ``TBUserApiClient/saveDevice(name:label:deviceId:type:description:deviceProfileId:tenantId:customerId:gateway:overwriteActivityTime:accessToken:responseHandler:)`` for a detailed explanation when a **device is created** and when a **device is edited/updated**.
 
 #### Create a new device
 The following listing creates a new device for a given tenant. The device is not added to a customer and the device profile is empty, resulting in a new device with a default device profile. This call requires 'TENANT\_ADMIN' authority.
@@ -228,15 +228,16 @@ The following listing shows an example which edits the device label to *New Labe
 
 ⚠️ **Caution:** You can remove the device from your customer if you don't provide a valid customer id. Once removed, you require a user with 'TENANT\_ADMIN' authority to re-add the device to your customer.
 ```swift
-// Assuming ``Device`` was retrieved through ``TBUserApiClient/getDeviceById(deviceId:responseHandler:)``
+// Assuming ``device`` was retrieved through ``TBUserApiClient/getDeviceById(deviceId:responseHandler:)``
 myClient?.saveDevice(name: device.name,
                       label: "New Label Name",
                       deviceId: device.id.id,
                       type: device.type,
+                      description: device.additionalInfo?.description ?? "",
                       deviceProfileId: device.deviceProfileId.id,
                       tenantId: device.tenantId.id,
                       customerId: device.customerId.id) { updatedDevice in
-                        print("\(updatedDevice)")
+    print("\(updatedDevice)")
 }
 ```
 

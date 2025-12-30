@@ -178,7 +178,7 @@ final class IntegrationTests: FunctionalTestCases {
         loginSucceeds(apiClient: tbTestClient)
         getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
         self.getCustomerDevices(apiClient: tbTestClient)
-        // Change label name to new label and compare
+        // Change label value to new label value and compare
         if let firstDevice = getCustomerDeviceInfos(apiClient: tbTestClient)?.first {
             originalDeviceLabel = firstDevice.label!
             originalDevice = updateDeviceLabel(apiClient: tbTestClient, device: firstDevice, newLabelName: newDeviceLabel)
@@ -193,7 +193,6 @@ final class IntegrationTests: FunctionalTestCases {
         } else {
             XCTFail("Failed to update device label to original value")
         }
-
     }
 
     /**

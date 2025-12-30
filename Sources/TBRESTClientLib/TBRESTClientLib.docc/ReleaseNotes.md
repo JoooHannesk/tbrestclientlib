@@ -5,7 +5,7 @@
 * Added following endpoint functions:
     * Get device by ID: ``TBUserApiClient/getDeviceById(deviceId:responseHandler:)``
     * Get device info by ID: ``TBUserApiClient/getDeviceInfoById(deviceId:responseHandler:)``
-    * Save device (to add or update a device): ``TBUserApiClient/saveDevice(name:label:deviceId:type:deviceProfileId:tenantId:customerId:accessToken:responseHandler:)``
+* Save device (to add or update a device): ``TBUserApiClient/saveDevice(name:label:deviceId:type:description:deviceProfileId:tenantId:customerId:gateway:overwriteActivityTime:accessToken:responseHandler:)``
     * Delete device: ``TBUserApiClient/deleteDevice(deviceId:responseHandler:)``
 * API change: All parameters that previously took an ID as a String have been updated to accept a UUID instead.
 
