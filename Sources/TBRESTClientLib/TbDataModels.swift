@@ -121,7 +121,7 @@ public struct User: TBDataModel {
     public let lastName: String
     public let phone: String?
     public let name: String
-    public let additionalInfo: AdditionalInfo?
+    public let additionalInfo: AdditionalInfoUser?
     /// createdTime as Date type
     public var createdTimeDt: Date { Date(timeIntervalSince1970: TimeInterval(createdTime/1000)) }
     
@@ -142,7 +142,7 @@ public struct Customer: TBDataModel {
     public let tenantId: ID
     public let version: Int64
     public let name: String
-    public let additionalInfo: AdditionalInfo?
+    public let additionalInfo: AdditionalInfoUser?
     /// createdTime as Date type
     public var createdTimeDt: Date { Date(timeIntervalSince1970: TimeInterval(createdTime/1000)) }
 }
@@ -159,7 +159,8 @@ public struct Device: TBDataModel {
     public let type: String
     public let label: String?
     public let deviceProfileId: ID
-    
+    public let additionalInfo: AdditionalInfoDevice?
+
     // the following properties are defined for DeviceInfo objects only
     public let customerTitle: String?
     public let customerIsPublic: Bool?
@@ -168,8 +169,6 @@ public struct Device: TBDataModel {
     
     /// createdTime as Date type
     public var createdTimeDt: Date { Date(timeIntervalSince1970: TimeInterval(createdTime/1000)) }
-    
-    // TODO: Think about adding `public let additionalInfo: AdditionalInfo?`
 }
 
 public struct DeviceProfile: TBDataModel {
@@ -224,7 +223,7 @@ public struct ID: TBDataModel, Hashable {
     }
 }
 
-public struct AdditionalInfo: TBDataModel {
+public struct AdditionalInfoUser: TBDataModel {
     public let defaultDashboardFullscreen: Bool?
     public let defaultDashboardId: String?
     public let description: String?
@@ -234,6 +233,12 @@ public struct AdditionalInfo: TBDataModel {
     public let lang: String?
     public let lastLoginTs: Int?
     public let userCredentialsEnabled: Bool?
+}
+
+public struct AdditionalInfoDevice: TBDataModel {
+    public let gateway: Bool?
+    public let overwriteActivityTime: Bool?
+    public let description: String?
 }
 
 public struct PaginationDataContainer<T: TBDataModel>: TBDataModel, PaginationDataResponse {
