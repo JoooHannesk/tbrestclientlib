@@ -316,19 +316,19 @@ public class TBUserApiClient: TBHTTPRequest {
         if let type = type { deviceData["type"] = type }
 
         if let deviceId = deviceId {
-            deviceData["id"] = ID(id: deviceId, entityType: .device).getAsDict()
+            deviceData["id"] = ID(id: deviceId, entityType: .device).asDict
         }
 
         if let deviceProfileId = deviceProfileId {
-            deviceData["deviceProfileId"] = ID(id: deviceProfileId, entityType: .deviceProfile).getAsDict()
+            deviceData["deviceProfileId"] = ID(id: deviceProfileId, entityType: .deviceProfile).asDict
         }
 
         if let tenantId = tenantId {
-            deviceData["tenantId"] = ID(id: tenantId, entityType: .tenant).getAsDict()
+            deviceData["tenantId"] = ID(id: tenantId, entityType: .tenant).asDict
         }
         
         if let customerId = customerId {
-            deviceData["customerId"] = ID(id: customerId, entityType: .customer).getAsDict()
+            deviceData["customerId"] = ID(id: customerId, entityType: .customer).asDict
         }
 
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.saveDevice,

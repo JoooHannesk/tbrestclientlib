@@ -16,6 +16,12 @@ public protocol TBDataModel: Codable & CustomStringConvertible & Hashable & Send
 }
 extension TBDataModel {
     public var description: String { return getStringRepresentation(for: self) }
+    public var asDict: [String: Any] {
+        if let data = try? JSONEncoder().encode(self), let dict = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] {
+            return dict
+        }
+        return [:]
+    }
 }
 
 extension Array: TBDataModel where Element: Codable & Hashable { }
@@ -218,9 +224,6 @@ public struct ID: TBDataModel, Hashable {
         self.entityType = entityType
     }
 
-    public func getAsDict() -> [String: String] {
-        ["id": id.uuidString, "entityType": entityType.rawValue]
-    }
 }
 
 public struct AdditionalInfoUser: TBDataModel {
