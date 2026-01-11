@@ -298,10 +298,11 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter customerId: customer id as UUID
      - Parameter gateway: device acts as a gateway; default: false
      - Parameter overwriteActivityTime: if the device is a gateway, it can overwrite the end-devices activity times
-     - Parameter accessToken: the access token to use for the (new) device
+     - Parameter accessToken: the access token to use for the (new) device; if the device gets updated and this `accessToken` stays empty, the old access token will be used
      - Parameter responseHandler: optional callable taking the new ``Device`` object as an argument, will only be called in case the API call succeeds
      - Note: If you don't provide a `description`, `deviceProfileName` and `deviceProfileId` or `customerId` for a new device, it will be created with their corresponding
-     default values. **Catuion: If you don't provide these fields for an existing device during edit/update, these fields will be (re)set to their default values and may remain empty or get cleared!**
+     default values. **Caution: If you don't provide these fields for an existing device during edit/update, these fields will be (re)set to their default values and may remain empty or get cleared!
+     This may result in a device which is not bound to a customer anymore or lost its device profile settings.**
      */
     public func saveDevice(name: String,
                            label: String? = nil,
