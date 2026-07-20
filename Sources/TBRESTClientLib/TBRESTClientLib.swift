@@ -247,6 +247,38 @@ public class TBUserApiClient: TBHTTPRequest {
     }
 
     /**
+     Get Tenant Devices – requires 'TENANT\_ADMIN' authority
+
+     Receives a page of devices owned by the tenant. Specify parameters to filter the results, which are wrapped inside a PageData object that
+     allows to iterate over the result set using pagination.
+     - Parameter pageSize: Maximum amount of entities in a one page
+     - Parameter page: Sequence number of page starting from 0
+     - Parameter type: Device type as the name of the device profile
+     - Parameter textSearch: The case insensitive 'substring' filter based on the device name.
+     - Parameter sortProperty: sort resutls according to enumeration 'TbQuerySortProperty'; default: .name
+     - Parameter sortOrder: sort results in ascending or descending order, state according to ``TbQuerySortOrder``; default: `.ascending`
+     - Parameter responseHandler: takes a 'PageDataContainer<Device>' as parameter and is called upon successful server response
+     - Note: works with 'TENANT\_ADMIN' authority only!
+     */
+    public func getTenantDevices(pageSize: Int32 = Int32.max,
+                          page: Int32 = 0,
+                          type: String? = nil,
+                          textSearch: String? = nil,
+                          sortProperty: TbQuerySortProperty = .name,
+                          sortOrder: TbQuerySortOrder = .ascending,
+                          responseHandler: ((PaginationDataContainer<Device>) -> Void)?)
+    -> Void {
+        let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getTenantDevices,
+                                                                pageSize: pageSize, page: page, type: type,
+                                                                textSearch: textSearch,
+                                                                sortProperty: sortProperty, sortOrder: sortOrder)
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                     authToken: self.authData, expectedTBResponseType: PaginationDataContainer<Device>.self) { responseObject -> Void in
+            responseHandler?(responseObject as! PaginationDataContainer<Device>)
+        }
+    }
+
+    /**
      Get device by ID – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
 
      Before returning the device object, the server checks if the device belongs to the tenant or customer (depending

@@ -1,4 +1,4 @@
-![project_avatar_icon](https://github.com/JoooHannesk/tbrestclientlib/blob/main/Meta/tbrestclientlib-project-avatar.png)
+![project_avatar_icon](https://github.com/JoooHannesk/tbrestclientlib/blob/main/Assets/tbrestclientlib-project-avatar.png)
 
 # TBRESTClientLib
 Simple ReST client library for ThingsBoard - implementing the administration / user-space API (not device API) – written in Swift.
@@ -10,7 +10,7 @@ This library implements selected parts of the ThingsBoard administration and use
 
 Throughout this documentation, we aim to follow the official ThingsBoard nomenclature and API documentation as closely as possible. While every effort is made to stay aligned, minor deviations may occur.
 
-## 🛠 Development Status – Available Functions (v0.0.20)
+## 🛠 Development Status – Available Functions (v0.0.21)
 This library is **under active development** and is steadily expanding its coverage of the ThingsBoard API. As a result, **not all API endpoints are available yet**. For a detailed and up-to-date overview of the currently supported endpoints, please refer to the [Usage](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/usage) section.
 
 ### Currently supported functionality
@@ -41,6 +41,7 @@ For a detailed overview of the properties supported by each response model, plea
 ## 🕰️ Release history
 [See what's new](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/releasenotes)
 
+* Version 0.0.21 – 2026-07-20
 * Version 0.0.20 – 2025-12-29
 * Version 0.0.19 – 2025-11-08
 * Version 0.0.15 - 2025-08-19

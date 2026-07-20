@@ -183,6 +183,27 @@ class FunctionalTestCases: XCTestCase {
     }
 
     /**
+     Test getTenantDevices()
+     */
+    @discardableResult
+    func getTenantDevices(apiClient: TBUserApiClient?) -> Array<Device>? {
+        let expectedResponseWithTenantDevices = XCTestExpectation(description: "Expected response containing customer Device objects!")
+        if let tenantId = self.tbUser?.tenantId.id {
+            apiClient?.getTenantDevices { tenantDevicesPaginated in
+                if let tenantDevices = tenantDevicesPaginated.getItemsInsideArray() {
+                    XCTAssertGreaterThanOrEqual(tenantDevices.count, 1)
+                    XCTAssertEqual(tenantDevices[0].tenantId.id , tenantId)
+                    self.tbDevice = tenantDevices[0]
+                    self.tbDevices = tenantDevices
+                    expectedResponseWithTenantDevices.fulfill()
+                }
+            }
+        }
+        wait(for: [expectedResponseWithTenantDevices], timeout: 3.0)
+        return self.tbDevices
+    }
+
+    /**
      Test getDeviceById() - for a given device ID
      */
     @discardableResult

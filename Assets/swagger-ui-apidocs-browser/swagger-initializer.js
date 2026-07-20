@@ -6,10 +6,11 @@ window.onload = function() {
     urls: [
       { url: "https://raw.githubusercontent.com/JoooHannesk/tbrestclientlib/refs/heads/main/Reference/TBOpenAPISpecs/thingsboard-spec-openapi-3.7.0.json", name: "v3.7.0" },
       { url: "https://raw.githubusercontent.com/JoooHannesk/tbrestclientlib/refs/heads/main/Reference/TBOpenAPISpecs/thingsboard-spec-openapi-3.9.0.json", name: "v3.9.0" },
-      { url: "https://raw.githubusercontent.com/JoooHannesk/tbrestclientlib/refs/heads/main/Reference/TBOpenAPISpecs/thingsboard-spec-openapi-4.2.1.json", name: "v4.2.1" }
+      { url: "https://raw.githubusercontent.com/JoooHannesk/tbrestclientlib/refs/heads/main/Reference/TBOpenAPISpecs/thingsboard-spec-openapi-4.2.1.json", name: "v4.2.1" },
+      { url: "https://raw.githubusercontent.com/JoooHannesk/tbrestclientlib/refs/heads/main/Reference/TBOpenAPISpecs/thingsboard-spec-openapi-4.3.1.3.json", name: "v4.3.1.3" }
     ],
     // Set which one opens by default (index starts at 0)
-    "urls.primaryName": "v4.2.1",
+    "urls.primaryName": "v4.3.1.3",
     dom_id: '#swagger-ui',
     deepLinking: true,
     presets: [

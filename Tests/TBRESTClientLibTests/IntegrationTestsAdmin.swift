@@ -37,6 +37,7 @@ final class IntegrationTestsAdmin: FunctionalTestCases {
      Test create new device and delete device
 
      Create a device for the current tenant and delete this device afterwards.
+     - Note: works with 'TENANT\_ADMIN' authority only!
      */
     func testCreateNewDeviceDeleteDevice() {
         let newDeviceName = "TestDevice"
@@ -53,6 +54,18 @@ final class IntegrationTestsAdmin: FunctionalTestCases {
         }
     }
 
-    
+    /**
+     Test getTenantDevices()
+
+     Get all devices registered at the tenant the user belongs to.
+
+     - Note: works with 'TENANT\_ADMIN' authority only!
+     */
+    func testGetTenantDevices() {
+        let (tbTestClient, serversettings) = prepare()
+        loginSucceeds(apiClient: tbTestClient)
+        getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        getTenantDevices(apiClient: tbTestClient)
+    }
 
 }

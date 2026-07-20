@@ -1,6 +1,9 @@
 # ThingsBoard Server Compatibility
 This client library is compatible with the following ThingsBoard server versions
 
+* TBRESTClientLib v.0.0.21:
+    * tested with ThingsBoard CE 4.3.1.3 – [v.4.3.1.3 API Reference](https://apidocs.kinzig-developer-docs.com/tbrestclientlib/?urls.primaryName=v4.3.1.3)
+
 * TBRESTClientLib v.0.0.20:
     * tested with ThingsBoard CE 4.2.1 – [v.4.2.1 API Reference](https://apidocs.kinzig-developer-docs.com/tbrestclientlib/?urls.primaryName=v4.2.1)
 

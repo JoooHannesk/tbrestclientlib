@@ -1,5 +1,9 @@
 # Release Notes
 
+## Client – Version 0.0.21
+* Released: 2026-07-20
+* Added following endpoint: ``TBUserApiClient/getTenantDevices(pageSize:page:type:textSearch:sortProperty:sortOrder:responseHandler:)``
+
 ## Client – Version 0.0.20
 * Released: 2025-12-29
 * Added following endpoint functions:
@@ -7,7 +11,7 @@
     * Get device info by ID: ``TBUserApiClient/getDeviceInfoById(deviceId:responseHandler:)``
 * Save device (to add or update a device): ``TBUserApiClient/saveDevice(name:label:deviceId:type:description:deviceProfileId:tenantId:customerId:gateway:overwriteActivityTime:accessToken:responseHandler:)``
     * Delete device: ``TBUserApiClient/deleteDevice(deviceId:responseHandler:)``
-* API change: All parameters that previously took an ID as a String have been updated to accept a UUID instead.
+* API change: All parameters that previously took an ID as a String have been updated to accept the ID as UUID instead.
 
 ## Client - Version 0.0.19
 * Released: 2025-11-08

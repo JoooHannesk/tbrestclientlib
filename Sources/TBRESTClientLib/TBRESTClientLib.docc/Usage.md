@@ -141,8 +141,22 @@ Types involved: ``Customer``
 ## Devices and device profiles
 Working with devices and device profiles.
 
-### Get devices and device infos
-Get devices and device infos for the customer the user belongs to. The response supports pagination which is automatically neglected when using default arguments for function parameters, assuming a response with just a few devices being returned.
+### Get tenant devices and device infos
+Get devices registered with the tenant.
+
+#### getTenantDevices()
+This requires the user to have `TENANT\_ADMIN` authority. The response supports pagination which is automatically neglected when using default arguments for function parameters, assuming a response with just a few devices being returned: ``TBUserApiClient/getTenantDevices(pageSize:page:type:textSearch:sortProperty:sortOrder:responseHandler:)``
+```swift
+// picking up all devices assuming there are not hundreds/thousands - therefore omitting the use of proper pagination
+apiClient?.getTenantDevices { tenantDevicesPaginated in
+    if let tenantDevices = tenantDevicesPaginated.getItemsInsideArray() {
+        print(tenantDevices)
+    }
+}
+```
+
+### Get customer devices and device infos
+Get devices and device infos for the **customer the user belongs to**. The response supports pagination which is automatically neglected when using default arguments for function parameters, assuming a response with just a few devices being returned.
 
 ``TBUserApiClient/getCustomerDeviceInfos(customerId:pageSize:page:type:deviceProfileId:active:textSearch:sortProperty:sortOrder:responseHandler:)`` gives more flexibility compared to ``TBUserApiClient/getCustomerDevices(customerId:pageSize:page:type:textSearch:sortProperty:sortOrder:responseHandler:)``.
 
@@ -151,13 +165,11 @@ To minimize complexity, the return type is ``Device`` for both functions. Refer 
 #### getCustomerDeviceInfos()
 Get all devices which belong to a customer: ``TBUserApiClient/getCustomerDeviceInfos(customerId:pageSize:page:type:deviceProfileId:active:textSearch:sortProperty:sortOrder:responseHandler:)``. Please be aware that this library does not make a difference between `DeviceInfo` and ``Device`` objects. Refer to <doc:Usage/Note-on-Equality-Comparisons-Device-vs-DeviceInfo> for further information about extended info objects.
 ```swift
-var devices: [Device]! = []
-
 // picking up all devices assuming there are not hundreds/thousands - therefore omitting the use of proper pagination
 let customerId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
 myClient?.getCustomerDeviceInfos(customerId: customerId) { tbDevicesPaginated in
-    self.devices = tbDevicesPaginated.data
-    print("\(self.devices)")
+    let devices = tbDevicesPaginated.data
+    print(devices)
 }
 ```
 Types involved: ``PaginationDataContainer``, ``Device``
