@@ -41,6 +41,7 @@ For a detailed overview of the properties supported by each response model, plea
 ## 🕰️ Release history
 [See what's new](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/releasenotes)
 
+* Version 0.0.22 – 2026-08-10
 * Version 0.0.21 – 2026-07-20
 * Version 0.0.20 – 2025-12-29
 * Version 0.0.19 – 2025-11-08
@@ -51,8 +52,8 @@ For a detailed overview of the properties supported by each response model, plea
 ## 💻 Requirements
 This library works with and was tested on:
 
-* iOS >= 17.5
-* macOS >= 14.0
+* iOS >= 15.0
+* macOS >= 11.0
 
 For compatibility to specific ThingsBoard server versions, refer to [ThingsBoard Server Compatibility](https://tbrestclientlib.kinzig-developer-docs.com/documentation/tbrestclientlib/thingsboardservercompatibility) in this library documentation.
 

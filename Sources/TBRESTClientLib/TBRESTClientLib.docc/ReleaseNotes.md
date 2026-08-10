@@ -1,5 +1,11 @@
 # Release Notes
 
+## Client – Version 0.0.22
+* Released: 2026-08-10
+* Extended minimum system requirements to include older macOS and iOS versions: 
+  * iOS >= 15.0
+  * macOS >= 11.0 
+
 ## Client – Version 0.0.21
 * Released: 2026-07-20
 * Added following endpoint: ``TBUserApiClient/getTenantDevices(pageSize:page:type:textSearch:sortProperty:sortOrder:responseHandler:)``

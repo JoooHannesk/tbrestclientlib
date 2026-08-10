@@ -5,8 +5,8 @@ import PackageDescription
 
 let package = Package(
     name: "TBRESTClientLib",
-    platforms: [.iOS(.v17),
-                .macOS(.v14),
+    platforms: [.iOS(.v15),
+                .macOS(.v11),
                 //.custom("Debian", versionString: "12")
     ],
     products: [

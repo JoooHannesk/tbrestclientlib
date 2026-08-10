@@ -9,7 +9,7 @@ This library implements selected parts of the ThingsBoard administration and use
 
 Throughout this documentation, we aim to follow the official ThingsBoard nomenclature and API documentation as closely as possible. While every effort is made to stay aligned, minor deviations may occur.
 
-## 🛠 Development Status – Available Functions (v0.0.21)
+## 🛠 Development Status – Available Functions (v0.0.22)
 This library is **under active development** and is steadily expanding its coverage of the ThingsBoard API. As a result, **not all API endpoints are available yet**. For a detailed and up-to-date overview of the currently supported endpoints, please refer to the <doc:Usage> section.
 
 ### Currently supported functionality
@@ -38,8 +38,8 @@ For a detailed overview of the properties supported by each response model, plea
 
 ## 💻 Requirements
 This client library works with and was tested on:
-* iOS >= 17.5
-* macOS >= 14.0
+* iOS >= 15.0
+* macOS >= 11.0
 
 For compatibility to specific ThingsBoard server versions, refer to <doc:ThingsBoardServerCompatibility>
 
