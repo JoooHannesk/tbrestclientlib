@@ -11,7 +11,7 @@ import OSLog
 
 // MARK: - HTTP request (generalized)
 
-public enum TBHTTPClientRequestError: Error {
+public enum TBHTTPClientRequestError: Error, Equatable {
     case badURL
     case improperPayloadDataFormat
     case httpRequestFailure
