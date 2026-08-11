@@ -98,6 +98,10 @@ class SimpleHTTPClient {
             } else if let responseData = responseData {
                 let responseDataResultDict = self.convertResponseToTbDataModelObject(responseData, expectedResponseType: responseType)
                 completionHandler(responseDataResultDict)
+            } else {
+                // Neither data nor error: treat as transport failure so the completion handler always fires.
+                self.logger?.error("TBRESTClientLib (system) HTTP request completed with neither data nor error")
+                completionHandler(.failure(.system(.httpRequestFailure)))
             }
         }
         requestTask.resume()

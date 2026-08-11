@@ -1,5 +1,9 @@
 # Release Notes
 
+## Client – Version 0.0.26
+* Added an **async/await API**: every request method now exists in an additional async variant with the same name minus the `responseHandler` parameter (e.g. ``TBUserApiClient/login()``, ``TBUserApiClient/getUser()``). The async variants return their value directly and throw a ``TBHTTPClientRequestError`` on failure instead of invoking the handlers registered via ``TBHTTPRequest/registerErrorHandler(apiErrorHandler:systemErrorHandler:)``. The callback-based API remains unchanged and is **not** deprecated — both flavors can be mixed freely on the same client instance. See <doc:Usage/Choosing-between-callbacks-and-asyncawait>.
+* Fixed a dead path in the HTTP client where a response with neither data nor error would silently drop the request; it is now reported as ``TBSystemError/httpRequestFailure``.
+
 ## Client – Version 0.0.24
 * Reworked the error type structure — **breaking change** for implementors matching on `TBHTTPClientRequestError`:
     * New enum ``TBSystemError`` carries all system/transport-level errors (`badURL`, `improperPayloadDataFormat`, `httpRequestFailure`, `emptyLogin`, `badLogin`, `undecodableResponse(body:)`)

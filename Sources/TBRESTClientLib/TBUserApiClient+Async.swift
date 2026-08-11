@@ -1,179 +1,112 @@
 //
-//  TBRESTClientLib.swift
+//  TBUserApiClient+Async.swift
 //
 //
-//  Created by Johannes Kinzig on 30.07.24.
-//
-// Thingsboard Client Library - implementing the thingsboard administration / user-space api (not device api)
+//  Async/await counterparts of the callback-based public API.
+//  Each method mirrors its callback-based sibling in TBRESTClientLib.swift: same name,
+//  same parameters and defaults, just without the responseHandler parameter. The result
+//  is returned and failures are thrown as ``TBHTTPClientRequestError`` instead of being
+//  routed to handlers registered via ``TBHTTPRequest/registerErrorHandler(apiErrorHandler:systemErrorHandler:)``.
 //
 
 import Foundation
-import OSLog
 
-public class TBUserApiClient: TBHTTPRequest {
-    // MARK: - Properties
-    var aem: APIEndpointManager          // internal: accessed by the async API in TBUserApiClient+Async.swift
-    var serverSettings: ServerSettings   // internal: async login(withUsername:andPassword:) mutates it
-    var authData: AuthLogin?             // internal get/set: async login() assigns it
-    
-    
-    // MARK: - Initializers
-    /**
-     Initialize TB client
-     
-     - Parameter baseUrlStr: server url as utf8 string without trailing slash (no API endpoint, just base server URL)
-     - Parameter username: user's username as utf8 string
-     - Parameter password: user's password as utf8 string
-     - Parameter httpSessionHandler: HTTP session handler to use for http request
-     - Parameter apiEndpointVersion: API version, currently only .v1 supported because no other version is currently implemented.
-     - Parameter logger: Logger (from OSLog) instance (optional)
-     - Note: Intention for httpSessionHandler: can take a mock-http session handler for unit testing the http calls.
-     This initializer's intention is mainly to be used when performing unit testing. When using the library it is recommended to use the
-     convenience initializer.
-     */
-    public init(baseUrlStr: String, username: String, password: String, apiEndpointVersion: TbApiEndpointsVersion = .v1, httpSessionHandler: URLSessionProtocol = URLSession.shared, logger: Logger? = nil) throws {
-        serverSettings = ServerSettings(baseUrl: baseUrlStr, username: username, password: password)
-        guard serverSettings.allPartsGiven() else {
-            throw TBSystemError.emptyLogin
-        }
-        aem = APIEndpointManager(serverSettings: self.serverSettings, apiEndpoints: apiEndpointVersion.version)
-        super.init(httpSessionHandler: httpSessionHandler, logger: logger)
-    }
-    
-    /**
-     Initialize TB client by providing access token
-     
-     - Parameter baseUrlStr: server url as utf8 string without trailing slash (no API endpoint, just base server URL)
-     - Parameter accessToken: AuthLogin object containing `token` and `refreshToken`
-     - Parameter apiEndpointVersion: API version, currently only .v1 supported because no other version is currently implemented.
-     - Parameter httpSessionHandler: HTTP session handler, defaults `URLSession.shared`
-     - Parameter logger: Logger (from OSLog) instance (optional)
-     - Note: Re-use tokens from an existing/previous session instead of optaining new ones from the server.
-     */
-    public init(baseUrlStr: String, accessToken: AuthLogin, apiEndpointVersion: TbApiEndpointsVersion = .v1, httpSessionHandler: URLSessionProtocol = URLSession.shared, logger: Logger? = nil) throws {
-        serverSettings = ServerSettings(baseUrl: baseUrlStr, username: "", password: "")
-        guard accessToken.allPartsGiven() && serverSettings.urlGiven() else {
-            throw TBSystemError.emptyLogin
-        }
-        authData = accessToken
-        aem = APIEndpointManager(serverSettings: self.serverSettings, apiEndpoints: apiEndpointVersion.version)
-        super.init(httpSessionHandler: httpSessionHandler, logger: logger)
-    }
-    
+extension TBUserApiClient {
+
     // MARK: – Authentication
     /**
-     Request authentication with server to optain an authentication token
-     
-     - Parameter responseHandler: takes an 'AuthLogin' as parameter and is called upon successful server response
-     - Note: Property `authData`  contains token and refreshToken after login succeeded
+     Request authentication with server to optain an authentication token (async)
+
+     - Returns: an ``AuthLogin`` object containing token and refreshToken
+     - Throws: ``TBSystemError/emptyLogin`` when username/password are empty, otherwise ``TBHTTPClientRequestError``
+     (`.api` for server errors such as bad credentials, `.system` for transport errors)
+     - Note: Property `authData` contains token and refreshToken after login succeeded.
+     In an async context `try await client.login()` selects this overload; the callback-based
+     ``login(responseHandler:)`` remains available in synchronous contexts.
      */
-    public func login(responseHandler: ((AuthLogin) -> Void)? = nil) throws -> Void {
+    @discardableResult
+    public func login() async throws -> AuthLogin {
         guard serverSettings.allPartsGiven() else {
             throw TBSystemError.emptyLogin
         }
         let authDataDict: Dictionary<String, String> = ["username": serverSettings.username, "password": serverSettings.password]
-        tbApiRequest(fromEndpoint: aem.getEndpointURL(\.login),
-                     withPayload: authDataDict,
-                     expectedTBResponseType: AuthLogin.self) { responseObject -> Void in
-            if responseObject is AuthLogin {
-                self.authData = responseObject as? AuthLogin
-                if let authData = self.authData {
-                    responseHandler?(authData)
-                }
-            }
+        let responseObject = try await tbApiRequest(fromEndpoint: aem.getEndpointURL(\.login),
+                                                    withPayload: authDataDict,
+                                                    expectedTBResponseType: AuthLogin.self)
+        guard let authLogin = responseObject as? AuthLogin else {
+            throw TBHTTPClientRequestError.system(.undecodableResponse(body: String(describing: responseObject)))
         }
+        self.authData = authLogin
+        return authLogin
     }
-    
+
     /**
-     Request authentication with the server to optain/renew the authentication token
-     
+     Request authentication with the server to optain/renew the authentication token (async)
+
      - Parameter username: user's username as utf8 string
      - Parameter password: user's password as utf8 string
-     - Parameter responseHandler: takes an 'AuthLogin' as parameter and is called upon successful server response
-     - Note: authData contains **new** tokens after login succeeded
+     - Returns: an ``AuthLogin`` object containing the **new** token and refreshToken
+     - Throws: ``TBSystemError/emptyLogin`` when username/password are empty, otherwise ``TBHTTPClientRequestError``
      */
-    public func login(withUsername username: String, andPassword password: String, responseHandler: ((AuthLogin) -> Void)? = nil) throws -> Void {
+    @discardableResult
+    public func login(withUsername username: String, andPassword password: String) async throws -> AuthLogin {
         serverSettings.username = username
         serverSettings.password = password
-        try login(responseHandler: responseHandler)
+        return try await login()
     }
-    
+
     /**
-     Return the login data
-     
-     Return the login data which were given during initialisation. Ideal when having to manage multiple instances and need to distinguish between them.
-     - Returns: a tuple with (serverUrl, username) - both as String
-     - Note: For security reasons, the password is not returned!
-     */
-    public func getLoginData() -> (String, String) {
-        return (serverSettings.baseUrl, serverSettings.username)
-    }
-    
-    /**
-     Return access token
-     
-     Returns the access token currently in use. Useful for session recovery to continue an existing authentication context.
-     - Returns: authData (of type ``AuthLogin``)
-     - Note: Returns `nil` if authentication has not been attempted, or if the provided credentials were invalid. Call ``login(responseHandler:)`` before accessing this value.
-     */
-    public func getAccessToken() -> AuthLogin? {
-        return self.authData
-    }
-    
-    /**
-     Logout
-     
+     Logout (async)
+
      Request user logout on ThingsBoard server and destroy access token locally.
-     - Note: Calling `logout()` on the server side serves the purpose of audit logging, as the logout request is written to the audit log. The main logout procedure, however, takes place on the client side by clearing the access token.
+     - Note: Server-side failures are logged and ignored, matching the callback-based ``logout()``;
+     the local access token is always cleared.
      */
-    public func logout() -> Void {
-        tbApiRequest(fromEndpoint: aem.getEndpointURL(\.logout),
-                     usingMethod: .post,
-                     authToken: self.authData,
-                     expectedTBResponseType: TBAppError.self) { responseObject in
-            self.logger?.warning("Logout failed: \(String(describing: responseObject))")
-        }
+    public func logout() async {
+        _ = try? await tbApiRequest(fromEndpoint: aem.getEndpointURL(\.logout),
+                                    usingMethod: .post,
+                                    authToken: self.authData,
+                                    expectedTBResponseType: TBAppError.self)
         self.authData = nil
     }
 
 
     // MARK: - User related requests
     /**
-     Get currently logged in user info
-     
-     - Parameter responseHandler: takes a 'User' as parameter and is called upon successful server response
-     - Note: for supported data models as parameters see: TbDataModels.swift
+     Get currently logged in user info (async)
+
+     - Returns: the ``User`` object
+     - Throws: ``TBHTTPClientRequestError``
      */
-    public func getUser(responseHandler: ((User) -> Void)? = nil) -> Void {
-        tbApiRequest(fromEndpoint: aem.getEndpointURL(\.getUser),
-                     usingMethod: .get,
-                     authToken: self.authData,
-                     expectedTBResponseType: User.self) { responseObject -> Void in
-            responseHandler?(responseObject as! User)
-        }
+    public func getUser() async throws -> User {
+        let responseObject = try await tbApiRequest(fromEndpoint: aem.getEndpointURL(\.getUser),
+                                                    usingMethod: .get,
+                                                    authToken: self.authData,
+                                                    expectedTBResponseType: User.self)
+        return responseObject as! User
     }
-    
+
     /**
-     Get customer info
-     
+     Get customer info (async)
+
      A user can only request information for the customer account they belong to.
      - Parameter customerId: A string value representing the customer id
-     - Parameter responseHandler: takes a ``Customer`` as parameter and is called upon successful retrieval of the customer information
+     - Returns: the ``Customer`` object
+     - Throws: ``TBHTTPClientRequestError``
      */
-    public func getCustomerById(customerId: UUID, responseHandler: ((Customer) -> Void)? = nil) -> Void {
+    public func getCustomerById(customerId: UUID) async throws -> Customer {
         let endpointURL = aem.getEndpointURL(\.getCustomerById, replacePaths: [URLModifier(searchString: "{?customerId?}", replaceString: customerId.uuidString)])
-        tbApiRequest(fromEndpoint: endpointURL,
-                     usingMethod: .get,
-                     authToken: self.authData,
-                     expectedTBResponseType: Customer.self) { responseObject -> Void in
-            responseHandler?(responseObject as! Customer)
-        }
+        let responseObject = try await tbApiRequest(fromEndpoint: endpointURL,
+                                                    usingMethod: .get,
+                                                    authToken: self.authData,
+                                                    expectedTBResponseType: Customer.self)
+        return responseObject as! Customer
     }
-    
+
     // MARK: - Device related requests
     /**
-     Get Customer Devices – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     
+     Get Customer Devices (async) – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+
      Receives a page of devices assigned to the customer (by ID). Specify parameters to filter the results, which are wrapped inside a PageData object that
      allows to iterate over the result set using pagination.
      - Parameter customerId: A UUID value representing the customer id
@@ -183,32 +116,30 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter textSearch: The case insensitive 'substring' filter based on the device name.
      - Parameter sortProperty: sort resutls according to enumeration 'TbQuerySortProperty'; default: .name
      - Parameter sortOrder: sort results in ascending or descending order, state according to ``TbQuerySortOrder``; default: `.ascending`
-     - Parameter responseHandler: takes a 'PageDataContainer<Device>' as parameter and is called upon successful server response
-     - Note: for supported data models as parameters see: TbDataModels.swift
+     - Returns: a `PaginationDataContainer<Device>`
+     - Throws: ``TBHTTPClientRequestError``
      */
     public func getCustomerDevices(customerId: UUID,
-                            pageSize: Int32 = Int32.max,
-                            page: Int32 = 0,
-                            type: String? = nil,
-                            textSearch: String? = nil,
-                            sortProperty: TbQuerySortProperty = .name,
-                            sortOrder: TbQuerySortOrder = .ascending,
-                            responseHandler: ((PaginationDataContainer<Device>) -> Void)?)
-    -> Void {
+                                   pageSize: Int32 = Int32.max,
+                                   page: Int32 = 0,
+                                   type: String? = nil,
+                                   textSearch: String? = nil,
+                                   sortProperty: TbQuerySortProperty = .name,
+                                   sortOrder: TbQuerySortOrder = .ascending)
+    async throws -> PaginationDataContainer<Device> {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getCustomerDevices,
                                                                 replacePaths: [URLModifier(searchString: "{?customerId?}", replaceString: customerId.uuidString)],
                                                                 pageSize: pageSize, page: page, type: type,
                                                                 textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: PaginationDataContainer<Device>.self) { responseObject -> Void in
-            responseHandler?(responseObject as! PaginationDataContainer<Device>)
-        }
+        let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                                                    authToken: self.authData, expectedTBResponseType: PaginationDataContainer<Device>.self)
+        return responseObject as! PaginationDataContainer<Device>
     }
-    
+
     /**
-     Get Customer Device Infos – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     
+     Get Customer Device Infos (async) – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+
      Receives a page of devices info objects assigned to the customer (by ID). Specify parameters to filter the results, which are wrapped inside a PageData object that
      allows to iterate over the result set using pagination.
      - Parameter customerId: customer id (UUID) as string
@@ -220,34 +151,32 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter textSearch: The case insensitive 'substring' filter based on the device name
      - Parameter sortProperty: sort resutls according to enumeration 'TbQuerySortProperty'; default: .name
      - Parameter sortOrder: sort results in ascending or descending order, state according to ``TbQuerySortOrder``; default: `.ascending`
-     - Parameter responseHandler: takes a 'PageDataContainer<Device>' as parameter and is called upon successful server response
-     - Note: for supported data models as parameters see: `TbDataModels.swift`
+     - Returns: a `PaginationDataContainer<Device>`
+     - Throws: ``TBHTTPClientRequestError``
      */
     public func getCustomerDeviceInfos(customerId: UUID,
-                                pageSize: Int32 = Int32.max,
-                                page: Int32 = 0,
-                                type: String? = nil,
-                                deviceProfileId: String? = nil,
-                                active: Bool? = nil,
-                                textSearch: String? = nil,
-                                sortProperty: TbQuerySortProperty = .name,
-                                sortOrder: TbQuerySortOrder = .ascending,
-                                responseHandler: ((PaginationDataContainer<Device>) -> Void)?)
-    -> Void {
+                                       pageSize: Int32 = Int32.max,
+                                       page: Int32 = 0,
+                                       type: String? = nil,
+                                       deviceProfileId: String? = nil,
+                                       active: Bool? = nil,
+                                       textSearch: String? = nil,
+                                       sortProperty: TbQuerySortProperty = .name,
+                                       sortOrder: TbQuerySortOrder = .ascending)
+    async throws -> PaginationDataContainer<Device> {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getCustomerDeviceInfos,
                                                                 replacePaths: [URLModifier(searchString: "{?customerId?}", replaceString: customerId.uuidString)],
                                                                 pageSize: pageSize, page: page, type: type,
                                                                 deviceProfileId: deviceProfileId,
                                                                 active: active, textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: PaginationDataContainer<Device>.self) { responseObject -> Void in
-            responseHandler?(responseObject as! PaginationDataContainer<Device>)
-        }
+        let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                                                    authToken: self.authData, expectedTBResponseType: PaginationDataContainer<Device>.self)
+        return responseObject as! PaginationDataContainer<Device>
     }
 
     /**
-     Get Tenant Devices – requires 'TENANT\_ADMIN' authority
+     Get Tenant Devices (async) – requires 'TENANT\_ADMIN' authority
 
      Receives a page of devices owned by the tenant. Specify parameters to filter the results, which are wrapped inside a PageData object that
      allows to iterate over the result set using pagination.
@@ -257,64 +186,65 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter textSearch: The case insensitive 'substring' filter based on the device name.
      - Parameter sortProperty: sort resutls according to enumeration 'TbQuerySortProperty'; default: .name
      - Parameter sortOrder: sort results in ascending or descending order, state according to ``TbQuerySortOrder``; default: `.ascending`
-     - Parameter responseHandler: takes a 'PageDataContainer<Device>' as parameter and is called upon successful server response
+     - Returns: a `PaginationDataContainer<Device>`
+     - Throws: ``TBHTTPClientRequestError``
      - Note: works with 'TENANT\_ADMIN' authority only!
      */
     public func getTenantDevices(pageSize: Int32 = Int32.max,
-                          page: Int32 = 0,
-                          type: String? = nil,
-                          textSearch: String? = nil,
-                          sortProperty: TbQuerySortProperty = .name,
-                          sortOrder: TbQuerySortOrder = .ascending,
-                          responseHandler: ((PaginationDataContainer<Device>) -> Void)?)
-    -> Void {
+                                 page: Int32 = 0,
+                                 type: String? = nil,
+                                 textSearch: String? = nil,
+                                 sortProperty: TbQuerySortProperty = .name,
+                                 sortOrder: TbQuerySortOrder = .ascending)
+    async throws -> PaginationDataContainer<Device> {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getTenantDevices,
                                                                 pageSize: pageSize, page: page, type: type,
                                                                 textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: PaginationDataContainer<Device>.self) { responseObject -> Void in
-            responseHandler?(responseObject as! PaginationDataContainer<Device>)
-        }
+        let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                                                    authToken: self.authData, expectedTBResponseType: PaginationDataContainer<Device>.self)
+        return responseObject as! PaginationDataContainer<Device>
     }
 
     /**
-     Get device by ID – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     Get device by ID (async) – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
 
      Before returning the device object, the server checks if the device belongs to the tenant or customer (depending
      whether the request comes from a TENANT\_ADMIN' or 'CUSTOMER\_USER').
      - Parameter deviceId: device id as UUID
-     - Parameter responseHandler: optional callable taking the returned ``Device`` object as an argument, will only be called in case the API call succeeds
+     - Returns: the ``Device`` object
+     - Throws: ``TBHTTPClientRequestError``
      */
-    public func getDeviceById(deviceId: UUID, responseHandler: ((Device) -> Void)?) {
+    public func getDeviceById(deviceId: UUID) async throws -> Device {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getDeviceById,
                                                                 replacePaths: [URLModifier(searchString: "{?deviceId?}", replaceString: deviceId.uuidString)])
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, authToken: self.authData, expectedTBResponseType: Device.self) { device -> Void in
-            responseHandler?(device as! Device)
-        }
+        let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                                                    authToken: self.authData, expectedTBResponseType: Device.self)
+        return responseObject as! Device
     }
 
     /**
-     Get device info by ID – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     Get device info by ID (async) – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
 
      Before returning the device info object, the server checks if the device belongs to the tenant or customer (depending
      whether the request comes from a TENANT\_ADMIN' or 'CUSTOMER\_USER').
      - Parameter deviceId: device id as UUID
-     - Parameter responseHandler: optional callable taking the returned ``Device`` object as an argument, will only be called in case the API call succeeds
+     - Returns: the ``Device`` object
+     - Throws: ``TBHTTPClientRequestError``
      - Note: To maintain a consistent interface, this library uses the ``Device`` type for both standard device data and extended *Device Info* results. Rather
      than using two separate models, extended fields (such as `customerTitle` and `deviceProfileName`) are integrated directly into the `Device` object.
      Please note that these extended fields will be *nil* when using standard API endpoints; they are only populated when performing specific *DeviceInfo* requests.
      */
-    public func getDeviceInfoById(deviceId: UUID, responseHandler: ((Device) -> Void)?) {
+    public func getDeviceInfoById(deviceId: UUID) async throws -> Device {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getDeviceInfoById,
                                                                 replacePaths: [URLModifier(searchString: "{?deviceId?}", replaceString: deviceId.uuidString)])
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, authToken: self.authData, expectedTBResponseType: Device.self) { device -> Void in
-            responseHandler?(device as! Device)
-        }
+        let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                                                    authToken: self.authData, expectedTBResponseType: Device.self)
+        return responseObject as! Device
     }
 
     /**
-     Create a new device or update an existing one – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+     Create a new device or update an existing one (async) – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
 
      To create a new device, don't provide the device id. When creating a device, ThingsBoard takes care for creating the device id by itself.
      An access token is generated in case it was not provided in the `accessToken` parameter. ThingsBoard responds with the newly created device.
@@ -331,7 +261,8 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter gateway: device acts as a gateway; default: false
      - Parameter overwriteActivityTime: if the device is a gateway, it can overwrite the end-devices activity times
      - Parameter accessToken: the access token to use for the (new) device; if the device gets updated and this `accessToken` stays empty, the old access token will be used
-     - Parameter responseHandler: optional callable taking the new ``Device`` object as an argument, will only be called in case the API call succeeds
+     - Returns: the new/updated ``Device`` object
+     - Throws: ``TBHTTPClientRequestError``
      - Note: If you don't provide a `description`, `deviceProfileName` and `deviceProfileId` or `customerId` for a new device, it will be created with their corresponding
      default values. **Caution: If you don't provide these fields for an existing device during edit/update, these fields will be (re)set to their default values and may remain empty or get cleared!
      This may result in a device which is not bound to a customer anymore or lost its device profile settings.**
@@ -346,8 +277,8 @@ public class TBUserApiClient: TBHTTPRequest {
                            customerId: UUID? = nil,
                            gateway: Bool = false,
                            overwriteActivityTime: Bool = false,
-                           accessToken: String = "",
-                           responseHandler: ((Device) -> Void)?) {
+                           accessToken: String = "") async throws -> Device {
+        // payload construction mirrors saveDevice(...responseHandler:) — keep in sync
         var deviceData = Dictionary<String, Any>()
 
         deviceData["name"] = name
@@ -366,38 +297,37 @@ public class TBUserApiClient: TBHTTPRequest {
         if let tenantId = tenantId {
             deviceData["tenantId"] = ID(id: tenantId, entityType: .tenant).asDict
         }
-        
+
         if let customerId = customerId {
             deviceData["customerId"] = ID(id: customerId, entityType: .customer).asDict
         }
 
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.saveDevice,
                                                                 replacePaths: [URLModifier(searchString: "{?accessToken?}", replaceString: accessToken)])
-        tbApiRequest(fromEndpoint: endpointURL, withPayload: deviceData, authToken: self.authData, expectedTBResponseType: Device.self) { device -> Void in
-            responseHandler?(device as! Device)
-        }
+        let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, withPayload: deviceData,
+                                                    authToken: self.authData, expectedTBResponseType: Device.self)
+        return responseObject as! Device
     }
 
     /**
-     Delete device – requires 'TENANT\_ADMIN' authority
+     Delete device (async) – requires 'TENANT\_ADMIN' authority
 
      Delete device for given device id. Delete device and all its relations.
      - Parameter deviceId: device id as UUID
-     - Parameter responseHandler: optional callable called on success, takes no argument
+     - Throws: ``TBHTTPClientRequestError``
      */
-    public func deleteDevice(deviceId: UUID, responseHandler: (() -> Void)? = nil) {
+    public func deleteDevice(deviceId: UUID) async throws {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.deleteDevice,
                                                                 replacePaths: [URLModifier(searchString: "{?deviceId?}", replaceString: deviceId.uuidString)])
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete, authToken: self.authData, expectedTBResponseType: [String].self) {_ in
-            responseHandler?()
-        }
+        _ = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete,
+                                   authToken: self.authData, expectedTBResponseType: [String].self)
     }
 
 
     // MARK: - Device Profile related requests
     /**
-     Get Device Profile Infos – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     
+     Get Device Profile Infos (async) – requires 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+
      Receives a page of devices profile info objects defined for the tenant. Specify parameters to filter the results, which are wrapped inside a PageData object that
      allows to iterate over result set using pagination.
      - Parameter pageSize: Maximum amount of entities in a one page
@@ -406,7 +336,8 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter sortProperty: sort resutls according to enumeration 'TbQuerySortProperty'; default: .name
      - Parameter sortOrder: sort results in ascending or descending order, state according to ``TbQuerySortOrder``; default: `.ascending`
      - Parameter transportType: Type of the transport the device profiles support: DEFAULT, MQTT, COAP, LWM2M, SNMP
-     - Parameter responseHandler: takes a 'PageDataContainer<DeviceProfile>' as parameter and is called upon successful server response
+     - Returns: a `PaginationDataContainer<DeviceProfileInfo>`
+     - Throws: ``TBHTTPClientRequestError``
      */
     public func getDeviceProfileInfos(
         pageSize: Int32 = Int32.max,
@@ -414,22 +345,20 @@ public class TBUserApiClient: TBHTTPRequest {
         textSearch: String? = nil,
         sortProperty: TbQuerySortProperty = .name,
         sortOrder: TbQuerySortOrder = .ascending,
-        transportType: TbQueryTransportType? = nil,
-        responseHandler: ((PaginationDataContainer<DeviceProfileInfo>) -> Void)?)
-    -> Void {
+        transportType: TbQueryTransportType? = nil)
+    async throws -> PaginationDataContainer<DeviceProfileInfo> {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getDeviceProfileInfos,
                                                                 pageSize: pageSize, page: page,
                                                                 textSearch: textSearch, transportType: transportType,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: PaginationDataContainer<DeviceProfileInfo>.self) { responseObject -> Void in
-            responseHandler?(responseObject as! PaginationDataContainer<DeviceProfileInfo>)
-        }
+        let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                                                    authToken: self.authData, expectedTBResponseType: PaginationDataContainer<DeviceProfileInfo>.self)
+        return responseObject as! PaginationDataContainer<DeviceProfileInfo>
     }
-    
+
     /**
-     Get Device Profiles – requires 'TENANT\_ADMIN' authority
-     
+     Get Device Profiles (async) – requires 'TENANT\_ADMIN' authority
+
      Receives a page of devices profile objects defined for the tenant. Specify parameters to filter the results which are wrapped insude a PageData object that
      allows to iterate over result set using pagination.
      - Parameter pageSize: Maximum amount of entities in a one page
@@ -437,7 +366,8 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter textSearch: The case insensitive 'substring' filter based on the device name
      - Parameter sortProperty: sort resutls according to enumeration 'TbQuerySortProperty'; default: .name
      - Parameter sortOrder: sort results in ascending or descending order, state according to ``TbQuerySortOrder``; default: `.ascending`
-     - Parameter responseHandler: takes a 'PageDataContainer<DeviceProfile>' as parameter and is called upon successful server response
+     - Returns: a `PaginationDataContainer<DeviceProfile>`
+     - Throws: ``TBHTTPClientRequestError``
      - Note: works with 'TENANT\_ADMIN' authority only!
      */
     public func getDeviceProfiles(
@@ -445,226 +375,215 @@ public class TBUserApiClient: TBHTTPRequest {
         page: Int32 = 0,
         textSearch: String? = nil,
         sortProperty: TbQuerySortProperty = .name,
-        sortOrder: TbQuerySortOrder = .ascending,
-        responseHandler: ((PaginationDataContainer<DeviceProfile>) -> Void)?)
-    -> Void {
+        sortOrder: TbQuerySortOrder = .ascending)
+    async throws -> PaginationDataContainer<DeviceProfile> {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getDeviceProfiles,
                                                                 pageSize: pageSize, page: page, textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: PaginationDataContainer<DeviceProfile>.self) { responseObject -> Void in
-            responseHandler?(responseObject as! PaginationDataContainer<DeviceProfile>)
-        }
+        let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                                                    authToken: self.authData, expectedTBResponseType: PaginationDataContainer<DeviceProfile>.self)
+        return responseObject as! PaginationDataContainer<DeviceProfile>
     }
-    
+
     // MARK: - Attributes and Telemetry
     /**
-     Get Attribute Keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     
+     Get Attribute Keys (async) – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+
      Get a set of unique attribute keys for the requested entity.
      - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
-     - Parameter responseHandler: takes an 'Array<String>' as parameter and is called upon successful server response
+     - Returns: an `Array<String>` containing the attribute key names
+     - Throws: ``TBHTTPClientRequestError``
      - Note: The response includes merged key names for all scopes (supported scopes: ``TbQueryEntityScopes``).
      */
-    public func getAttributeKeys(for entityType: TbQueryEntityTypes, entityId: UUID, responseHandler: ((Array<String>) -> Void)?)
-    -> Void {
+    public func getAttributeKeys(for entityType: TbQueryEntityTypes, entityId: UUID) async throws -> Array<String> {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getAttributeKeys, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
             URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString)
         ])
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: Array<String>.self) { responseObject -> Void in
-            responseHandler?(responseObject as! Array<String>)
-        }
+        let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                                                    authToken: self.authData, expectedTBResponseType: Array<String>.self)
+        return responseObject as! Array<String>
     }
-    
+
     /**
-     Get Attribute Keys by Scope – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     
+     Get Attribute Keys by Scope (async) – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+
      Get a set of unique attribute keys for the requested entity and given scope
      - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter scope: scope in which the attribute is managed, as defined in ``TbQueryEntityScopes``
-     - Parameter responseHandler: takes an 'Array<String>' as parameter and is called upon successful server response
-     - Note: The response includes key names for requested scope.
+     - Returns: an `Array<String>` containing the attribute key names for the requested scope
+     - Throws: ``TBHTTPClientRequestError``
      */
     public func getAttributeKeysByScope(for entityType: TbQueryEntityTypes, entityId: UUID,
-                                        scope: TbQueryEntityScopes, responseHandler: ((Array<String>) -> Void)?)
-    -> Void {
+                                        scope: TbQueryEntityScopes) async throws -> Array<String> {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getAttributeKeysByScope, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
             URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString),
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ])
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: Array<String>.self) { responseObject -> Void in
-            responseHandler?(responseObject as! Array<String>)
-        }
+        let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                                                    authToken: self.authData, expectedTBResponseType: Array<String>.self)
+        return responseObject as! Array<String>
     }
-    
+
     /**
-     Create or update the attributes based on entity id and the specified attribute scope – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     
+     Create or update the attributes based on entity id and the specified attribute scope (async) – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+
      Implementes the endpoint saveEntityAttributesV2
      - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter attributesData: attributes with values as key value pairs, contained inside a dictionary
      - Parameter scope: scope in which the attribute is managed as defined in ``TbQueryEntityScopes``
-     - Parameter responseHandler: takes no parameters and is called upon successful server response
+     - Throws: ``TBHTTPClientRequestError``
      - Note: Attribute scopes depend on the entity type: .server - supported for all entity; .shared - supported for devices
      */
-    public func saveEntityAttributes(for entityType: TbQueryEntityTypes, entityId: UUID, attributesData:  Dictionary<String, Any>,
-                                     scope: TbQueryEntityScopes, responseHandler: (() -> Void)? = nil)
-    -> Void {
+    public func saveEntityAttributes(for entityType: TbQueryEntityTypes, entityId: UUID, attributesData: Dictionary<String, Any>,
+                                     scope: TbQueryEntityScopes) async throws {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.saveEntityAttributes, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
             URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString),
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ])
-        tbApiRequest(fromEndpoint: endpointURL, withPayload: attributesData,
-                     authToken: self.authData, expectedTBResponseType: [String].self) { _ in
-            responseHandler?()
-        }
+        _ = try await tbApiRequest(fromEndpoint: endpointURL, withPayload: attributesData,
+                                   authToken: self.authData, expectedTBResponseType: [String].self)
     }
-    
+
     /**
-     Get all entity attributes (scope-independent)  by keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     
-     - Parameter entityType:tb entity types as defined in ``TbQueryEntityTypes`` enum
+     Get all entity attributes (scope-independent) by keys (async) – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+
+     - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the keys
-     - Parameter responseHandler: takes an array containing items of type ``AttributesResponse``
+     - Returns: an array containing items of type ``AttributesResponse``
+     - Throws: ``TBHTTPClientRequestError``
      */
-    public func getAttributes(for entityType: TbQueryEntityTypes, entityId: UUID, keys: [String] = [], responseHandler: (([AttributesResponse]) -> Void)?) {
+    public func getAttributes(for entityType: TbQueryEntityTypes, entityId: UUID, keys: [String] = []) async throws -> [AttributesResponse] {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getAttributes, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
             URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString)
         ], keys: keys)
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, authToken: self.authData, expectedTBResponseType: [AttributesResponse].self) { responseObject in
-            responseHandler?(responseObject as! [AttributesResponse])
-        }
+        let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                                                    authToken: self.authData, expectedTBResponseType: [AttributesResponse].self)
+        return responseObject as! [AttributesResponse]
     }
-    
+
     /**
-     Get entity attributes by scope and by keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     
-     - Parameter entityType:tb entity types as defined in ``TbQueryEntityTypes`` enum
+     Get entity attributes by scope and by keys (async) – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+
+     - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the keys
      - Parameter scope: scope in which the attribute is managed as defined in ``TbQueryEntityScopes``
-     - Parameter responseHandler: takes an array containing items of type ``AttributesResponse``
+     - Returns: an array containing items of type ``AttributesResponse``
+     - Throws: ``TBHTTPClientRequestError``
      */
-    public func getAttributesByScope(for entityType: TbQueryEntityTypes, entityId: UUID, keys: [String] = [], scope: TbQueryEntityScopes, responseHandler: (([AttributesResponse]) -> Void)?) {
+    public func getAttributesByScope(for entityType: TbQueryEntityTypes, entityId: UUID, keys: [String] = [], scope: TbQueryEntityScopes) async throws -> [AttributesResponse] {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getAttributesByScope, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
             URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString),
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ], keys: keys)
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, authToken: self.authData, expectedTBResponseType: [AttributesResponse].self) { responseObject in
-            responseHandler?(responseObject as! [AttributesResponse])
-        }
+        let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                                                    authToken: self.authData, expectedTBResponseType: [AttributesResponse].self)
+        return responseObject as! [AttributesResponse]
     }
-    
+
     /**
-     Delete entity attributes by scope and keys – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     
-     - Parameter entityType:tb entity types as defined in ``TbQueryEntityTypes`` enum
+     Delete entity attributes by scope and keys (async) – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+
+     - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the keys
      - Parameter scope: scope in which the attribute is managed as defined in ``TbQueryEntityScopes``
-     - Parameter responseHandler: takes no parameters, is called on success
+     - Throws: ``TBHTTPClientRequestError``
      */
-    public func deleteEntityAttributes(for entityType: TbQueryEntityTypes, entityId: UUID, keys: [String], scope: TbQueryEntityScopes, responseHandler: (() -> Void)? = nil) {
+    public func deleteEntityAttributes(for entityType: TbQueryEntityTypes, entityId: UUID, keys: [String], scope: TbQueryEntityScopes) async throws {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.deleteEntityAttributes, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
             URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString),
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ], keys: keys)
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete, authToken: self.authData, expectedTBResponseType: [String].self) { _ in
-            responseHandler?()
-        }
+        _ = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete,
+                                   authToken: self.authData, expectedTBResponseType: [String].self)
     }
-    
+
     /**
-     Save entity telemetry data for the given entity – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     
+     Save entity telemetry data for the given entity (async) – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+
      - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter timeseriesData: timeseries data as key-value pairs (as dictionary)
-     - Parameter responseHandler: takes no parameters and is called upon successful server response
+     - Throws: ``TBHTTPClientRequestError``
      - Note: This library supports pushing time-series data to server but with limited functionality (simple json object).
      This limitation is accepted, as the main scope of this library is not to mimic client device functionality. In principle, this function
      may be used to push mass-data to the server – which results in repetitive function-calls leading to repetitive http requests.
      */
-    public func saveEntityTelemetry(for entityType: TbQueryEntityTypes, entityId: UUID, timeseriesData: Dictionary<String, Any>, responseHandler: (() -> Void)? = nil) {
+    public func saveEntityTelemetry(for entityType: TbQueryEntityTypes, entityId: UUID, timeseriesData: Dictionary<String, Any>) async throws {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.saveEntityTelemetry, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
             URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString),
             URLModifier(searchString: "{?scope?}", replaceString: TbQueryEntityScopes.any.rawValue)
         ])
-        tbApiRequest(fromEndpoint: endpointURL, withPayload: timeseriesData,
-                     authToken: self.authData, expectedTBResponseType: [String].self) { _ in
-            responseHandler?()
-        }
+        _ = try await tbApiRequest(fromEndpoint: endpointURL, withPayload: timeseriesData,
+                                   authToken: self.authData, expectedTBResponseType: [String].self)
     }
-    
+
     /**
-     Get unique time-series key names for the given entity – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     
+     Get unique time-series key names for the given entity (async) – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+
      - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
-     - Parameter responseHandler: takes an 'Array<String>' as parameter and is called upon successful server response
+     - Returns: an `Array<String>` containing the time-series key names
+     - Throws: ``TBHTTPClientRequestError``
      */
-    public func getTimeseriesKeys(for entityType: TbQueryEntityTypes, entityId: UUID, responseHandler: ((Array<String>) -> Void)?)
-    -> Void {
+    public func getTimeseriesKeys(for entityType: TbQueryEntityTypes, entityId: UUID) async throws -> Array<String> {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getTimeseriesKeys, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
             URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString)
         ])
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: Array<String>.self) { responseObject -> Void in
-            responseHandler?(responseObject as! Array<String>)
-        }
+        let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                                                    authToken: self.authData, expectedTBResponseType: Array<String>.self)
+        return responseObject as! Array<String>
     }
-    
+
     /**
-     Get the **latest** time-series data from server – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     
+     Get the **latest** time-series data from server (async) – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+
      Latest time-series data is stored in a different table for performance reasons (according to ThingsBoard docs) and can therefore be retrieved
      via a seperate API call.
      - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the time-series keys
      - Parameter getValuesAsStrings: Get values from servers as strings (not as native datatypes)
-     - Parameter responseHandler: takes an 'Dictionary<String, TimeseriesResponse?>' as parameter and is called upon successful server response
+     - Returns: a `Dictionary<String, TimeseriesResponse?>` keyed by time-series key, each value being the latest ``TimeseriesResponse`` (or nil)
+     - Throws: ``TBHTTPClientRequestError``
      - Note: Retrieving values as strings is recommended if a time-series value is e.g. of type JSON-String.
      JSON-String values cannot be treated by this library as native datatypes currently and should therefore be retrieved as strings. To get the value from a ``TimeseriesResponse`` object, refer to
      ``TimeseriesResponse/value`` and ``MplValueType``.
      */
     public func getLatestTimeseries(for entityType: TbQueryEntityTypes, entityId: UUID, keys: Array<String>? = nil,
-                                    getValuesAsStrings: Bool = true, responseHandler: ((Dictionary<String, TimeseriesResponse?>) -> Void)?) {
+                                    getValuesAsStrings: Bool = true) async throws -> Dictionary<String, TimeseriesResponse?> {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getTimeseries, replacePaths: [
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
             URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString)],
                                                                 keys: keys, useStrictDataTypes: !getValuesAsStrings)
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: Dictionary<String, [TimeseriesResponse]>.self) { responseObject -> Void in
-            let responseObjectArray = responseObject as! Dictionary<String, [TimeseriesResponse]>
-            let responseTimeseries: Dictionary<String, TimeseriesResponse?> = responseObjectArray.mapValues { $0.last }
-            responseHandler?(responseTimeseries)
-        }
+        let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                                                    authToken: self.authData, expectedTBResponseType: Dictionary<String, [TimeseriesResponse]>.self)
+        let responseObjectArray = responseObject as! Dictionary<String, [TimeseriesResponse]>
+        return responseObjectArray.mapValues { $0.last }
     }
-    
+
     /**
-     Get time-series data from server – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     
+     Get time-series data from server (async) – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+
      Retrieve time-series data according to specified time interval and (optional) aggregation functions:
      - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the time-series keys
-     - Parameter startTs: delete time-series data for given periode – specified by startTs and endTs (unix time in milliseconds, int64)
-     - Parameter endTs: delete time-series data for given periode – specified by startTs and endTs (unix time milliseconds, int64)
+     - Parameter startTs: retrieve time-series data for given periode – specified by startTs and endTs (unix time in milliseconds, int64)
+     - Parameter endTs: retrieve time-series data for given periode – specified by startTs and endTs (unix time milliseconds, int64)
      - Parameter intervalType: Value representing the type fo the interval to use for the aggregation function. Supported interval types: ``TbQueryIntervalTypes``
      - Parameter interval: Int64 value specifying the aggregation interval range in milliseconds (in combination with `intervalType` set to `.milliseconds`
      - Parameter timeZone: String value specifying the timezone being used to calculate exact timestamps for ``TbQueryIntervalTypes``
@@ -672,7 +591,8 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter aggregation: Value specifying the aggregation function, if `interval` or `intervalType`is not given `aggregation` parameter will use `.none`
      - Parameter sortOrder: sort results in ascending or descending order, state according to ``TbQuerySortOrder``; default: `.ascending`
      - Parameter getValuesAsStrings: Get values from servers as strings (not as native datatypes)
-     - Parameter responseHandler: takes an 'Dictionary<String, [TimeseriesResponse]>' as parameter and is called upon successful server response
+     - Returns: a `Dictionary<String, [TimeseriesResponse]>` keyed by time-series key
+     - Throws: ``TBHTTPClientRequestError``
      - Note: Retrieving values as strings is recommended if a time-series value is e.g. of type JSON-String.
      JSON-String values cannot be treated by this library as native datatype currently and should therefore be retrieved as strings. To get the value from a ``TimeseriesResponse`` object, refer to
      ``TimeseriesResponse/value`` and ``MplValueType``.
@@ -680,7 +600,7 @@ public class TBUserApiClient: TBHTTPRequest {
     public func getTimeseries(for entityType: TbQueryEntityTypes, entityId: UUID, keys: Array<String>, startTs: Int64, endTs: Int64,
                               intervalType: TbQueryIntervalTypes? = nil, interval: Int64? = nil, timeZone: String? = nil,
                               limit: Int? = nil, aggregation: TbQueryAggregationOptions = .none, sortOrder: TbQuerySortOrder = .ascending,
-                              getValuesAsStrings: Bool = true, responseHandler: ((Dictionary<String, [TimeseriesResponse]>) -> Void)?) {
+                              getValuesAsStrings: Bool = true) async throws -> Dictionary<String, [TimeseriesResponse]> {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getTimeseries,
                                                                 replacePaths: [
                                                                     URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
@@ -691,17 +611,16 @@ public class TBUserApiClient: TBHTTPRequest {
                                                                 timeZone: timeZone, limit: limit,
                                                                 aggregation: aggregation, orderBy: sortOrder,
                                                                 useStrictDataTypes: !getValuesAsStrings)
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: Dictionary<String, [TimeseriesResponse]>.self) { responseObject -> Void in
-            responseHandler?(responseObject as! Dictionary<String, [TimeseriesResponse]>)
-        }
+        let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
+                                                    authToken: self.authData, expectedTBResponseType: Dictionary<String, [TimeseriesResponse]>.self)
+        return responseObject as! Dictionary<String, [TimeseriesResponse]>
     }
-    
+
     /**
-     Delete entity time-series data – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
-     
+     Delete entity time-series data (async) – 'TENANT\_ADMIN' or 'CUSTOMER\_USER' authority
+
      Delete time-series data for selected entity based on its id, type and keys
-     - Parameter entityType:tb entity types as defined in ``TbQueryEntityTypes`` enum
+     - Parameter entityType: tb entity types as defined in ``TbQueryEntityTypes`` enum
      - Parameter entityId: entitiy id
      - Parameter keys: array of strings containing the keys
      - Parameter deleteAllDataForKeys: delete all time-series data for given key (should be false when used with `startTs`/`endTs`)
@@ -710,13 +629,12 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter deleteLatest: delete latest value (stored in separate table for performance), if the value's timestamp matches the time-frame
      - Parameter rewriteLatestIfDeleted: rewrite latest value (stored in separate table for performance) if the value's timestamp matches the time-frame and `deleteLatest` is true;
      the replacement value will be fetched from the 'time-series' table, and its timestamp will be the most recent one before the defined time-range
-     - Parameter responseHandler: takes no parameters and is called upon successful server response
+     - Throws: ``TBHTTPClientRequestError``
      */
     public func deleteEntityTimeseries(for entityType: TbQueryEntityTypes, entityId: UUID, keys: [String],
                                        deleteAllDataForKeys: Bool? = nil,
                                        startTs: Int64? = nil, endTs: Int64? = nil,
-                                       deleteLatest: Bool? = nil, rewriteLatestIfDeleted: Bool? = nil,
-                                       responseHandler: (() -> Void)? = nil) {
+                                       deleteLatest: Bool? = nil, rewriteLatestIfDeleted: Bool? = nil) async throws {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.deleteEntityTimeseries,
                                                                 replacePaths: [
                                                                     URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
@@ -724,8 +642,7 @@ public class TBUserApiClient: TBHTTPRequest {
                                                                 ],
                                                                 keys: keys, deleteAllDataForKeys: deleteAllDataForKeys, startTs: startTs, endTs: endTs,
                                                                 deleteLatest: deleteLatest, rewriteLatestIfDeleted: rewriteLatestIfDeleted)
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete, authToken: self.authData, expectedTBResponseType: [String].self) { _ in
-            responseHandler?()
-        }
+        _ = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete,
+                                   authToken: self.authData, expectedTBResponseType: [String].self)
     }
 }

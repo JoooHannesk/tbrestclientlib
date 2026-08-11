@@ -1,6 +1,23 @@
 # Usage
 Detailed overview of the currently supported methods and data models used to communicate with your ThingsBoard server.
 
+## Choosing between callbacks and async/await
+Since version 0.0.26, every request method exists in two flavors: the original callback-based variant and an async/await variant. The async variant carries the same name, just without the `responseHandler` parameter — it returns the value directly and throws a ``TBHTTPClientRequestError`` on failure (``TBHTTPClientRequestError/api(_:)`` for server-provided errors, ``TBHTTPClientRequestError/system(_:)`` for local/transport errors). Error handlers registered via ``TBHTTPRequest/registerErrorHandler(apiErrorHandler:systemErrorHandler:)`` are **not** invoked for async calls; use `do/catch` instead. As a precondition check, the async ``TBUserApiClient/login()`` throws a bare ``TBSystemError/emptyLogin`` when credentials are empty, matching the callback-based ``TBUserApiClient/login(responseHandler:)``. In an async context, Swift automatically selects the async overload:
+
+```swift
+let myClient = try TBUserApiClient(baseUrlStr: "https://my-thingsboard-iot-server.com",
+                                   username: "MyUsername",
+                                   password: "MySuperSecretPassword")
+do {
+    try await myClient.login()
+    let user = try await myClient.getUser()
+} catch let error as TBHTTPClientRequestError {
+    print("Request failed: \(error)")
+}
+```
+
+Both APIs can be mixed freely on the same client instance – the sections below describe the callback-based flavor.
+
 ## Initialization and Login (Authentication)
 A client object can be initialized in two different ways - and requires to provide login data. Either by username/password or access tokens retrieved by a previous session. The following initializers are implemented as failable and will do so, if their parameters are provided with an empty string.
 * ``TBUserApiClient/init(baseUrlStr:username:password:apiEndpointVersion:httpSessionHandler:logger:)``: server url, authentication by username and password 
