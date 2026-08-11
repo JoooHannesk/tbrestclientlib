@@ -17,8 +17,14 @@ public class TBHTTPRequest {
     let logger: Logger?
     
     // MARK: - Initialization
-    init(httpSessionHandler: URLSessionProtocol, logger: Logger? = nil) {
-        httpClient = SimpleHTTPClient(sessionHandler: httpSessionHandler,  logger: logger)
+
+    /// Initializes a new TBHTTPRequest with a custom URLSession handler, a request timeout, and an optional logger.
+    /// - Parameters:
+    ///   - httpSessionHandler: The session handler used to perform network requests (useful for dependency injection and testing).
+    ///   - requestTimeout: The timeout interval, in seconds, for HTTP requests created by this client.
+    ///   - logger: Optional OSLog Logger used to record diagnostic messages. If nil, logging is disabled.
+    init(httpSessionHandler: URLSessionProtocol, requestTimeout: TimeInterval, logger: Logger? = nil) {
+        httpClient = SimpleHTTPClient(sessionHandler: httpSessionHandler, requestTimeout: requestTimeout, logger: logger)
         self.logger = logger
     }
     

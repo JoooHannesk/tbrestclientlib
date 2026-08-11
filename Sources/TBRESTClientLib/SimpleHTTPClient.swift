@@ -42,10 +42,17 @@ enum SupportedHTTPMethods: String {
 class SimpleHTTPClient {
     
     private var sessionHandler: URLSessionProtocol
+    private var requestTimeout: TimeInterval
     private let logger: Logger?
-    
-    init(sessionHandler: URLSessionProtocol = URLSession.shared,  logger: Logger? = nil) {
+
+    /// Initializes a new `SimpleHTTPClient`.
+    /// - Parameters:
+    ///   - sessionHandler: The URL session used to execute requests. Defaults to `URLSession.shared`.
+    ///   - requestTimeout: The timeout interval, in seconds, applied to each request.
+    ///   - logger: Optional `Logger` for emitting request/response diagnostics. Pass `nil` to disable logging.
+    init(sessionHandler: URLSessionProtocol = URLSession.shared, requestTimeout: TimeInterval, logger: Logger? = nil) {
         self.sessionHandler = sessionHandler
+        self.requestTimeout = requestTimeout
         self.logger = logger
     }
     
@@ -71,6 +78,7 @@ class SimpleHTTPClient {
             return
         }
         var request = URLRequest(url: url)
+        request.timeoutInterval = self.requestTimeout
         request.httpMethod = httpMethod.rawValue
         
         if let httpHeaders = httpHeaders {

@@ -26,18 +26,19 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter password: user's password as utf8 string
      - Parameter httpSessionHandler: HTTP session handler to use for http request
      - Parameter apiEndpointVersion: API version, currently only .v1 supported because no other version is currently implemented.
+     - Parameter requestTimeout: Request timeout, defaults to 10 seconds
      - Parameter logger: Logger (from OSLog) instance (optional)
      - Note: Intention for httpSessionHandler: can take a mock-http session handler for unit testing the http calls.
      This initializer's intention is mainly to be used when performing unit testing. When using the library it is recommended to use the
      convenience initializer.
      */
-    public init(baseUrlStr: String, username: String, password: String, apiEndpointVersion: TbApiEndpointsVersion = .v1, httpSessionHandler: URLSessionProtocol = URLSession.shared, logger: Logger? = nil) throws {
+    public init(baseUrlStr: String, username: String, password: String, apiEndpointVersion: TbApiEndpointsVersion = .v1, httpSessionHandler: URLSessionProtocol = URLSession.shared, requestTimeout: TimeInterval = 15, logger: Logger? = nil) throws {
         serverSettings = ServerSettings(baseUrl: baseUrlStr, username: username, password: password)
         guard serverSettings.allPartsGiven() else {
             throw TBSystemError.emptyLogin
         }
         aem = APIEndpointManager(serverSettings: self.serverSettings, apiEndpoints: apiEndpointVersion.version)
-        super.init(httpSessionHandler: httpSessionHandler, logger: logger)
+        super.init(httpSessionHandler: httpSessionHandler, requestTimeout: requestTimeout, logger: logger)
     }
     
     /**
@@ -47,17 +48,18 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter accessToken: AuthLogin object containing `token` and `refreshToken`
      - Parameter apiEndpointVersion: API version, currently only .v1 supported because no other version is currently implemented.
      - Parameter httpSessionHandler: HTTP session handler, defaults `URLSession.shared`
+     - Parameter requestTimeout: Request timeout, defaults to 10 seconds
      - Parameter logger: Logger (from OSLog) instance (optional)
      - Note: Re-use tokens from an existing/previous session instead of optaining new ones from the server.
      */
-    public init(baseUrlStr: String, accessToken: AuthLogin, apiEndpointVersion: TbApiEndpointsVersion = .v1, httpSessionHandler: URLSessionProtocol = URLSession.shared, logger: Logger? = nil) throws {
+    public init(baseUrlStr: String, accessToken: AuthLogin, apiEndpointVersion: TbApiEndpointsVersion = .v1, httpSessionHandler: URLSessionProtocol = URLSession.shared, requestTimeout: TimeInterval = 15, logger: Logger? = nil) throws {
         serverSettings = ServerSettings(baseUrl: baseUrlStr, username: "", password: "")
         guard accessToken.allPartsGiven() && serverSettings.urlGiven() else {
             throw TBSystemError.emptyLogin
         }
         authData = accessToken
         aem = APIEndpointManager(serverSettings: self.serverSettings, apiEndpoints: apiEndpointVersion.version)
-        super.init(httpSessionHandler: httpSessionHandler, logger: logger)
+        super.init(httpSessionHandler: httpSessionHandler, requestTimeout: requestTimeout, logger: logger)
     }
     
     // MARK: – Authentication
