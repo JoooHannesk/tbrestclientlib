@@ -39,10 +39,10 @@ enum SupportedHTTPMethods: String {
     case delete = "DELETE"
 }
 
-class SimpleHTTPClient {
-    
-    private var sessionHandler: URLSessionProtocol
-    private var requestTimeout: TimeInterval
+final class SimpleHTTPClient: Sendable {
+
+    private let sessionHandler: URLSessionProtocol
+    private let requestTimeout: TimeInterval
     private let logger: Logger?
 
     /// Initializes a new `SimpleHTTPClient`.

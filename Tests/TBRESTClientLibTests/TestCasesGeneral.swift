@@ -42,7 +42,7 @@ class FunctionalTestCases: XCTestCase {
         let expectation = XCTestExpectation(description: "Expected login to fail!")
         XCTAssertNotNil(apiClient)
         
-        func showLoginFailed(apperror: TBAppError) {
+        @Sendable func showLoginFailed(apperror: TBAppError) {
             XCTAssertNotNil(apperror)
             XCTAssertEqual(apperror.status, 401)
             XCTAssertEqual(apperror.errorCode, 10)

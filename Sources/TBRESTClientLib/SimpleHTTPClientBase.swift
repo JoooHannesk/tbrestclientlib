@@ -17,13 +17,15 @@ extension URLSessionDataTask: URLSessionDataTaskProtocol { }
 
 
 // MARK: - URLSession
-public protocol URLSessionProtocol {
-    func dataTask(with url: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol
+/// - Note: Refines `Sendable` because session handlers are shared across concurrency domains by
+/// ``TBUserApiClient``; the completion handler is invoked on an arbitrary thread and must be `@Sendable`.
+public protocol URLSessionProtocol: Sendable {
+    func dataTask(with url: URLRequest, completionHandler: @escaping @Sendable (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol
 }
 
 extension URLSession: URLSessionProtocol {
-    
-    public func dataTask(with url: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol   {
+
+    public func dataTask(with url: URLRequest, completionHandler: @escaping @Sendable (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol   {
         return (dataTask(with: url, completionHandler: completionHandler) as URLSessionDataTask) as URLSessionDataTaskProtocol
     }
 }
@@ -33,8 +35,9 @@ class MockURLSessionDataTask: URLSessionDataTaskProtocol {
     func resume() { }
 }
 
-class MockURLSession: URLSessionProtocol {
-    
+// @unchecked: mutable state is only set at init time by the owning test before any request runs.
+final class MockURLSession: URLSessionProtocol, @unchecked Sendable {
+
     var dataTask = MockURLSessionDataTask()
     
     var cmplHdlrData: Data?
@@ -47,7 +50,7 @@ class MockURLSession: URLSessionProtocol {
         self.cmplHdlrError = cmplHdlrError
     }
     
-    func dataTask(with url: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol {
+    func dataTask(with url: URLRequest, completionHandler: @escaping @Sendable (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTaskProtocol {
         completionHandler(self.cmplHdlrData, self.cmplHdlrURLResponse, self.cmplHdlrError)
         return self.dataTask
     }

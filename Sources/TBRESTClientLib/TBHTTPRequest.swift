@@ -8,13 +8,30 @@
 import Foundation
 import OSLog
 
-public class TBHTTPRequest {
-    
+/// - Note: `@unchecked Sendable` because the mutable state (error handlers here, auth data and
+/// server settings in ``TBUserApiClient``) is guarded by `stateLock`; everything else is immutable.
+public class TBHTTPRequest: @unchecked Sendable {
+
     // MARK: - Properties
-    var httpClient: SimpleHTTPClient
-    private(set) var apiErrorHandler: ((TBAppError) -> Void)? = nil
-    private(set) var systemErrorHandler: ((TBSystemError) -> Void)? = nil
+    let httpClient: SimpleHTTPClient
     let logger: Logger?
+
+    /// Guards all mutable state of this class and its subclasses. Accessors must not nest
+    /// ``withStateLock(_:)`` calls (NSLock is not reentrant).
+    private let stateLock = NSLock()
+    private var _apiErrorHandler: (@Sendable (TBAppError) -> Void)? = nil
+    private var _systemErrorHandler: (@Sendable (TBSystemError) -> Void)? = nil
+
+    var apiErrorHandler: (@Sendable (TBAppError) -> Void)? { withStateLock { _apiErrorHandler } }
+    var systemErrorHandler: (@Sendable (TBSystemError) -> Void)? { withStateLock { _systemErrorHandler } }
+
+    /// Runs `body` while holding `stateLock`. Used by this class and ``TBUserApiClient`` to
+    /// serialize access to mutable state.
+    func withStateLock<T>(_ body: () -> T) -> T {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        return body()
+    }
     
     // MARK: - Initialization
 
@@ -38,10 +55,14 @@ public class TBHTTPRequest {
      
      - Parameter apiErrorHandler: called when the API responds with an error, takes the server-provided ``TBAppError``
      - Parameter systemErrorHandler: called when the HTTP request fails locally, takes a ``TBSystemError``
+     - Note: Both handlers are invoked on an arbitrary background thread (URLSession's completion queue),
+     hence they must be `@Sendable`. Dispatch to the main actor inside the handler if needed.
      */
-    public func registerErrorHandler(apiErrorHandler: ((TBAppError) -> Void)? = nil, systemErrorHandler: ((TBSystemError) -> Void)? = nil) {
-        self.apiErrorHandler = apiErrorHandler
-        self.systemErrorHandler = systemErrorHandler
+    public func registerErrorHandler(apiErrorHandler: (@Sendable (TBAppError) -> Void)? = nil, systemErrorHandler: (@Sendable (TBSystemError) -> Void)? = nil) {
+        withStateLock {
+            self._apiErrorHandler = apiErrorHandler
+            self._systemErrorHandler = systemErrorHandler
+        }
     }
     
     /**

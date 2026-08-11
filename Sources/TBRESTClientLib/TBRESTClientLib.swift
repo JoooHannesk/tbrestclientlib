@@ -10,12 +10,25 @@
 import Foundation
 import OSLog
 
-public class TBUserApiClient: TBHTTPRequest {
+public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
     // MARK: - Properties
-    var aem: APIEndpointManager          // internal: accessed by the async API in TBUserApiClient+Async.swift
-    var serverSettings: ServerSettings   // internal: async login(withUsername:andPassword:) mutates it
-    var authData: AuthLogin?             // internal get/set: async login() assigns it
-    
+    let aem: APIEndpointManager          // internal: accessed by the async API in TBUserApiClient+Async.swift
+
+    // Mutable state is guarded by the superclass' stateLock so the client stays Sendable
+    // (conformance is inherited from TBHTTPRequest). Backing storage is only touched directly
+    // by the initializers (before super.init) and inside withStateLock.
+    private var _serverSettings: ServerSettings
+    private var _authData: AuthLogin? = nil
+
+    var serverSettings: ServerSettings {  // internal: async login(withUsername:andPassword:) mutates it
+        get { withStateLock { _serverSettings } }
+        set { withStateLock { _serverSettings = newValue } }
+    }
+    var authData: AuthLogin? {            // internal get/set: async login() assigns it
+        get { withStateLock { _authData } }
+        set { withStateLock { _authData = newValue } }
+    }
+
     
     // MARK: - Initializers
     /**
@@ -33,11 +46,11 @@ public class TBUserApiClient: TBHTTPRequest {
      convenience initializer.
      */
     public init(baseUrlStr: String, username: String, password: String, apiEndpointVersion: TbApiEndpointsVersion = .v1, httpSessionHandler: URLSessionProtocol = URLSession.shared, requestTimeout: TimeInterval = 15, logger: Logger? = nil) throws {
-        serverSettings = ServerSettings(baseUrl: baseUrlStr, username: username, password: password)
-        guard serverSettings.allPartsGiven() else {
+        _serverSettings = ServerSettings(baseUrl: baseUrlStr, username: username, password: password)
+        guard _serverSettings.allPartsGiven() else {
             throw TBSystemError.emptyLogin
         }
-        aem = APIEndpointManager(serverSettings: self.serverSettings, apiEndpoints: apiEndpointVersion.version)
+        aem = APIEndpointManager(serverSettings: _serverSettings, apiEndpoints: apiEndpointVersion.version)
         super.init(httpSessionHandler: httpSessionHandler, requestTimeout: requestTimeout, logger: logger)
     }
     
@@ -53,12 +66,12 @@ public class TBUserApiClient: TBHTTPRequest {
      - Note: Re-use tokens from an existing/previous session instead of optaining new ones from the server.
      */
     public init(baseUrlStr: String, accessToken: AuthLogin, apiEndpointVersion: TbApiEndpointsVersion = .v1, httpSessionHandler: URLSessionProtocol = URLSession.shared, requestTimeout: TimeInterval = 15, logger: Logger? = nil) throws {
-        serverSettings = ServerSettings(baseUrl: baseUrlStr, username: "", password: "")
-        guard accessToken.allPartsGiven() && serverSettings.urlGiven() else {
+        _serverSettings = ServerSettings(baseUrl: baseUrlStr, username: "", password: "")
+        guard accessToken.allPartsGiven() && _serverSettings.urlGiven() else {
             throw TBSystemError.emptyLogin
         }
-        authData = accessToken
-        aem = APIEndpointManager(serverSettings: self.serverSettings, apiEndpoints: apiEndpointVersion.version)
+        _authData = accessToken
+        aem = APIEndpointManager(serverSettings: _serverSettings, apiEndpoints: apiEndpointVersion.version)
         super.init(httpSessionHandler: httpSessionHandler, requestTimeout: requestTimeout, logger: logger)
     }
     
