@@ -31,7 +31,7 @@ public class TBUserApiClient: TBHTTPRequest {
      This initializer's intention is mainly to be used when performing unit testing. When using the library it is recommended to use the
      convenience initializer.
      */
-    public init?(baseUrlStr: String, username: String, password: String, apiEndpointVersion: TbApiEndpointsVersion = .v1, httpSessionHandler: URLSessionProtocol = URLSession.shared, logger: Logger? = nil) throws {
+    public init(baseUrlStr: String, username: String, password: String, apiEndpointVersion: TbApiEndpointsVersion = .v1, httpSessionHandler: URLSessionProtocol = URLSession.shared, logger: Logger? = nil) throws {
         serverSettings = ServerSettings(baseUrl: baseUrlStr, username: username, password: password)
         guard serverSettings.allPartsGiven() else {
             throw TBSystemError.emptyLogin
@@ -50,7 +50,7 @@ public class TBUserApiClient: TBHTTPRequest {
      - Parameter logger: Logger (from OSLog) instance (optional)
      - Note: Re-use tokens from an existing/previous session instead of optaining new ones from the server.
      */
-    public init?(baseUrlStr: String, accessToken: AuthLogin, apiEndpointVersion: TbApiEndpointsVersion = .v1, httpSessionHandler: URLSessionProtocol = URLSession.shared, logger: Logger? = nil) throws {
+    public init(baseUrlStr: String, accessToken: AuthLogin, apiEndpointVersion: TbApiEndpointsVersion = .v1, httpSessionHandler: URLSessionProtocol = URLSession.shared, logger: Logger? = nil) throws {
         serverSettings = ServerSettings(baseUrl: baseUrlStr, username: "", password: "")
         guard accessToken.allPartsGiven() && serverSettings.urlGiven() else {
             throw TBSystemError.emptyLogin

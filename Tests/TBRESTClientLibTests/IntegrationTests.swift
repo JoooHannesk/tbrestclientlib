@@ -93,12 +93,12 @@ final class IntegrationTests: FunctionalTestCases {
         loginSucceeds(apiClient: tbTestClient)
         let authData = tbTestClient!.authData
         let newTbTestClient = try! TBUserApiClient(baseUrlStr: serversettings!.baseUrl, accessToken: authData!, logger: Self.logger)
-        newTbTestClient!.registerErrorHandler(apiErrorHandler: { errorMsg in
+        newTbTestClient.registerErrorHandler(apiErrorHandler: { errorMsg in
             XCTFail("API error: \(errorMsg)")
         })
         getUser(apiClient: newTbTestClient, expectedUsername: serversettings!.username)
         renewLogin(apiClient: newTbTestClient, username: serversettings!.username, password: serversettings!.password)
-        compareDifferentAuthLogins(apiClientToken1: tbTestClient!.authData!, apiClientToken2: newTbTestClient!.authData!)
+        compareDifferentAuthLogins(apiClientToken1: tbTestClient!.authData!, apiClientToken2: newTbTestClient.authData!)
     }
 
     /**
