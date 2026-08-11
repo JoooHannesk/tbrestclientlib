@@ -9,7 +9,7 @@ This library implements selected parts of the ThingsBoard administration and use
 
 Throughout this documentation, we aim to follow the official ThingsBoard nomenclature and API documentation as closely as possible. While every effort is made to stay aligned, minor deviations may occur.
 
-## 🛠 Development Status – Available Functions (v0.0.22)
+## 🛠 Development Status – Available Functions (v0.0.24)
 This library is **under active development** and is steadily expanding its coverage of the ThingsBoard API. As a result, **not all API endpoints are available yet**. For a detailed and up-to-date overview of the currently supported endpoints, please refer to the <doc:Usage> section.
 
 ### Currently supported functionality

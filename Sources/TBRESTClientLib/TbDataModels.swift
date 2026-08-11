@@ -337,3 +337,7 @@ public struct TBAppError: TBDataModel {
     public let timestamp: Int
     public var timestampDt: Date { Date(timeIntervalSince1970: TimeInterval(timestamp/1000)) }
 }
+
+extension TBAppError: Error, LocalizedError {
+    public var errorDescription: String? { message }
+}

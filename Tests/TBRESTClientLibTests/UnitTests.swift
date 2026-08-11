@@ -29,7 +29,7 @@ final class UnitTests: FunctionalTestCases {
      */
     func testLoginDataEmpty() {
         XCTAssertThrowsError(try TBUserApiClient(baseUrlStr: "url.server.com", username: "", password: "", logger: Self.logger)) { error in
-            if case TBHTTPClientRequestError.emptyLogin = error {
+            if case TBSystemError.emptyLogin = error {
                 // expected error case returned
                 XCTAssertTrue(true, "Correct error type thrown!")
             }

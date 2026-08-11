@@ -404,9 +404,12 @@ class FunctionalTestCases: XCTestCase {
      */
     func saveEntityAttributesFailureUnmatchedDeviceID(apiClient: TBUserApiClient?) {
         let expectedResponseDeviceUnknown = XCTestExpectation(description: "Expected unknown device response...")
-        apiClient?.registerErrorHandler(apiErrorHandler: { tbAppError in
-            print("Operation failed with error: \(tbAppError)")
-            XCTAssertEqual(tbAppError.status, 999)
+        apiClient?.registerErrorHandler(systemErrorHandler: { systemError in
+            print("Operation failed with error: \(systemError)")
+            guard case .undecodableResponse = systemError else {
+                XCTFail("Expected .undecodableResponse, got \(systemError)")
+                return
+            }
             expectedResponseDeviceUnknown.fulfill()
         })
         let sampleAttributes = ["sampleAtt1String":"Hello Server", "sampleAtt2String": "Hello Client"]
@@ -423,9 +426,12 @@ class FunctionalTestCases: XCTestCase {
      */
     func saveEntityAttributesFailureNonConformingUUID(apiClient: TBUserApiClient?) {
         let expectedResponseDeviceUnknown = XCTestExpectation(description: "Expected unknown device response...")
-        apiClient?.registerErrorHandler(apiErrorHandler: { tbAppError in
-            print("Test failed with error: \(tbAppError)")
-            XCTAssertEqual(tbAppError.status, 999)
+        apiClient?.registerErrorHandler(systemErrorHandler: { systemError in
+            print("Test failed with error: \(systemError)")
+            guard case .undecodableResponse = systemError else {
+                XCTFail("Expected .undecodableResponse, got \(systemError)")
+                return
+            }
             expectedResponseDeviceUnknown.fulfill()
         })
         let sampleAttributes = ["sampleAtt1String":"Hello Server", "sampleAtt2Bool": true, "sampleAtt3Int": 4, "sampleAtt4Double": 3.1415926] as [String : Any]

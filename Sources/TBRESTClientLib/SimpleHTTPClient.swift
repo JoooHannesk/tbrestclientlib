@@ -11,14 +11,26 @@ import OSLog
 
 // MARK: - HTTP request (generalized)
 
-public enum TBHTTPClientRequestError: Error, Equatable {
+/// Errors originating from the local system or transport layer, e.g. a malformed URL,
+/// a failed HTTP request (host unreachable, no internet connection) or a server response
+/// which could not be decoded.
+public enum TBSystemError: Error, Equatable {
     case badURL
     case improperPayloadDataFormat
     case httpRequestFailure
     case emptyLogin
     case badLogin
-    case tbAppError(appError: TBAppError)
-    case tbGenericError(genericError: TBAppError)
+    /// The server responded, but the body was neither the expected data model nor a ``TBAppError``.
+    /// The raw response body is attached for diagnostics.
+    case undecodableResponse(body: String)
+}
+
+/// Top-level request error, separating the two error domains:
+/// ``api(_:)`` carries an error object provided by the ThingsBoard server (e.g. wrong login),
+/// ``system(_:)`` carries a local system/transport error (e.g. no internet connection).
+public enum TBHTTPClientRequestError: Error, Equatable {
+    case api(TBAppError)
+    case system(TBSystemError)
 }
 
 enum SupportedHTTPMethods: String {
@@ -55,7 +67,7 @@ class SimpleHTTPClient {
                        completionHandler: @escaping (Result<any TBDataModel, TBHTTPClientRequestError>) -> Void)
     -> Void {
         guard let url = URL(string: urlString) else {
-            completionHandler(.failure(.badURL))
+            completionHandler(.failure(.system(.badURL)))
             return
         }
         var request = URLRequest(url: url)
@@ -71,7 +83,7 @@ class SimpleHTTPClient {
                 // print(String(data: httpBody, encoding: .utf8)!)
                 request.httpBody = httpBody as Data  // typecast to 'Data' type
             } catch {
-                completionHandler(.failure(.improperPayloadDataFormat))
+                completionHandler(.failure(.system(.improperPayloadDataFormat)))
                 return
             }
         }
@@ -82,7 +94,7 @@ class SimpleHTTPClient {
             }
             if let error = error {
                 self.logger?.error("TBRESTClientLib (system) HTTP request failed: \(error) - \(error.localizedDescription)")
-                completionHandler(.failure(.httpRequestFailure))
+                completionHandler(.failure(.system(.httpRequestFailure)))
             } else if let responseData = responseData {
                 let responseDataResultDict = self.convertResponseToTbDataModelObject(responseData, expectedResponseType: responseType)
                 completionHandler(responseDataResultDict)
@@ -102,7 +114,7 @@ class SimpleHTTPClient {
     fileprivate func convertResponseToTbDataModelObject(_ responseData: Data, expectedResponseType: any TBDataModel.Type)
     -> Result<any TBDataModel, TBHTTPClientRequestError> {
         guard let responseDataStr = String(data: responseData, encoding: .utf8) else {
-            return .failure(.improperPayloadDataFormat)
+            return .failure(.system(.improperPayloadDataFormat))
         }
         
         var localError: String = ""
@@ -126,13 +138,11 @@ class SimpleHTTPClient {
         // try converting to app error model object
         do {
             let tbapperror = try decoder.decode(TBAppError.self, from: responseData)
-            return .failure(.tbAppError(appError: tbapperror))
+            return .failure(.api(tbapperror))
         } catch {
             localError += "\(error.localizedDescription): \(error)\nAPI Response: \(responseDataStr)\n"
         }
         self.logger?.error("TBRESTClientLib (serverside) Error Message: \(localError)")
-        // create error object to keep in convention with other errors – even delivered in other format from server
-        let genErr = TBAppError(status: 999, message: responseDataStr, errorCode: 999, timestamp: 0)
-        return .failure(.tbGenericError(genericError: genErr))
+        return .failure(.system(.undecodableResponse(body: responseDataStr)))
     }
 }

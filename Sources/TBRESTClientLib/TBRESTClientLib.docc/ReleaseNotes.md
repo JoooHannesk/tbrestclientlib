@@ -1,5 +1,14 @@
 # Release Notes
 
+## Client – Version 0.0.24
+* Reworked the error type structure — **breaking change** for implementors matching on `TBHTTPClientRequestError`:
+    * New enum ``TBSystemError`` carries all system/transport-level errors (`badURL`, `improperPayloadDataFormat`, `httpRequestFailure`, `emptyLogin`, `badLogin`, `undecodableResponse(body:)`)
+    * ``TBHTTPClientRequestError`` now contains only two cases separating the error domains: ``TBHTTPClientRequestError/api(_:)`` (server-provided ``TBAppError``) and ``TBHTTPClientRequestError/system(_:)``
+    * `systemErrorHandler` registered via ``TBHTTPRequest/registerErrorHandler(apiErrorHandler:systemErrorHandler:)`` now receives a ``TBSystemError`` — it can no longer nominally receive API error cases which were never delivered to it
+    * Server responses which can neither be decoded as the expected data model nor as ``TBAppError`` are now reported as ``TBSystemError/undecodableResponse(body:)`` to the `systemErrorHandler` (previously a synthetic ``TBAppError`` with status 999 was delivered to the `apiErrorHandler`)
+    * Initializers and ``TBUserApiClient/login(responseHandler:)`` now throw ``TBSystemError/emptyLogin`` instead of `TBHTTPClientRequestError.emptyLogin`
+* ``TBAppError`` now conforms to `Error` and `LocalizedError` (`localizedDescription` returns the server-provided message)
+
 ## Client – Version 0.0.22
 * Released: 2026-08-10
 * Extended minimum system requirements to include older macOS and iOS versions: 

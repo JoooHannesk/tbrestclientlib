@@ -28,7 +28,7 @@ The following listing shows initialization by username and password. After initi
 
 The parameter `apiErrorHandler` is used to register a callback function that handles API-related errors. This function takes a single argument of type ``TBAppError`` and is triggered when the API returns an error, such as an invalid response or a server-side error (e.g. HTTP 500).
 
-The parameter `systemErrorHandler` is used to register a callback function that handles system-level errors. It takes a single argument of type ``TBHTTPClientRequestError`` and is invoked when local issues occur, such as a failed hostname resolution or an unreachable server.
+The parameter `systemErrorHandler` is used to register a callback function that handles system-level errors. It takes a single argument of type ``TBSystemError`` and is invoked when local issues occur, such as a failed hostname resolution, an unreachable server or a server response which could not be decoded (``TBSystemError/undecodableResponse(body:)``).
 
 ```swift
 import TBRESTClientLib

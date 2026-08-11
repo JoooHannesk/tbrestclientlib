@@ -34,7 +34,7 @@ public class TBUserApiClient: TBHTTPRequest {
     public init?(baseUrlStr: String, username: String, password: String, apiEndpointVersion: TbApiEndpointsVersion = .v1, httpSessionHandler: URLSessionProtocol = URLSession.shared, logger: Logger? = nil) throws {
         serverSettings = ServerSettings(baseUrl: baseUrlStr, username: username, password: password)
         guard serverSettings.allPartsGiven() else {
-            throw TBHTTPClientRequestError.emptyLogin
+            throw TBSystemError.emptyLogin
         }
         aem = APIEndpointManager(serverSettings: self.serverSettings, apiEndpoints: apiEndpointVersion.version)
         super.init(httpSessionHandler: httpSessionHandler, logger: logger)
@@ -53,7 +53,7 @@ public class TBUserApiClient: TBHTTPRequest {
     public init?(baseUrlStr: String, accessToken: AuthLogin, apiEndpointVersion: TbApiEndpointsVersion = .v1, httpSessionHandler: URLSessionProtocol = URLSession.shared, logger: Logger? = nil) throws {
         serverSettings = ServerSettings(baseUrl: baseUrlStr, username: "", password: "")
         guard accessToken.allPartsGiven() && serverSettings.urlGiven() else {
-            throw TBHTTPClientRequestError.emptyLogin
+            throw TBSystemError.emptyLogin
         }
         authData = accessToken
         aem = APIEndpointManager(serverSettings: self.serverSettings, apiEndpoints: apiEndpointVersion.version)
@@ -69,7 +69,7 @@ public class TBUserApiClient: TBHTTPRequest {
      */
     public func login(responseHandler: ((AuthLogin) -> Void)? = nil) throws -> Void {
         guard serverSettings.allPartsGiven() else {
-            throw TBHTTPClientRequestError.emptyLogin
+            throw TBSystemError.emptyLogin
         }
         let authDataDict: Dictionary<String, String> = ["username": serverSettings.username, "password": serverSettings.password]
         tbApiRequest(fromEndpoint: aem.getEndpointURL(\.login),
