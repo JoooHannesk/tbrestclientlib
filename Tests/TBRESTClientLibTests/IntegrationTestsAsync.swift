@@ -23,8 +23,8 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func prepare() -> (TBUserApiClient?, ServerSettings?) {
         let serversettings = FileResourceLoader(searchPath: "Resources").loadServerSettingsFromFile(fileName: "ServerSettings")
         let tbTestClient = try? TBUserApiClient(baseUrlStr: serversettings!.baseUrl,
-                                                username: serversettings!.username,
-                                                password: serversettings!.password,
+                                                username: serversettings!.username!,
+                                                password: serversettings!.password!,
                                                 logger: Self.logger)
         return (tbTestClient, serversettings)
     }
@@ -71,7 +71,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func testGetUser() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
     }
 
     /**
@@ -80,7 +80,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func testGetCustomerById() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         try await getCustomerById(apiClient: tbTestClient, expectedCustomerName: "IoT Playground")
     }
 
@@ -90,11 +90,11 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func testLoginWithAccessToken() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        let authData = tbTestClient!.authData
+        let authData = tbTestClient!.authToken
         let newTbTestClient = try TBUserApiClient(baseUrlStr: serversettings!.baseUrl, accessToken: authData!, logger: Self.logger)
-        try await getUser(apiClient: newTbTestClient, expectedUsername: serversettings!.username)
-        try await renewLogin(apiClient: newTbTestClient, username: serversettings!.username, password: serversettings!.password)
-        compareDifferentAuthLogins(apiClientToken1: tbTestClient!.authData!, apiClientToken2: newTbTestClient.authData!)
+        try await getUser(apiClient: newTbTestClient, expectedUsername: serversettings!.username!)
+        try await renewLogin(apiClient: newTbTestClient, username: serversettings!.username!, password: serversettings!.password!)
+        compareDifferentAuthLogins(apiClientToken1: tbTestClient!.authToken!, apiClientToken2: newTbTestClient.authToken!)
     }
 
     /**
@@ -103,7 +103,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func testGetCustomerDevices() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         try await getCustomerDevices(apiClient: tbTestClient)
     }
 
@@ -113,7 +113,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func testGetCustomerDeviceInfos() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         try await getCustomerDevices(apiClient: tbTestClient)
         try await getCustomerDeviceInfos(apiClient: tbTestClient)
     }
@@ -125,7 +125,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
         var deviceOfInterest: Device? = nil
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         // 1. Get all devices for customer, select the first
         let firstDevice = try await getCustomerDevices(apiClient: tbTestClient)?.first
         XCTAssertNotNil(firstDevice)
@@ -146,7 +146,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
         var deviceOfInterest: Device? = nil
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         try await getCustomerDevices(apiClient: tbTestClient)
         // 1. Get all device infos for customer, select the first
         let firstDevice = try await getCustomerDeviceInfos(apiClient: tbTestClient)?.first
@@ -172,7 +172,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
         let newDeviceLabel = "Test Device Label"
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         try await getCustomerDevices(apiClient: tbTestClient)
         // Change label value to new label value and compare
         if let firstDevice = try await getCustomerDeviceInfos(apiClient: tbTestClient)?.first {
@@ -206,7 +206,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func testGetAttributeKeys() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         try await getCustomerDevices(apiClient: tbTestClient)
         try await getAttributeKeys(apiClient: tbTestClient)
     }
@@ -217,7 +217,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func testGetAttributeKeysByScope() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         try await getCustomerDevices(apiClient: tbTestClient)
         try await getAttributeKeysByScope(apiClient: tbTestClient)
     }
@@ -228,7 +228,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func testSaveEntityAttributesSuccess() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         try await getCustomerDevices(apiClient: tbTestClient)
         try await saveEntityAttributesSuccess(apiClient: tbTestClient)
     }
@@ -257,7 +257,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func testGetAttributesSuccess() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         try await getCustomerDevices(apiClient: tbTestClient)
         try await saveEntityAttributesSuccess(apiClient: tbTestClient)
         try await getAttributesSuccess(apiClient: tbTestClient)
@@ -269,7 +269,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func testGetAttributesByScopeSuccess() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         try await getCustomerDevices(apiClient: tbTestClient)
         try await saveEntityAttributesSuccess(apiClient: tbTestClient)
         try await getAttributesByScopeSuccess(apiClient: tbTestClient)
@@ -281,7 +281,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func testdeleteEntityAttributes() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         try await getCustomerDevices(apiClient: tbTestClient)
         try await deleteEntityAttributes(apiClient: tbTestClient)
     }
@@ -292,7 +292,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func testSaveEntityTelemetrySuccess() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         try await getCustomerDevices(apiClient: tbTestClient)
         try await saveEntityTelemetrySuccess(apiClient: tbTestClient)
     }
@@ -303,7 +303,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func testGetTimeseriesKeys() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         try await getCustomerDevices(apiClient: tbTestClient)
         try await saveEntityTelemetrySuccess(apiClient: tbTestClient)
         try await getTimeseriesKeys(apiClient: tbTestClient)
@@ -316,7 +316,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func testGetLatestTimeseriesValuesAsStrings() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         try await getCustomerDevices(apiClient: tbTestClient)
         try await saveEntityTelemetrySuccess(apiClient: tbTestClient)
         try await getLatestTimeseries(apiClient: tbTestClient, getValuesAsStrings: true)
@@ -329,7 +329,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func testGetLatestTimeseriesValuesAsNativeTypes() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         try await getCustomerDevices(apiClient: tbTestClient)
         try await saveEntityTelemetrySuccess(apiClient: tbTestClient)
         try await getLatestTimeseries(apiClient: tbTestClient, getValuesAsStrings: false)
@@ -342,7 +342,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func testGetTimeseriesValuesAsStrings() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         try await getCustomerDevices(apiClient: tbTestClient)
         try await saveEntityTelemetrySuccess(apiClient: tbTestClient)
         try await getTimeseries(apiClient: tbTestClient, getValuesAsStrings: true)
@@ -355,7 +355,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func testGetTimeseriesValuesAsNativeTypes() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         try await getCustomerDevices(apiClient: tbTestClient)
         try await saveEntityTelemetrySuccess(apiClient: tbTestClient)
         try await getTimeseries(apiClient: tbTestClient, getValuesAsStrings: false)
@@ -367,7 +367,7 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func testdeleteEntityTimeseries() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         try await getCustomerDevices(apiClient: tbTestClient)
         try await saveEntityTelemetrySuccess(apiClient: tbTestClient)
         try await deleteEntityTimeseries(apiClient: tbTestClient)
@@ -379,8 +379,46 @@ final class IntegrationTestsAsync: FunctionalTestCases {
     func testLogout() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
-        await logout(apiClient: tbTestClient)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
+        try await logout(apiClient: tbTestClient)
+    }
+
+}
+
+
+/**
+ Integration tests
+
+ Integration tests with new `apiKey` login, therefore just testing a view cases where a login needs to succeed.
+ All test cases can be run with `CUSTOMER\_USER` authority.
+ */
+final class IntegrationTestsAsyncApiKeyLogin: FunctionalTestCases {
+
+    static let logger = Logger(subsystem: "TestBundle.TBRESTClientLibTests", category: "IntegrationTestsAsync")
+
+    func prepare() -> (TBUserApiClient?, ServerSettings?) {
+        let serversettings = FileResourceLoader(searchPath: "Resources").loadServerSettingsFromFile(fileName: "ServerSettings")
+        let tbTestClient = try? TBUserApiClient(baseUrlStr: serversettings!.baseUrl,
+                                                apiKey: serversettings!.apiKey!,
+                                                logger: Self.logger)
+        return (tbTestClient, serversettings)
+    }
+
+    /**
+     Test async getUser() - expect correct response with own user info
+     */
+    func testGetUser() async throws {
+        let (tbTestClient, serversettings) = prepare()
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
+    }
+
+    /**
+     Test async getCustomerById() - expect a valid `Customer` as response
+     */
+    func testGetCustomerById() async throws {
+        let (tbTestClient, serversettings) = prepare()
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
+        try await getCustomerById(apiClient: tbTestClient, expectedCustomerName: "IoT Playground")
     }
 
 }

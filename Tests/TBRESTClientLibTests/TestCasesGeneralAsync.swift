@@ -49,7 +49,7 @@ extension FunctionalTestCases {
      Test async login() for success
      */
     @discardableResult
-    func loginSucceeds(apiClient: TBUserApiClient?) async throws -> AuthLogin {
+    func loginSucceeds(apiClient: TBUserApiClient?) async throws -> AuthToken {
         let apiClient = try XCTUnwrap(apiClient)
         let authObject = try await apiClient.login()
         XCTAssertTrue(!authObject.token.isEmpty && !authObject.refreshToken.isEmpty)
@@ -61,7 +61,7 @@ extension FunctionalTestCases {
      Test async login(withUsername:andPassword:) for success
      */
     @discardableResult
-    func renewLogin(apiClient: TBUserApiClient?, username: String, password: String) async throws -> AuthLogin {
+    func renewLogin(apiClient: TBUserApiClient?, username: String, password: String) async throws -> AuthToken {
         let apiClient = try XCTUnwrap(apiClient)
         let authObject = try await apiClient.login(withUsername: username, andPassword: password)
         XCTAssertTrue(!authObject.token.isEmpty && !authObject.refreshToken.isEmpty)
@@ -540,8 +540,8 @@ extension FunctionalTestCases {
     /**
      Test async logout
      */
-    func logout(apiClient: TBUserApiClient?) async {
-        await apiClient?.logout()
+    func logout(apiClient: TBUserApiClient?) async throws {
+        try await apiClient?.logout()
         XCTAssertNil(apiClient?.getAccessToken())
     }
 }

@@ -19,8 +19,8 @@ final class IntegrationTestsAdminAsync: FunctionalTestCases {
     func prepare() -> (TBUserApiClient?, ServerSettings?) {
         let serversettings = FileResourceLoader(searchPath: "Resources").loadServerSettingsFromFile(fileName: "ServerSettingsAdmin")
         let tbTestClient = try? TBUserApiClient(baseUrlStr: serversettings!.baseUrl,
-                                                username: serversettings!.username,
-                                                password: serversettings!.password,
+                                                username: serversettings!.username!,
+                                                password: serversettings!.password!,
                                                 logger: Self.logger)
         return (tbTestClient, serversettings)
     }
@@ -46,7 +46,7 @@ final class IntegrationTestsAdminAsync: FunctionalTestCases {
         let newDeviceLabel = "Should not be here!"
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         if let newDevice = try await createNewDeviceForCustomer(apiClient: tbTestClient, name: newDeviceName, label: newDeviceLabel) {
             XCTAssertEqual(newDeviceName, newDevice.name)
             XCTAssertEqual(newDeviceLabel, newDevice.label)
@@ -66,8 +66,34 @@ final class IntegrationTestsAdminAsync: FunctionalTestCases {
     func testGetTenantDevices() async throws {
         let (tbTestClient, serversettings) = prepare()
         try await loginSucceeds(apiClient: tbTestClient)
-        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username)
+        try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
         try await getTenantDevices(apiClient: tbTestClient)
     }
 
+}
+
+/**
+ Integration tests
+
+ Integration tests with new `apiKey` login, therefore just testing a view cases where a login needs to succeed.
+ All test cases can be run with `CUSTOMER\_USER` authority.
+ */
+final class IntegrationTestsAdminAsyncApiKeyLogin: FunctionalTestCases {
+
+    static let logger = Logger(subsystem: "TestBundle.TBRESTClientLibTests", category: "IntegrationTests")
+
+    func prepare() -> (TBUserApiClient?, ServerSettings?) {
+        let serversettings = FileResourceLoader(searchPath: "Resources").loadServerSettingsFromFile(fileName: "ServerSettingsAdmin")
+        let tbTestClient = try? TBUserApiClient(baseUrlStr: serversettings!.baseUrl,
+                                                apiKey: serversettings!.apiKey!,
+                                                logger: Self.logger)
+        return (tbTestClient, serversettings)
+    }
+
+
+    func testGetUser() async throws {
+        let (tbTestClient, serversettings) = prepare()
+        let user = try await getUser(apiClient: tbTestClient, expectedUsername: serversettings!.username!)
+        XCTAssertEqual(user?.authority, .tenantAdmin)
+    }
 }

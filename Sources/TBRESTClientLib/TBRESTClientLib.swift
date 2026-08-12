@@ -18,18 +18,11 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
     // (conformance is inherited from TBHTTPRequest). Backing storage is only touched directly
     // by the initializers (before super.init) and inside withStateLock.
     private var _serverSettings: ServerSettings
-    private var _authData: AuthLogin? = nil
-
     var serverSettings: ServerSettings {  // internal: async login(withUsername:andPassword:) mutates it
         get { withStateLock { _serverSettings } }
         set { withStateLock { _serverSettings = newValue } }
     }
-    var authData: AuthLogin? {            // internal get/set: async login() assigns it
-        get { withStateLock { _authData } }
-        set { withStateLock { _authData = newValue } }
-    }
 
-    
     // MARK: - Initializers
     /**
      Initialize TB client
@@ -39,7 +32,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
      - Parameter password: user's password as utf8 string
      - Parameter httpSessionHandler: HTTP session handler to use for http request
      - Parameter apiEndpointVersion: API version, currently only .v1 supported because no other version is currently implemented.
-     - Parameter requestTimeout: Request timeout, defaults to 10 seconds
+     - Parameter requestTimeout: Request timeout, defaults to 15 seconds
      - Parameter logger: Logger (from OSLog) instance (optional)
      - Note: Intention for httpSessionHandler: can take a mock-http session handler for unit testing the http calls.
      This initializer's intention is mainly to be used when performing unit testing. When using the library it is recommended to use the
@@ -55,45 +48,64 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
     }
     
     /**
-     Initialize TB client by providing access token
-     
+     Initialize TB client by providing access token (JWT token)
+
      - Parameter baseUrlStr: server url as utf8 string without trailing slash (no API endpoint, just base server URL)
-     - Parameter accessToken: AuthLogin object containing `token` and `refreshToken`
+     - Parameter accessToken: ``AuthToken`` object containing `token` and `refreshToken`
      - Parameter apiEndpointVersion: API version, currently only .v1 supported because no other version is currently implemented.
      - Parameter httpSessionHandler: HTTP session handler, defaults `URLSession.shared`
-     - Parameter requestTimeout: Request timeout, defaults to 10 seconds
+     - Parameter requestTimeout: Request timeout, defaults to 15 seconds
      - Parameter logger: Logger (from OSLog) instance (optional)
-     - Note: Re-use tokens from an existing/previous session instead of optaining new ones from the server.
+     - Note: Re-use tokens from an existing/previous session instead of obtaining new ones from the server. JWT token authentication is deprecated since ThingsBoard 4.3, the preferred way is to use an `apiKey`. Refer to ``init(baseUrlStr:apiKey:apiEndpointVersion:httpSessionHandler:requestTimeout:logger:)``
      */
-    public init(baseUrlStr: String, accessToken: AuthLogin, apiEndpointVersion: TbApiEndpointsVersion = .v1, httpSessionHandler: URLSessionProtocol = URLSession.shared, requestTimeout: TimeInterval = 15, logger: Logger? = nil) throws {
+    public init(baseUrlStr: String, accessToken: AuthToken, apiEndpointVersion: TbApiEndpointsVersion = .v1, httpSessionHandler: URLSessionProtocol = URLSession.shared, requestTimeout: TimeInterval = 15, logger: Logger? = nil) throws {
         _serverSettings = ServerSettings(baseUrl: baseUrlStr, username: "", password: "")
         guard accessToken.allPartsGiven() && _serverSettings.urlGiven() else {
             throw TBSystemError.emptyLogin
         }
-        _authData = accessToken
         aem = APIEndpointManager(serverSettings: _serverSettings, apiEndpoints: apiEndpointVersion.version)
-        super.init(httpSessionHandler: httpSessionHandler, requestTimeout: requestTimeout, logger: logger)
+        super.init(httpSessionHandler: httpSessionHandler, authToken: accessToken, requestTimeout: requestTimeout, logger: logger)
     }
-    
+
+    /**
+     Initialize TB client by providing an apiKey
+
+     - Parameter baseUrlStr: server url as utf8 string without trailing slash (no API endpoint, just base server URL)
+     - Parameter apiKey: API key as utf8 string (API key authentication is available since ThingsBoard 4.3)
+     - Parameter apiEndpointVersion: API version, currently only .v1 supported because no other version is currently implemented.
+     - Parameter httpSessionHandler: HTTP session handler, defaults `URLSession.shared`
+     - Parameter requestTimeout: Request timeout, defaults to 15 seconds
+     - Parameter logger: Logger (from OSLog) instance (optional)
+     - Note: JWT token authentication is deprecated since ThingsBoard 4.3, now the preferred way is to use an `apiKey`. No ``login(responseHandler:)`` call is required when initialized with an API key.
+     */
+    public init(baseUrlStr: String, apiKey: String, apiEndpointVersion: TbApiEndpointsVersion = .v1, httpSessionHandler: URLSessionProtocol = URLSession.shared, requestTimeout: TimeInterval = 15, logger: Logger? = nil) throws {
+        _serverSettings = ServerSettings(baseUrl: baseUrlStr, username: "", password: "")
+        guard !apiKey.isEmpty && _serverSettings.urlGiven() else {
+            throw TBSystemError.emptyLogin
+        }
+        aem = APIEndpointManager(serverSettings: _serverSettings, apiEndpoints: apiEndpointVersion.version)
+        super.init(httpSessionHandler: httpSessionHandler, apiKey: apiKey, requestTimeout: requestTimeout, logger: logger)
+    }
+
     // MARK: – Authentication
     /**
      Request authentication with server to optain an authentication token
      
-     - Parameter responseHandler: takes an 'AuthLogin' as parameter and is called upon successful server response
+     - Parameter responseHandler: takes an ``AuthToken`` as parameter and is called upon successful server response
      - Note: Property `authData`  contains token and refreshToken after login succeeded
      */
-    public func login(responseHandler: ((AuthLogin) -> Void)? = nil) throws -> Void {
-        guard serverSettings.allPartsGiven() else {
+    public func login(responseHandler: ((AuthToken) -> Void)? = nil) throws -> Void {
+        guard serverSettings.allPartsGiven(), let username = serverSettings.username, let password = serverSettings.password else {
             throw TBSystemError.emptyLogin
         }
-        let authDataDict: Dictionary<String, String> = ["username": serverSettings.username, "password": serverSettings.password]
+        let authDataDict: Dictionary<String, String> = ["username": username, "password": password]
         tbApiRequest(fromEndpoint: aem.getEndpointURL(\.login),
                      withPayload: authDataDict,
-                     expectedTBResponseType: AuthLogin.self) { responseObject -> Void in
-            if responseObject is AuthLogin {
-                self.authData = responseObject as? AuthLogin
-                if let authData = self.authData {
-                    responseHandler?(authData)
+                     expectedTBResponseType: AuthToken.self) { responseObject -> Void in
+            if responseObject is AuthToken {
+                if let authToken = responseObject as? AuthToken {
+                    self.authToken = authToken
+                    responseHandler?(authToken)
                 }
             }
         }
@@ -104,10 +116,10 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
      
      - Parameter username: user's username as utf8 string
      - Parameter password: user's password as utf8 string
-     - Parameter responseHandler: takes an 'AuthLogin' as parameter and is called upon successful server response
+     - Parameter responseHandler: takes an ``AuthToken`` as parameter and is called upon successful server response
      - Note: authData contains **new** tokens after login succeeded
      */
-    public func login(withUsername username: String, andPassword password: String, responseHandler: ((AuthLogin) -> Void)? = nil) throws -> Void {
+    public func login(withUsername username: String, andPassword password: String, responseHandler: ((AuthToken) -> Void)? = nil) throws -> Void {
         serverSettings.username = username
         serverSettings.password = password
         try login(responseHandler: responseHandler)
@@ -121,34 +133,34 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
      - Note: For security reasons, the password is not returned!
      */
     public func getLoginData() -> (String, String) {
-        return (serverSettings.baseUrl, serverSettings.username)
+        return (serverSettings.baseUrl, serverSettings.username ?? "")
     }
     
     /**
      Return access token
      
      Returns the access token currently in use. Useful for session recovery to continue an existing authentication context.
-     - Returns: authData (of type ``AuthLogin``)
+     - Returns: Token (of type ``AuthToken``)
      - Note: Returns `nil` if authentication has not been attempted, or if the provided credentials were invalid. Call ``login(responseHandler:)`` before accessing this value.
      */
-    public func getAccessToken() -> AuthLogin? {
-        return self.authData
+    public func getAccessToken() -> AuthToken? {
+        return self.authToken
     }
     
     /**
      Logout
      
-     Request user logout on ThingsBoard server and destroy access token locally.
-     - Note: Calling `logout()` on the server side serves the purpose of audit logging, as the logout request is written to the audit log. The main logout procedure, however, takes place on the client side by clearing the access token.
+     Request user logout on ThingsBoard server and destroy access token / API key locally.
+     - Note: Calling `logout()` on the server side serves the purpose of audit logging, as the logout request is written to the audit log. The main logout procedure, however, takes place on the client side by clearing the access token / API key.
      */
     public func logout() -> Void {
         tbApiRequest(fromEndpoint: aem.getEndpointURL(\.logout),
                      usingMethod: .post,
-                     authToken: self.authData,
                      expectedTBResponseType: TBAppError.self) { responseObject in
             self.logger?.warning("Logout failed: \(String(describing: responseObject))")
         }
-        self.authData = nil
+        self.authToken = nil
+        self.apiKey = nil
     }
 
 
@@ -162,7 +174,6 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
     public func getUser(responseHandler: ((User) -> Void)? = nil) -> Void {
         tbApiRequest(fromEndpoint: aem.getEndpointURL(\.getUser),
                      usingMethod: .get,
-                     authToken: self.authData,
                      expectedTBResponseType: User.self) { responseObject -> Void in
             responseHandler?(responseObject as! User)
         }
@@ -179,7 +190,6 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
         let endpointURL = aem.getEndpointURL(\.getCustomerById, replacePaths: [URLModifier(searchString: "{?customerId?}", replaceString: customerId.uuidString)])
         tbApiRequest(fromEndpoint: endpointURL,
                      usingMethod: .get,
-                     authToken: self.authData,
                      expectedTBResponseType: Customer.self) { responseObject -> Void in
             responseHandler?(responseObject as! Customer)
         }
@@ -216,7 +226,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
                                                                 textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: PaginationDataContainer<Device>.self) { responseObject -> Void in
+                     expectedTBResponseType: PaginationDataContainer<Device>.self) { responseObject -> Void in
             responseHandler?(responseObject as! PaginationDataContainer<Device>)
         }
     }
@@ -256,7 +266,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
                                                                 active: active, textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: PaginationDataContainer<Device>.self) { responseObject -> Void in
+                     expectedTBResponseType: PaginationDataContainer<Device>.self) { responseObject -> Void in
             responseHandler?(responseObject as! PaginationDataContainer<Device>)
         }
     }
@@ -288,7 +298,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
                                                                 textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: PaginationDataContainer<Device>.self) { responseObject -> Void in
+                     expectedTBResponseType: PaginationDataContainer<Device>.self) { responseObject -> Void in
             responseHandler?(responseObject as! PaginationDataContainer<Device>)
         }
     }
@@ -304,7 +314,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
     public func getDeviceById(deviceId: UUID, responseHandler: ((Device) -> Void)?) {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getDeviceById,
                                                                 replacePaths: [URLModifier(searchString: "{?deviceId?}", replaceString: deviceId.uuidString)])
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, authToken: self.authData, expectedTBResponseType: Device.self) { device -> Void in
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, expectedTBResponseType: Device.self) { device -> Void in
             responseHandler?(device as! Device)
         }
     }
@@ -323,7 +333,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
     public func getDeviceInfoById(deviceId: UUID, responseHandler: ((Device) -> Void)?) {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getDeviceInfoById,
                                                                 replacePaths: [URLModifier(searchString: "{?deviceId?}", replaceString: deviceId.uuidString)])
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, authToken: self.authData, expectedTBResponseType: Device.self) { device -> Void in
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, expectedTBResponseType: Device.self) { device -> Void in
             responseHandler?(device as! Device)
         }
     }
@@ -388,7 +398,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
 
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.saveDevice,
                                                                 replacePaths: [URLModifier(searchString: "{?accessToken?}", replaceString: accessToken)])
-        tbApiRequest(fromEndpoint: endpointURL, withPayload: deviceData, authToken: self.authData, expectedTBResponseType: Device.self) { device -> Void in
+        tbApiRequest(fromEndpoint: endpointURL, withPayload: deviceData, expectedTBResponseType: Device.self) { device -> Void in
             responseHandler?(device as! Device)
         }
     }
@@ -403,7 +413,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
     public func deleteDevice(deviceId: UUID, responseHandler: (() -> Void)? = nil) {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.deleteDevice,
                                                                 replacePaths: [URLModifier(searchString: "{?deviceId?}", replaceString: deviceId.uuidString)])
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete, authToken: self.authData, expectedTBResponseType: [String].self) {_ in
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete, expectedTBResponseType: [String].self) {_ in
             responseHandler?()
         }
     }
@@ -437,7 +447,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
                                                                 textSearch: textSearch, transportType: transportType,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: PaginationDataContainer<DeviceProfileInfo>.self) { responseObject -> Void in
+                    expectedTBResponseType: PaginationDataContainer<DeviceProfileInfo>.self) { responseObject -> Void in
             responseHandler?(responseObject as! PaginationDataContainer<DeviceProfileInfo>)
         }
     }
@@ -467,7 +477,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
                                                                 pageSize: pageSize, page: page, textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: PaginationDataContainer<DeviceProfile>.self) { responseObject -> Void in
+                     expectedTBResponseType: PaginationDataContainer<DeviceProfile>.self) { responseObject -> Void in
             responseHandler?(responseObject as! PaginationDataContainer<DeviceProfile>)
         }
     }
@@ -489,7 +499,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
             URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString)
         ])
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: Array<String>.self) { responseObject -> Void in
+                     expectedTBResponseType: Array<String>.self) { responseObject -> Void in
             responseHandler?(responseObject as! Array<String>)
         }
     }
@@ -513,7 +523,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ])
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: Array<String>.self) { responseObject -> Void in
+                     expectedTBResponseType: Array<String>.self) { responseObject -> Void in
             responseHandler?(responseObject as! Array<String>)
         }
     }
@@ -538,7 +548,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ])
         tbApiRequest(fromEndpoint: endpointURL, withPayload: attributesData,
-                     authToken: self.authData, expectedTBResponseType: [String].self) { _ in
+                     expectedTBResponseType: [String].self) { _ in
             responseHandler?()
         }
     }
@@ -556,7 +566,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
             URLModifier(searchString: "{?entityType?}", replaceString: entityType.rawValue),
             URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString)
         ], keys: keys)
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, authToken: self.authData, expectedTBResponseType: [AttributesResponse].self) { responseObject in
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, expectedTBResponseType: [AttributesResponse].self) { responseObject in
             responseHandler?(responseObject as! [AttributesResponse])
         }
     }
@@ -576,7 +586,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
             URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString),
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ], keys: keys)
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, authToken: self.authData, expectedTBResponseType: [AttributesResponse].self) { responseObject in
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get, expectedTBResponseType: [AttributesResponse].self) { responseObject in
             responseHandler?(responseObject as! [AttributesResponse])
         }
     }
@@ -596,7 +606,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
             URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString),
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ], keys: keys)
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete, authToken: self.authData, expectedTBResponseType: [String].self) { _ in
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete, expectedTBResponseType: [String].self) { _ in
             responseHandler?()
         }
     }
@@ -619,7 +629,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
             URLModifier(searchString: "{?scope?}", replaceString: TbQueryEntityScopes.any.rawValue)
         ])
         tbApiRequest(fromEndpoint: endpointURL, withPayload: timeseriesData,
-                     authToken: self.authData, expectedTBResponseType: [String].self) { _ in
+                     expectedTBResponseType: [String].self) { _ in
             responseHandler?()
         }
     }
@@ -638,7 +648,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
             URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString)
         ])
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: Array<String>.self) { responseObject -> Void in
+                     expectedTBResponseType: Array<String>.self) { responseObject -> Void in
             responseHandler?(responseObject as! Array<String>)
         }
     }
@@ -664,7 +674,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
             URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString)],
                                                                 keys: keys, useStrictDataTypes: !getValuesAsStrings)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: Dictionary<String, [TimeseriesResponse]>.self) { responseObject -> Void in
+                     expectedTBResponseType: Dictionary<String, [TimeseriesResponse]>.self) { responseObject -> Void in
             let responseObjectArray = responseObject as! Dictionary<String, [TimeseriesResponse]>
             let responseTimeseries: Dictionary<String, TimeseriesResponse?> = responseObjectArray.mapValues { $0.last }
             responseHandler?(responseTimeseries)
@@ -707,7 +717,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
                                                                 aggregation: aggregation, orderBy: sortOrder,
                                                                 useStrictDataTypes: !getValuesAsStrings)
         tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                     authToken: self.authData, expectedTBResponseType: Dictionary<String, [TimeseriesResponse]>.self) { responseObject -> Void in
+                     expectedTBResponseType: Dictionary<String, [TimeseriesResponse]>.self) { responseObject -> Void in
             responseHandler?(responseObject as! Dictionary<String, [TimeseriesResponse]>)
         }
     }
@@ -739,7 +749,7 @@ public class TBUserApiClient: TBHTTPRequest, @unchecked Sendable {
                                                                 ],
                                                                 keys: keys, deleteAllDataForKeys: deleteAllDataForKeys, startTs: startTs, endTs: endTs,
                                                                 deleteLatest: deleteLatest, rewriteLatestIfDeleted: rewriteLatestIfDeleted)
-        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete, authToken: self.authData, expectedTBResponseType: [String].self) { _ in
+        tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete, expectedTBResponseType: [String].self) { _ in
             responseHandler?()
         }
     }

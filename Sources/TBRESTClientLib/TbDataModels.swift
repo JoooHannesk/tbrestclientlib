@@ -97,21 +97,37 @@ fileprivate func getStringRepresentation(for dataModelObject: any TBDataModel) -
 /// hold info required to request login at server
 struct ServerSettings: TBDataModel {
     let baseUrl: String
-    var username: String
-    var password: String
-    
-    func allPartsGiven() -> Bool {
-        return !baseUrl.isEmpty && !username.isEmpty && !password.isEmpty
+    var username: String?
+    var password: String?
+    var apiKey: String?
+
+    /// `username` and `password` are both present and non-empty
+    var hasUserCredentials: Bool {
+        guard let username, let password else { return false }
+        return !username.isEmpty && !password.isEmpty
     }
-    
+
+    /// `apiKey` is present and non-empty
+    var hasApiKey: Bool {
+        guard let apiKey else { return false }
+        return !apiKey.isEmpty
+    }
+
+    /// `baseUrl` is always required, in combination with either `username`/`password` or an `apiKey`
+    func allPartsGiven() -> Bool {
+        return !baseUrl.isEmpty && (hasUserCredentials || hasApiKey)
+    }
+
     func urlGiven() -> Bool {
         return !baseUrl.isEmpty
     }
-    
+
 }
 
+/// Auth Token
+/// 
 /// hold authentication tokens received by server upon successful login
-public struct AuthLogin: TBDataModel {
+public struct AuthToken: TBDataModel {
     public let token: String
     public let refreshToken: String
     

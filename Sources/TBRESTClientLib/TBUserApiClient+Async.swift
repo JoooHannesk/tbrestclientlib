@@ -17,27 +17,24 @@ extension TBUserApiClient {
     /**
      Request authentication with server to optain an authentication token (async)
 
-     - Returns: an ``AuthLogin`` object containing token and refreshToken
-     - Throws: ``TBSystemError/emptyLogin`` when username/password are empty, otherwise ``TBHTTPClientRequestError``
-     (`.api` for server errors such as bad credentials, `.system` for transport errors)
-     - Note: Property `authData` contains token and refreshToken after login succeeded.
-     In an async context `try await client.login()` selects this overload; the callback-based
-     ``login(responseHandler:)`` remains available in synchronous contexts.
+     - Returns: an ``AuthToken`` object containing token and refreshToken
+     - Throws: ``TBSystemError/emptyLogin`` when username/password are empty, otherwise ``TBHTTPClientRequestError`` (`.api` for server errors such as bad credentials, `.system` for transport errors)
+     - Note: Property `authData` contains token and refreshToken after login succeeded. In an async context `try await client.login()` selects this overload; the callback-based ``login(responseHandler:)`` remains available in synchronous contexts.
      */
     @discardableResult
-    public func login() async throws -> AuthLogin {
-        guard serverSettings.allPartsGiven() else {
+    public func login() async throws -> AuthToken {
+        guard serverSettings.allPartsGiven(), let username = serverSettings.username, let password = serverSettings.password else {
             throw TBSystemError.emptyLogin
         }
-        let authDataDict: Dictionary<String, String> = ["username": serverSettings.username, "password": serverSettings.password]
+        let authDataDict: Dictionary<String, String> = ["username": username, "password": password]
         let responseObject = try await tbApiRequest(fromEndpoint: aem.getEndpointURL(\.login),
                                                     withPayload: authDataDict,
-                                                    expectedTBResponseType: AuthLogin.self)
-        guard let authLogin = responseObject as? AuthLogin else {
+                                                    expectedTBResponseType: AuthToken.self)
+        guard let authToken = responseObject as? AuthToken else {
             throw TBHTTPClientRequestError.system(.undecodableResponse(body: String(describing: responseObject)))
         }
-        self.authData = authLogin
-        return authLogin
+        self.authToken = authToken
+        return authToken
     }
 
     /**
@@ -45,29 +42,34 @@ extension TBUserApiClient {
 
      - Parameter username: user's username as utf8 string
      - Parameter password: user's password as utf8 string
-     - Returns: an ``AuthLogin`` object containing the **new** token and refreshToken
+     - Returns: an ``AuthToken`` object containing the **new** token and refreshToken
      - Throws: ``TBSystemError/emptyLogin`` when username/password are empty, otherwise ``TBHTTPClientRequestError``
      */
     @discardableResult
-    public func login(withUsername username: String, andPassword password: String) async throws -> AuthLogin {
+    public func login(withUsername username: String, andPassword password: String) async throws -> AuthToken {
         serverSettings.username = username
         serverSettings.password = password
         return try await login()
     }
 
+
+
     /**
      Logout (async)
 
-     Request user logout on ThingsBoard server and destroy access token locally.
-     - Note: Server-side failures are logged and ignored, matching the callback-based ``logout()``;
-     the local access token is always cleared.
+     Request user logout on ThingsBoard server and destroy access token / API key locally.
+     - Throws: ``TBHTTPClientRequestError`` when the server-side logout request fails; the local
+     credentials are only cleared after the server request succeeded. This differs from the
+     callback-based ``logout()``, which ignores server-side failures and always clears the local credentials.
+     - Note: Calling `logout()` on the server side serves the purpose of audit logging, as the logout request
+     is written to the audit log. The main logout procedure, however, takes place on the client side by clearing the access token / API key.
      */
-    public func logout() async {
-        _ = try? await tbApiRequest(fromEndpoint: aem.getEndpointURL(\.logout),
-                                    usingMethod: .post,
-                                    authToken: self.authData,
-                                    expectedTBResponseType: TBAppError.self)
-        self.authData = nil
+    public func logout() async throws {
+        _ = try await tbApiRequest(fromEndpoint: aem.getEndpointURL(\.logout),
+                                   usingMethod: .post,
+                                   expectedTBResponseType: TBAppError.self)
+        self.authToken = nil
+        self.apiKey = nil
     }
 
 
@@ -81,7 +83,6 @@ extension TBUserApiClient {
     public func getUser() async throws -> User {
         let responseObject = try await tbApiRequest(fromEndpoint: aem.getEndpointURL(\.getUser),
                                                     usingMethod: .get,
-                                                    authToken: self.authData,
                                                     expectedTBResponseType: User.self)
         return responseObject as! User
     }
@@ -98,7 +99,6 @@ extension TBUserApiClient {
         let endpointURL = aem.getEndpointURL(\.getCustomerById, replacePaths: [URLModifier(searchString: "{?customerId?}", replaceString: customerId.uuidString)])
         let responseObject = try await tbApiRequest(fromEndpoint: endpointURL,
                                                     usingMethod: .get,
-                                                    authToken: self.authData,
                                                     expectedTBResponseType: Customer.self)
         return responseObject as! Customer
     }
@@ -133,7 +133,7 @@ extension TBUserApiClient {
                                                                 textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                                                    authToken: self.authData, expectedTBResponseType: PaginationDataContainer<Device>.self)
+                                                    expectedTBResponseType: PaginationDataContainer<Device>.self)
         return responseObject as! PaginationDataContainer<Device>
     }
 
@@ -171,7 +171,7 @@ extension TBUserApiClient {
                                                                 active: active, textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                                                    authToken: self.authData, expectedTBResponseType: PaginationDataContainer<Device>.self)
+                                                    expectedTBResponseType: PaginationDataContainer<Device>.self)
         return responseObject as! PaginationDataContainer<Device>
     }
 
@@ -202,7 +202,7 @@ extension TBUserApiClient {
                                                                 textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                                                    authToken: self.authData, expectedTBResponseType: PaginationDataContainer<Device>.self)
+                                                    expectedTBResponseType: PaginationDataContainer<Device>.self)
         return responseObject as! PaginationDataContainer<Device>
     }
 
@@ -219,7 +219,7 @@ extension TBUserApiClient {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getDeviceById,
                                                                 replacePaths: [URLModifier(searchString: "{?deviceId?}", replaceString: deviceId.uuidString)])
         let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                                                    authToken: self.authData, expectedTBResponseType: Device.self)
+                                                    expectedTBResponseType: Device.self)
         return responseObject as! Device
     }
 
@@ -239,7 +239,7 @@ extension TBUserApiClient {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.getDeviceInfoById,
                                                                 replacePaths: [URLModifier(searchString: "{?deviceId?}", replaceString: deviceId.uuidString)])
         let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                                                    authToken: self.authData, expectedTBResponseType: Device.self)
+                                                    expectedTBResponseType: Device.self)
         return responseObject as! Device
     }
 
@@ -278,7 +278,7 @@ extension TBUserApiClient {
                            gateway: Bool = false,
                            overwriteActivityTime: Bool = false,
                            accessToken: String = "") async throws -> Device {
-        // payload construction mirrors saveDevice(...responseHandler:) — keep in sync
+        // payload construction mirrors saveDevice(...responseHandler:) – keep in sync
         var deviceData = Dictionary<String, Any>()
 
         deviceData["name"] = name
@@ -305,7 +305,7 @@ extension TBUserApiClient {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.saveDevice,
                                                                 replacePaths: [URLModifier(searchString: "{?accessToken?}", replaceString: accessToken)])
         let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, withPayload: deviceData,
-                                                    authToken: self.authData, expectedTBResponseType: Device.self)
+                                                    expectedTBResponseType: Device.self)
         return responseObject as! Device
     }
 
@@ -320,7 +320,7 @@ extension TBUserApiClient {
         let endpointURL = aem.getEndpointURLWithQueryParameters(apiPath: \.deleteDevice,
                                                                 replacePaths: [URLModifier(searchString: "{?deviceId?}", replaceString: deviceId.uuidString)])
         _ = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete,
-                                   authToken: self.authData, expectedTBResponseType: [String].self)
+                                   expectedTBResponseType: [String].self)
     }
 
 
@@ -352,7 +352,7 @@ extension TBUserApiClient {
                                                                 textSearch: textSearch, transportType: transportType,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                                                    authToken: self.authData, expectedTBResponseType: PaginationDataContainer<DeviceProfileInfo>.self)
+                                                    expectedTBResponseType: PaginationDataContainer<DeviceProfileInfo>.self)
         return responseObject as! PaginationDataContainer<DeviceProfileInfo>
     }
 
@@ -381,7 +381,7 @@ extension TBUserApiClient {
                                                                 pageSize: pageSize, page: page, textSearch: textSearch,
                                                                 sortProperty: sortProperty, sortOrder: sortOrder)
         let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                                                    authToken: self.authData, expectedTBResponseType: PaginationDataContainer<DeviceProfile>.self)
+                                                    expectedTBResponseType: PaginationDataContainer<DeviceProfile>.self)
         return responseObject as! PaginationDataContainer<DeviceProfile>
     }
 
@@ -402,7 +402,7 @@ extension TBUserApiClient {
             URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString)
         ])
         let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                                                    authToken: self.authData, expectedTBResponseType: Array<String>.self)
+                                                    expectedTBResponseType: Array<String>.self)
         return responseObject as! Array<String>
     }
 
@@ -424,7 +424,7 @@ extension TBUserApiClient {
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ])
         let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                                                    authToken: self.authData, expectedTBResponseType: Array<String>.self)
+                                                    expectedTBResponseType: Array<String>.self)
         return responseObject as! Array<String>
     }
 
@@ -447,7 +447,7 @@ extension TBUserApiClient {
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ])
         _ = try await tbApiRequest(fromEndpoint: endpointURL, withPayload: attributesData,
-                                   authToken: self.authData, expectedTBResponseType: [String].self)
+                                   expectedTBResponseType: [String].self)
     }
 
     /**
@@ -465,7 +465,7 @@ extension TBUserApiClient {
             URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString)
         ], keys: keys)
         let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                                                    authToken: self.authData, expectedTBResponseType: [AttributesResponse].self)
+                                                    expectedTBResponseType: [AttributesResponse].self)
         return responseObject as! [AttributesResponse]
     }
 
@@ -486,7 +486,7 @@ extension TBUserApiClient {
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ], keys: keys)
         let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                                                    authToken: self.authData, expectedTBResponseType: [AttributesResponse].self)
+                                                    expectedTBResponseType: [AttributesResponse].self)
         return responseObject as! [AttributesResponse]
     }
 
@@ -506,7 +506,7 @@ extension TBUserApiClient {
             URLModifier(searchString: "{?scope?}", replaceString: scope.rawValue)
         ], keys: keys)
         _ = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete,
-                                   authToken: self.authData, expectedTBResponseType: [String].self)
+                                   expectedTBResponseType: [String].self)
     }
 
     /**
@@ -527,7 +527,7 @@ extension TBUserApiClient {
             URLModifier(searchString: "{?scope?}", replaceString: TbQueryEntityScopes.any.rawValue)
         ])
         _ = try await tbApiRequest(fromEndpoint: endpointURL, withPayload: timeseriesData,
-                                   authToken: self.authData, expectedTBResponseType: [String].self)
+                                   expectedTBResponseType: [String].self)
     }
 
     /**
@@ -544,7 +544,7 @@ extension TBUserApiClient {
             URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString)
         ])
         let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                                                    authToken: self.authData, expectedTBResponseType: Array<String>.self)
+                                                    expectedTBResponseType: Array<String>.self)
         return responseObject as! Array<String>
     }
 
@@ -570,7 +570,7 @@ extension TBUserApiClient {
             URLModifier(searchString: "{?entityId?}", replaceString: entityId.uuidString)],
                                                                 keys: keys, useStrictDataTypes: !getValuesAsStrings)
         let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                                                    authToken: self.authData, expectedTBResponseType: Dictionary<String, [TimeseriesResponse]>.self)
+                                                    expectedTBResponseType: Dictionary<String, [TimeseriesResponse]>.self)
         let responseObjectArray = responseObject as! Dictionary<String, [TimeseriesResponse]>
         return responseObjectArray.mapValues { $0.last }
     }
@@ -612,7 +612,7 @@ extension TBUserApiClient {
                                                                 aggregation: aggregation, orderBy: sortOrder,
                                                                 useStrictDataTypes: !getValuesAsStrings)
         let responseObject = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .get,
-                                                    authToken: self.authData, expectedTBResponseType: Dictionary<String, [TimeseriesResponse]>.self)
+                                                    expectedTBResponseType: Dictionary<String, [TimeseriesResponse]>.self)
         return responseObject as! Dictionary<String, [TimeseriesResponse]>
     }
 
@@ -643,6 +643,6 @@ extension TBUserApiClient {
                                                                 keys: keys, deleteAllDataForKeys: deleteAllDataForKeys, startTs: startTs, endTs: endTs,
                                                                 deleteLatest: deleteLatest, rewriteLatestIfDeleted: rewriteLatestIfDeleted)
         _ = try await tbApiRequest(fromEndpoint: endpointURL, usingMethod: .delete,
-                                   authToken: self.authData, expectedTBResponseType: [String].self)
+                                   expectedTBResponseType: [String].self)
     }
 }

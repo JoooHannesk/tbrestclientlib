@@ -2,7 +2,7 @@
 Detailed overview of the currently supported methods and data models used to communicate with your ThingsBoard server.
 
 ## Choosing between callbacks and async/await
-Since version 0.0.26, every request method exists in two flavors: the original callback-based variant and an async/await variant. The async variant carries the same name, just without the `responseHandler` parameter — it returns the value directly and throws a ``TBHTTPClientRequestError`` on failure (``TBHTTPClientRequestError/api(_:)`` for server-provided errors, ``TBHTTPClientRequestError/system(_:)`` for local/transport errors). Error handlers registered via ``TBHTTPRequest/registerErrorHandler(apiErrorHandler:systemErrorHandler:)`` are **not** invoked for async calls; use `do/catch` instead. As a precondition check, the async ``TBUserApiClient/login()`` throws a bare ``TBSystemError/emptyLogin`` when credentials are empty, matching the callback-based ``TBUserApiClient/login(responseHandler:)``. In an async context, Swift automatically selects the async overload:
+Since version 0.0.26, every request method exists in two flavors: the original callback-based variant and an async/await variant. The async variant carries the same name, just without the `responseHandler` parameter – it returns the value directly and throws a ``TBHTTPClientRequestError`` on failure (``TBHTTPClientRequestError/api(_:)`` for server-provided errors, ``TBHTTPClientRequestError/system(_:)`` for local/transport errors). Error handlers registered via ``TBHTTPRequest/registerErrorHandler(apiErrorHandler:systemErrorHandler:)`` are **not** invoked for async calls; use `do/catch` instead. As a precondition check, the async ``TBUserApiClient/login()`` throws a bare ``TBSystemError/emptyLogin`` when credentials are empty, matching the callback-based ``TBUserApiClient/login(responseHandler:)``. In an async context, Swift automatically selects the async overload:
 
 ```swift
 let myClient = try TBUserApiClient(baseUrlStr: "https://my-thingsboard-iot-server.com",
@@ -19,11 +19,12 @@ do {
 Both APIs can be mixed freely on the same client instance – the sections below describe the callback-based flavor.
 
 ## Initialization and Login (Authentication)
-A client object can be initialized in two different ways - and requires to provide login data. Either by username/password or access tokens retrieved by a previous session. The following initializers are implemented as failable and will do so, if their parameters are provided with an empty string.
-* ``TBUserApiClient/init(baseUrlStr:username:password:apiEndpointVersion:httpSessionHandler:logger:)``: server url, authentication by username and password 
-* ``TBUserApiClient/init(baseUrlStr:accessToken:apiEndpointVersion:httpSessionHandler:logger:)``: server url, authentication by access token retrieved from a previous session
+A client object can be initialized in three different ways - and requires to provide login data. Either by username/password, by access tokens retrieved by a previous session, or (since version 0.0.29) by an API key. The following initializers are implemented as throwing and will do so, if their parameters are provided with an empty string.
+* ``TBUserApiClient/init(baseUrlStr:username:password:apiEndpointVersion:httpSessionHandler:requestTimeout:logger:)``: server url, authentication by username and password 
+* ``TBUserApiClient/init(baseUrlStr:accessToken:apiEndpointVersion:httpSessionHandler:requestTimeout:logger:)``: server url, authentication by access token (JWT token) retrieved from a previous session
+* ``TBUserApiClient/init(baseUrlStr:apiKey:apiEndpointVersion:httpSessionHandler:requestTimeout:logger:)``: server url, authentication by API key (available since ThingsBoard 4.3) – refer to <doc:Usage/Initialization-with-an-API-key>
 
-Since version 0.0.11, both initializers support an optional `logger` parameter that accepts a Logger? instance from *OSLog*. In addition, the `apiEndpointVersion` parameter was introduced in version 0.0.19 to support future API versioning. It currently defaults to `.v1` but has no practical effect yet.
+Since version 0.0.11, all initializers support an optional `logger` parameter that accepts a Logger? instance from *OSLog*. The `apiEndpointVersion` parameter was introduced in version 0.0.19 to support future API versioning. It currently defaults to `.v1` but has no practical effect yet. In addition, the optional `requestTimeout` parameter sets the timeout interval (in seconds) for HTTP requests created by this client, defaulting to 15 seconds.
 
 ```swift
 import OSLog
@@ -80,12 +81,12 @@ try? myClient?.login() { authToken in
     print("\(authToken)")
 }
 ```
-Types involved: ``AuthLogin``
+Types involved: ``AuthToken``
 
 ### Initialization with existing access token
-Initialization can also be performed by using a previosuly feteched access token (instead of username/password). The procedure mainly stays the same as described above: init client, then register error handler
+Initialization can also be performed by using a previosuly feteched access token (instead of username/password). The procedure mainly stays the same as described above: init client, then register error handler. Since version 0.0.29, the token type is named ``AuthToken`` (previously `AuthLogin`).
 ```swift
-let accessToken = AuthLogin(token: "MyAccessToken", refreshToken: "MyRefreshToken")
+let accessToken = AuthToken(token: "MyAccessToken", refreshToken: "MyRefreshToken")
 let myClient2 = try? TBUserApiClient(baseUrlStr: "https://my-thingsboard-iot-server.com", accessToken: accessToken)
 
 // version <= 0.0.9
@@ -102,7 +103,7 @@ myClient2?.registerErrorHandler(
         print("System Error: \(systemError)")
 })
 ```
-Types involved: ``AuthLogin``, ``TBAppError``
+Types involved: ``AuthToken``, ``TBAppError``
 
 ### Login when initialized with access token
 When initialized with an access token it may be the case to *renew* the login (e.g. because the server rejects an invalidated access token). In this case ``TBUserApiClient/login(withUsername:andPassword:responseHandler:)`` needs to be called to obtain a new access token.
@@ -111,7 +112,24 @@ try? myClient2?.login(withUsername: "MyUsername", andPassword: "MySuperSecretPas
     print("\(authToken)")
 }
 ```
-Types involved: ``AuthLogin``
+Types involved: ``AuthToken``
+
+### Initialization with an API key
+
+#### Applies to version >= 0.0.29
+Since ThingsBoard 4.3, the JWT token mechanism is deprecated and the preferred way to authenticate is an **API key** (created in the ThingsBoard UI or via the API). Initialize the client with the API key using ``TBUserApiClient/init(baseUrlStr:apiKey:apiEndpointVersion:httpSessionHandler:requestTimeout:logger:)`` – no ``TBUserApiClient/login(responseHandler:)`` call is required, every request is authenticated with the provided key directly. Registering an error handler works the same way as with the other initializers.
+```swift
+let myClient3 = try? TBUserApiClient(baseUrlStr: "https://my-thingsboard-iot-server.com", apiKey: "MyApiKey")
+
+myClient3?.registerErrorHandler(
+    apiErrorHandler: { apiError in
+        print("API Error: \(apiError)")
+    },
+    systemErrorHandler: { systemError in
+        print("System Error: \(systemError)")
+})
+```
+Since API keys are not obtained through a login, ``TBUserApiClient/getAccessToken()`` returns `nil` for a client initialized this way.
 
 ### Access Login Data
 Use ``TBUserApiClient/getLoginData()`` when working with multiple ``TBUserApiClient`` instances to retrieve the login data provided during initialization. The returned data includes the server URL and username. For security reasons, the password is not returned.
@@ -127,11 +145,13 @@ let accessToken = myClient?.getAccessToken()
 ```
 
 ### Logout
-Request user logout on ThingsBoard server and destroy access token locally.
+Request user logout on ThingsBoard server and destroy access token / API key locally.
 ```swift
 myClient?.logout()
 ```
-Calling ``TBUserApiClient/logout()`` on the server side serves the purpose of audit logging, as the logout request is written to the audit log. The main logout procedure, however, takes place on the client side by clearing the access token.
+Calling ``TBUserApiClient/logout()`` on the server side serves the purpose of audit logging, as the logout request is written to the audit log. The main logout procedure, however, takes place on the client side by clearing the access token / API key.
+
+Since version 0.0.29, the two flavors differ in how server-side failures are handled: the callback-based variant logs and ignores them and always clears the local credentials, while the async variant throws a ``TBHTTPClientRequestError`` and clears the local credentials only after the server request succeeded.
 
 ## User Profile
 To perform user-specific requests (e.g. user-accessible devices or profiles) it is mandatorry to include a user-id reference to these requests. Therefore it is required to obtain its own user-id first. More details about ``TBUserApiClient/getUser(responseHandler:)``

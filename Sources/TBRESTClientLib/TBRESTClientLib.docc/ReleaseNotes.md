@@ -1,19 +1,25 @@
 # Release Notes
 
+## Client – Version 0.0.29
+* Added **API key authentication** (available since ThingsBoard 4.3): the client can now be initialized with an API key via ``TBUserApiClient/init(baseUrlStr:apiKey:apiEndpointVersion:httpSessionHandler:requestTimeout:logger:)``. No ``TBUserApiClient/login()`` call is required – every request is authenticated with the provided key. Since ThingsBoard 4.3, this is the preferred authentication method over the (deprecated) JWT token mechanism. See <doc:Usage/Initialization-with-an-API-key>.
+* **Breaking change**: the type `AuthLogin` was renamed to ``AuthToken`` to clearly distinguish token-based authentication from the new API key mechanism. This affects the return type of ``TBUserApiClient/login()`` / ``TBUserApiClient/getAccessToken()`` and the `accessToken` parameter of ``TBUserApiClient/init(baseUrlStr:accessToken:apiEndpointVersion:httpSessionHandler:requestTimeout:logger:)``. The type's members (`token`, `refreshToken`) are unchanged – migrating only requires renaming the type.
+* **Breaking change** for users of the async API: the async ``TBUserApiClient/logout()`` is now marked `throws` and reports server-side logout failures as ``TBHTTPClientRequestError`` instead of silently ignoring them. The local credentials are cleared only after the server request succeeded. The callback-based ``TBUserApiClient/logout()`` is unchanged (server-side failures are logged and the local credentials are always cleared).
+* ``TBUserApiClient/logout()`` (both flavors) now also clears a locally stored API key, not just the access token.
+
 ## Client – Version 0.0.27
 * ``TBUserApiClient`` is now `Sendable`: client instances can be stored in actors and shared across concurrency domains without `nonisolated(unsafe)` workarounds. Mutable state (access token, server settings, error handlers) is internally guarded by a lock; concurrently mixing the callback-based and async API on the same instance is now safe.
 * **Breaking change** for implementors providing a custom `URLSessionProtocol` session handler: the protocol now refines `Sendable` and the `completionHandler` parameter of `dataTask(with:completionHandler:)` is `@Sendable`. Users passing `URLSession` (the default) are unaffected.
 * **Breaking change** for implementors under strict concurrency checking: the handlers passed to ``TBHTTPRequest/registerErrorHandler(apiErrorHandler:systemErrorHandler:)`` are now `@Sendable`, reflecting that they have always been invoked on a background thread. Dispatch to the main actor inside the handler when updating UI state.
 
 ## Client – Version 0.0.26
-* Added an **async/await API**: every request method now exists in an additional async variant with the same name minus the `responseHandler` parameter (e.g. ``TBUserApiClient/login()``, ``TBUserApiClient/getUser()``). The async variants return their value directly and throw a ``TBHTTPClientRequestError`` on failure instead of invoking the handlers registered via ``TBHTTPRequest/registerErrorHandler(apiErrorHandler:systemErrorHandler:)``. The callback-based API remains unchanged and is **not** deprecated — both flavors can be mixed freely on the same client instance. See <doc:Usage/Choosing-between-callbacks-and-asyncawait>.
+* Added an **async/await API**: every request method now exists in an additional async variant with the same name minus the `responseHandler` parameter (e.g. ``TBUserApiClient/login()``, ``TBUserApiClient/getUser()``). The async variants return their value directly and throw a ``TBHTTPClientRequestError`` on failure instead of invoking the handlers registered via ``TBHTTPRequest/registerErrorHandler(apiErrorHandler:systemErrorHandler:)``. The callback-based API remains unchanged and is **not** deprecated – both flavors can be mixed freely on the same client instance. See <doc:Usage/Choosing-between-callbacks-and-asyncawait>.
 * Fixed a dead path in the HTTP client where a response with neither data nor error would silently drop the request; it is now reported as ``TBSystemError/httpRequestFailure``.
 
 ## Client – Version 0.0.24
-* Reworked the error type structure — **breaking change** for implementors matching on `TBHTTPClientRequestError`:
+* Reworked the error type structure – **breaking change** for implementors matching on `TBHTTPClientRequestError`:
     * New enum ``TBSystemError`` carries all system/transport-level errors (`badURL`, `improperPayloadDataFormat`, `httpRequestFailure`, `emptyLogin`, `badLogin`, `undecodableResponse(body:)`)
     * ``TBHTTPClientRequestError`` now contains only two cases separating the error domains: ``TBHTTPClientRequestError/api(_:)`` (server-provided ``TBAppError``) and ``TBHTTPClientRequestError/system(_:)``
-    * `systemErrorHandler` registered via ``TBHTTPRequest/registerErrorHandler(apiErrorHandler:systemErrorHandler:)`` now receives a ``TBSystemError`` — it can no longer nominally receive API error cases which were never delivered to it
+    * `systemErrorHandler` registered via ``TBHTTPRequest/registerErrorHandler(apiErrorHandler:systemErrorHandler:)`` now receives a ``TBSystemError`` – it can no longer nominally receive API error cases which were never delivered to it
     * Server responses which can neither be decoded as the expected data model nor as ``TBAppError`` are now reported as ``TBSystemError/undecodableResponse(body:)`` to the `systemErrorHandler` (previously a synthetic ``TBAppError`` with status 999 was delivered to the `apiErrorHandler`)
     * Initializers and ``TBUserApiClient/login(responseHandler:)`` now throw ``TBSystemError/emptyLogin`` instead of `TBHTTPClientRequestError.emptyLogin`
 * ``TBAppError`` now conforms to `Error` and `LocalizedError` (`localizedDescription` returns the server-provided message)

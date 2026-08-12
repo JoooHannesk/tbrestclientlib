@@ -19,7 +19,6 @@ extension TBHTTPRequest {
      - Parameter fromEndpoint: Specify endpoint by giving the endpoint URL als 'TBApiEndpoints conforming protocol type'
      - Parameter usingMethod: Give the desired HTTP method, default: .post
      - Parameter withPayload: HTTP request payload given as Dictionary<String, Any>
-     - Parameter authToken: Authentication data
      - Parameter expectedTBResponseType: expected TB Data Model instance Type
      - Returns: the decoded TB data model object
      - Throws: ``TBHTTPClientRequestError``
@@ -28,11 +27,11 @@ extension TBHTTPRequest {
     internal func tbApiRequest(fromEndpoint endpointURL: String,
                                usingMethod httpMethod: SupportedHTTPMethods = .post,
                                withPayload payload: Dictionary<String, Any>? = nil,
-                               authToken authData: AuthLogin? = nil,
                                expectedTBResponseType responseType: any TBDataModel.Type)
     async throws -> any TBDataModel {
         var tbheaders = ["Content-Type": "application/json", "Accept": "application/json"]
-        if let token = authData?.token { tbheaders["x-authorization"] = "Bearer \(token)" }
+        if let token = self.authToken?.token { tbheaders["x-authorization"] = "Bearer \(token)" }
+        if let apiKey = self.apiKey { tbheaders["x-authorization"] = "ApiKey \(apiKey)" }
         return try await withCheckedThrowingContinuation { continuation in
             httpClient.doHttpRequest(from: endpointURL,
                                      usingMethod: httpMethod,

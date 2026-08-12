@@ -95,7 +95,7 @@ class FunctionalTestCases: XCTestCase {
      Compare AuthLogin tokens
      Tokens must be different to pass the test
      */
-    func compareDifferentAuthLogins(apiClientToken1: AuthLogin, apiClientToken2: AuthLogin) {
+    func compareDifferentAuthLogins(apiClientToken1: AuthToken, apiClientToken2: AuthToken) {
         if !apiClientToken1.allPartsGiven() || !apiClientToken2.allPartsGiven() {
             XCTFail("Not all parts given in AuthLogin objects")
         }

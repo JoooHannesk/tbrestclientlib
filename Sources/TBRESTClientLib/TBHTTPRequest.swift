@@ -16,6 +16,16 @@ public class TBHTTPRequest: @unchecked Sendable {
     let httpClient: SimpleHTTPClient
     let logger: Logger?
 
+    /// Auth Token
+    ///
+    /// Authentication token based on ThingsBoard JWT token mechanism
+    var authToken: AuthToken? = nil
+
+    /// apiKey
+    ///
+    /// New API key authentication method (since ThingsBoard version 4.3.)
+    var apiKey: String? = nil
+
     /// Guards all mutable state of this class and its subclasses. Accessors must not nest
     /// ``withStateLock(_:)`` calls (NSLock is not reentrant).
     private let stateLock = NSLock()
@@ -38,9 +48,13 @@ public class TBHTTPRequest: @unchecked Sendable {
     /// Initializes a new TBHTTPRequest with a custom URLSession handler, a request timeout, and an optional logger.
     /// - Parameters:
     ///   - httpSessionHandler: The session handler used to perform network requests (useful for dependency injection and testing).
+    ///   - authToken: Authentication token based on ThingsBoard JWT token mechanism
+    ///   - apiKey: New API key authentication mechanism, since ThingsBoard version 4.3.
     ///   - requestTimeout: The timeout interval, in seconds, for HTTP requests created by this client.
     ///   - logger: Optional OSLog Logger used to record diagnostic messages. If nil, logging is disabled.
-    init(httpSessionHandler: URLSessionProtocol, requestTimeout: TimeInterval, logger: Logger? = nil) {
+    init(httpSessionHandler: URLSessionProtocol, authToken: AuthToken? = nil, apiKey: String? = nil, requestTimeout: TimeInterval, logger: Logger? = nil) {
+        self.authToken = authToken
+        self.apiKey = apiKey
         httpClient = SimpleHTTPClient(sessionHandler: httpSessionHandler, requestTimeout: requestTimeout, logger: logger)
         self.logger = logger
     }
@@ -70,19 +84,19 @@ public class TBHTTPRequest: @unchecked Sendable {
      - Parameter fromEndpoint: Specify endpoint by giving the endpoint URL als 'TBApiEndpoints conforming protocol type'
      - Parameter usingMethod: Give the desired HTTP method, default: .post
      - Parameter withPayload: HTTP request payload given as Dictionary<String, Any>
-     - Parameter authData: Authentication data
      - Parameter expectedTBResponseType: expected TB Data Model instance Type
      - Parameter successHandler: function to run in case of success
      */
-    internal func tbApiRequest(fromEndpoint endpointURL: String,
-                              usingMethod httpMethod: SupportedHTTPMethods = .post,
-                              withPayload payload: Dictionary<String, Any>? = nil,
-                              authToken authData: AuthLogin? = nil,
-                               expectedTBResponseType responseType: any TBDataModel.Type,
-                               successHandler: @escaping (any TBDataModel) -> Void)
+    internal func tbApiRequest(
+        fromEndpoint endpointURL: String,
+        usingMethod httpMethod: SupportedHTTPMethods = .post,
+        withPayload payload: Dictionary<String, Any>? = nil,
+        expectedTBResponseType responseType: any TBDataModel.Type,
+        successHandler: @escaping (any TBDataModel) -> Void)
     -> Void {
         var tbheaders = ["Content-Type": "application/json", "Accept": "application/json"]
-        if let token = authData?.token { tbheaders["x-authorization"] = "Bearer \(token)" }
+        if let token = self.authToken?.token { tbheaders["x-authorization"] = "Bearer \(token)" }
+        if let apiKey = self.apiKey { tbheaders["x-authorization"] = "ApiKey \(apiKey)" }
         httpClient.doHttpRequest(from: endpointURL, usingMethod: httpMethod, withhttpHeaders: tbheaders, withPayload: payload, expectedTBResponseType: responseType) { result in
             switch result {
             case .success(let responseObject):
