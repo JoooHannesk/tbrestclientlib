@@ -24,6 +24,11 @@ extension TBDataModel {
     }
 }
 
+/// Enums backed by a raw value have no mirror children, so describe them by their raw value instead
+extension TBDataModel where Self: RawRepresentable, RawValue == String {
+    public var description: String { return rawValue }
+}
+
 extension Array: TBDataModel where Element: Codable & Hashable { }
 extension Dictionary: TBDataModel where Key: Codable, Value: Codable & Hashable { }
 
@@ -116,13 +121,19 @@ public struct AuthLogin: TBDataModel {
     
 }
 
+public enum Authority: String, RawRepresentable, TBDataModel {
+    case sysAdmin = "SYS_ADMIN"
+    case customerUser = "CUSTOMER_USER"
+    case tenantAdmin = "TENANT_ADMIN"
+}
+
 public struct User: TBDataModel {
     public let id: ID
     public let createdTime: Int
     public let tenantId: ID
     public let customerId: ID
     public let email: String
-    public let authority: String
+    public let authority: Authority
     public let firstName: String
     public let lastName: String
     public let phone: String?
@@ -130,7 +141,6 @@ public struct User: TBDataModel {
     public let additionalInfo: AdditionalInfoUser?
     /// createdTime as Date type
     public var createdTimeDt: Date { Date(timeIntervalSince1970: TimeInterval(createdTime/1000)) }
-    
 }
 
 public struct Customer: TBDataModel {
